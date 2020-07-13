@@ -6,8 +6,8 @@ class StreamlabsClient:
         
         @sio.on('event')
         def on_event(event):
-            print(event)
-            print('I received an event!')
+            if(event['type'] == 'donation'):
+                print(event['message'][0]['message'])
 
         @sio.event
         def connect():
