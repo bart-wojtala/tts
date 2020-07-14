@@ -28,6 +28,10 @@ class TextToSpeechEngine:
                                 sentence += '.'
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
+        self.messages_to_generate = messages_to_generate
+    
+    def get_messages(self):
+        return self.messages_to_generate
 
 class VoiceMessage:
     def __init__(self, voice, message):
