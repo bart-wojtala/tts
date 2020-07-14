@@ -142,3 +142,6 @@ dmypy.json
 
 # TTS models too large for repository
 tts/models/
+
+# TTS generated audio
+/generated_audio
