@@ -3,10 +3,7 @@ class TextToSpeechEngine:
 
     def __init__(self, donation_message):
         words = donation_message.split()
-        messages_to_generate = {
-            'david:': [],
-            'neil:': []
-        }
+        messages_to_generate = []
 
         for i in range(0, len(words)):
             sentence = ''
@@ -23,9 +20,16 @@ class TextToSpeechEngine:
                         else:
                             if sentence[-1] != '.':
                                 sentence += '.'
-                            messages_to_generate.setdefault(voice, []).append(sentence)
+                            voice_message = VoiceMessage(voice, sentence)
+                            messages_to_generate.append(voice_message)
                             break
                         if j == len(words) - 1:
                             if sentence[-1] != '.':
                                 sentence += '.'
-                            messages_to_generate.setdefault(voice, []).append(sentence)
+                            voice_message = VoiceMessage(voice, sentence)
+                            messages_to_generate.append(voice_message)
+
+class VoiceMessage:
+    def __init__(self, voice, message):
+        self.voice = voice
+        self.message = message
