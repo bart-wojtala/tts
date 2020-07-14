@@ -1,3 +1,5 @@
+from models import VoiceMessage
+
 class TextToSpeechEngine:
     available_voices = ['david:', 'neil:']
 
@@ -32,8 +34,3 @@ class TextToSpeechEngine:
     
     def get_messages(self):
         return self.messages_to_generate
-
-class VoiceMessage:
-    def __init__(self, voice, message):
-        self.voice = voice
-        self.message = message
