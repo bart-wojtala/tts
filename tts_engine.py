@@ -3,7 +3,8 @@ from models import VoiceMessage
 class TextToSpeechEngine:
     available_voices = ['david:', 'neil:']
 
-    def __init__(self, donation_message):
+    def __init__(self, name, donation_message):
+        self.name = name
         words = donation_message.split()
         messages_to_generate = []
 
