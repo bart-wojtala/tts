@@ -1,4 +1,5 @@
 import socketio
+from models import Donation
 
 class StreamlabsClient:
     def __init__(self, token):
@@ -7,7 +8,8 @@ class StreamlabsClient:
         @sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
-                print(event['message'][0]['message'])
+                donation = Donation(event['message'][0]['name'], event['message'][0]['message'])
+                print(donation.name, donation.message)
 
         @sio.event
         def connect():
