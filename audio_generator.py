@@ -27,7 +27,6 @@ class AudioGenerator:
     def generate(self):
         hparams = create_hparams()
         hparams.sampling_rate = 22050
-        hparams.max_decoder_steps=10000
         models_path = "tts/models/"
         generated_audio_path = "generated_audio/"
         if not os.path.exists(generated_audio_path):
@@ -43,6 +42,10 @@ class AudioGenerator:
         silence = np.zeros(11000,)
         for message in self.messages:
             print(message.voice, message.message)
+            if len(message.message) > 127:
+                hparams.max_decoder_steps=100000
+            else:
+                hparams.max_decoder_steps=10000
 
             model = load_model(hparams)
             model.load_state_dict(torch.load(models_path + self.models[message.voice])['state_dict'])
