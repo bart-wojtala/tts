@@ -7,6 +7,8 @@ from requests import Session
 from threading import Thread
 from time import sleep
 
+from tts_engine import TextToSpeechEngine
+
 class StreamlabsClient:
     def __init__(self, token):
         sio = socketio.Client()
@@ -59,9 +61,15 @@ thread = Thread(target=fetch_new_messages, daemon=True)
 thread.start()
 
 def display_new_messages():
-    while new_donations:
+    generating_audio = False
+    while new_donations and not generating_audio:
+        generating_audio = True
         donation = new_donations.pop(0)
-        text_area.appendPlainText(donation.name + ": " + donation.message)
+        text_area.appendPlainText(donation.name + "| " + donation.message)
+        tts_engine = TextToSpeechEngine(donation.name, donation.message)
+        tts_engine.generate_audio()
+        generating_audio = False
+
     while server_messages:
         text_area.appendPlainText("**** " + server_messages.pop(0) + " **")
 
