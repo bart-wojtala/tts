@@ -21,7 +21,8 @@ class AudioGenerator:
         "neil:": "neil_tyson_checkpoint_500000"
     }
 
-    def __init__(self, messages):
+    def __init__(self, name, messages):
+        self.name = name
         self.messages = messages
 
     def generate(self):
@@ -68,5 +69,5 @@ class AudioGenerator:
             torch.cuda.empty_cache()
             
         scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
-        file_name = generated_audio_path + "_audio_" + str(datetime.timestamp(datetime.now())) + ".wav"
+        file_name = generated_audio_path + "audio_" + str(datetime.timestamp(datetime.now())) + "_" + self.name + ".wav"
         write(file_name, hparams.sampling_rate, scaled_audio)
