@@ -1,4 +1,5 @@
 from models import VoiceMessage
+from audio_generator import AudioGenerator
 
 class TextToSpeechEngine:
     available_voices = ['david:', 'neil:']
@@ -32,3 +33,8 @@ class TextToSpeechEngine:
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
         self.messages_to_generate = messages_to_generate
+
+    def generate_audio(self):
+        if self.messages_to_generate:
+            audio_generator = AudioGenerator(self.name, self.messages_to_generate)
+            audio_generator.generate()
