@@ -37,4 +37,5 @@ class TextToSpeechEngine:
     def generate_audio(self):
         if self.messages_to_generate:
             audio_generator = AudioGenerator(self.name, self.messages_to_generate)
-            audio_generator.generate()
+            return audio_generator.generate()
+        return

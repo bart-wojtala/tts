@@ -15,8 +15,6 @@ from audio_processing import griffin_lim
 from train import load_model
 from text import text_to_sequence
 
-from pygame import mixer
-
 class AudioGenerator:
     models = {
         "david:": "attenborough_checkpoint_547000",
@@ -73,8 +71,4 @@ class AudioGenerator:
         scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
         file_name = generated_audio_path + "audio_" + str(datetime.timestamp(datetime.now())) + "_" + self.name + ".wav"
         write(file_name, hparams.sampling_rate, scaled_audio)
-
-        mixer.init()
-        mixer.music.load(file_name)
-        mixer.music.set_volume(0.6)
-        mixer.music.play()
+        return file_name

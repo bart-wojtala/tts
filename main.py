@@ -9,6 +9,8 @@ from time import sleep
 
 from tts_engine import TextToSpeechEngine
 
+from pygame import mixer
+
 class StreamlabsClient:
     def __init__(self, token):
         sio = socketio.Client()
@@ -67,14 +69,22 @@ def display_new_messages():
         donation = new_donations.pop(0)
         text_area.appendPlainText(donation.name + "| " + donation.message)
         tts_engine = TextToSpeechEngine(donation.name, donation.message)
-        tts_engine.generate_audio()
+        file_name = tts_engine.generate_audio()
+        mixer.init()
+        mixer.music.load(file_name)
+        mixer.music.set_volume(0.6)
+        mixer.music.play()
         generating_audio = False
 
     while server_messages:
         text_area.appendPlainText("**** " + server_messages.pop(0) + " **")
 
 def on_button_clicked():
-    text_area.appendPlainText("Skipped donation")
+    if mixer.music.get_busy():
+        text_area.appendPlainText("**** Skipped donation! **")
+        mixer.music.stop()
+    else:
+        text_area.appendPlainText("**** No donation message! **")
 
 button.clicked.connect(on_button_clicked)
 timer = QTimer()
