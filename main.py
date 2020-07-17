@@ -1,15 +1,15 @@
 import socketio
+import sys
+from PyQt5 import Qt
+from PyQt5 import QtCore,QtGui
+from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QTimer
+from PyQt5.QtWidgets import QWidget,QMainWindow,QHeaderView, QMessageBox, QFileDialog
+from ui_layout import Ui_MainWindow
+import time
+import pygame
+import traceback
 from models import Donation
-
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from requests import Session
-from threading import Thread
-from time import sleep
-
 from tts_engine import TextToSpeechEngine
-
-from pygame import mixer
 
 class StreamlabsClient:
     def __init__(self, token):
@@ -23,72 +23,180 @@ class StreamlabsClient:
 
         @sio.event
         def connect():
-            server_messages.append("I'm connected!")
+            print("I'm connected!")
 
         @sio.event
         def connect_error():
-            server_messages.append("The connection failed!")
+            print("The connection failed!")
 
         @sio.event
         def disconnect():
-            server_messages.append("I'm disconnected!")
+            print("I'm disconnected!")
 
         sio.connect('https://sockets.streamlabs.com?token=' + token)
-        sio.wait()
 
 token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IjE5NTgyN0IxRDJBRDMxREUzQjJBIiwicmVhZF9vbmx5Ijp0cnVlLCJwcmV2ZW50X21hc3RlciI6dHJ1ZSwidHdpdGNoX2lkIjoiMzk2NTk5NTkifQ.jG1vs8NfnS2T5HTcJ_on9-_HokkiO0ACLYevhgUqnfo"
-
-
-server = Session()
-
-# GUI:
-app = QApplication([])
-text_area = QPlainTextEdit()
-text_area.setFocusPolicy(Qt.NoFocus)
-button = QPushButton("Skip donation")
-layout = QVBoxLayout()
-layout.addWidget(text_area)
-layout.addWidget(button)
-window = QWidget()
-window.setLayout(layout)
-window.show()
-
-# Event handlers:
+_mutex1 = QMutex()
+_running = False
 new_donations = []
-server_messages = []
-def fetch_new_messages():
-    StreamlabsClient(token)
 
-thread = Thread(target=fetch_new_messages, daemon=True)
-thread.start()
+class WorkerSignals(QObject):
+    textready = pyqtSignal(str) 
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
+    elapsed = pyqtSignal(int)
 
-def display_new_messages():
-    generating_audio = False
-    while new_donations and not generating_audio:
-        generating_audio = True
-        donation = new_donations.pop(0)
-        text_area.appendPlainText(donation.name + "| " + donation.message)
-        tts_engine = TextToSpeechEngine(donation.name, donation.message)
-        file_name = tts_engine.generate_audio()
-        mixer.init()
-        mixer.music.load(file_name)
-        mixer.music.set_volume(0.6)
-        mixer.music.play()
-        generating_audio = False
+class Worker(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
 
-    while server_messages:
-        text_area.appendPlainText("**** " + server_messages.pop(0) + " **")
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()    
 
-def on_button_clicked():
-    if mixer.music.get_busy():
-        text_area.appendPlainText("**** Skipped donation! **")
-        mixer.music.stop()
-    else:
-        text_area.appendPlainText("**** No donation message! **")
+        self.kwargs['progress_callback'] = self.signals.progress        
+        self.kwargs['elapsed_callback'] = self.signals.elapsed
+        self.kwargs['text_ready'] = self.signals.textready
 
-button.clicked.connect(on_button_clicked)
-timer = QTimer()
-timer.timeout.connect(display_new_messages)
-timer.start(1000)
+    @pyqtSlot()
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
 
-app.exec_()
+class GUISignals(QObject):
+    progress = pyqtSignal(int)   
+    elapsed = pyqtSignal(int)
+
+class GUI(QMainWindow, Ui_MainWindow):
+    def __init__(self,app):
+        super(GUI, self).__init__()
+        StreamlabsClient(token)
+        self.app = app
+        self.setupUi(self)
+        self.setWindowTitle("bart3s tts")
+
+        self.logs = []
+        self.logs2 = []
+        self.max_log_lines = 100
+        self.max_log2_lines = 100
+        
+        self.ClientSkipBtn.clicked.connect(self.skip_wav)
+        self.ClientStopBtn.setDisabled(True)
+        self.ClientSkipBtn.setDisabled(True)
+        self.log_window.ensureCursorVisible()
+
+        pygame.mixer.quit()
+        pygame.mixer.init(frequency=22050,size=-16, channels=1)
+        self.channel = pygame.mixer.Channel(0)
+
+        self.ClientStartBtn.clicked.connect(self.start)
+        self.ClientStopBtn.clicked.connect(self.stop)
+        self.threadpool = QThreadPool()
+        self.threadpool.setMaxThreadCount(2)
+        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        self.signals = GUISignals()  
+    
+    @pyqtSlot(str)
+    def draw_text(self,text):
+        obj = text[0:4]
+        msg = text[5:]
+        if obj=='Log1':
+            if len(self.logs2) > self.max_log2_lines:
+                self.logs2.pop(0)
+            self.logs2.append(msg)
+            log_text = '\n'.join(self.logs2)
+            self.log_window.setPlainText(log_text)
+            self.log_window.verticalScrollBar().setValue(
+                self.log_window.verticalScrollBar().maximum())
+        if obj=='Sta1':
+            self.statusbar.setText(msg)
+
+    @pyqtSlot(int)
+    def print_elapsed(self,val):
+        pass
+
+    def thread_complete(self):
+        pass
+
+    def print_output(self, s):
+        pass
+
+    def start(self):
+        global _running
+        _mutex1.lock()
+        _running = True
+        _mutex1.unlock()
+        worker = Worker(self.execute_this_fn, self.channel)
+        worker.signals.result.connect(self.print_output)
+        worker.signals.finished.connect(self.thread_complete)
+        worker.signals.textready.connect(self.draw_text)
+
+        self.threadpool.start(worker) 
+        
+    def stop(self):
+        global _running
+        _mutex1.lock()
+        _running = False
+        _mutex1.unlock()
+        self.skip_wav()
+
+    def execute_this_fn(self, channel, progress_callback, elapsed_callback, text_ready):
+        self.ClientStartBtn.setDisabled(True)
+        self.ClientStopBtn.setEnabled(True)
+        self.ClientSkipBtn.setEnabled(True)
+        text_ready.emit('Log1:Initializing')
+        while True:
+            _mutex1.lock()
+            if _running == False:
+                _mutex1.unlock()
+                break
+            else:
+                _mutex1.unlock()
+            if not channel.get_busy():
+                text_ready.emit("Sta1:Waiting for incoming donations...")
+                while new_donations:
+                    donation = new_donations.pop(0)
+                    name = donation.name
+                    msg = donation.message
+                    text_ready.emit("Log1:\n###########################")
+                    text_ready.emit("Log1:" + name + ' donated message:')
+                    text_ready.emit("Log1:" + msg)
+                    tts_engine = TextToSpeechEngine(donation.name, donation.message)
+                    file_name = tts_engine.generate_audio()
+                    self.playback_wav(file_name)
+                while not new_donations:
+                    text_ready.emit("Sta1:Waiting for incoming donations...")
+            time.sleep(0.5)
+        self.ClientStartBtn.setEnabled(True)
+        self.ClientStopBtn.setDisabled(True)
+        self.ClientSkipBtn.setDisabled(True)
+        text_ready.emit('Log1:\nDisconnected')
+        text_ready.emit('Sta1:Ready')
+        return 'Return value of execute_this_fn'
+
+    def playback_wav(self,wav):
+        sound = pygame.mixer.Sound(wav)
+        self.channel.queue(sound)
+        self.ClientSkipBtn.setEnabled(True)
+
+    def skip_wav(self):
+        if self.channel.get_busy():
+            self.channel.stop()
+        
+
+if __name__ == '__main__':
+    app = Qt.QApplication(sys.argv)
+    window = GUI(app)
+    window.show()
+    sys.exit(app.exec_())
