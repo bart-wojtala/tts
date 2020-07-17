@@ -11,6 +11,29 @@ import traceback
 from models import Donation
 from tts_engine import TextToSpeechEngine
 
+class LocalClient:
+    def __init__(self):
+        sio = socketio.Client()
+        
+        @sio.on('event')
+        def on_event(event):
+            donation = Donation(event['username'], event['message'])
+            new_donations.append(donation)
+
+        @sio.event
+        def connect():
+            print("I'm connected!")
+
+        @sio.event
+        def connect_error():
+            print("The connection failed!")
+
+        @sio.event
+        def disconnect():
+            print("I'm disconnected!")
+
+        sio.connect('http://localhost:3000')
+
 class StreamlabsClient:
     def __init__(self, token):
         sio = socketio.Client()
@@ -81,7 +104,8 @@ class GUISignals(QObject):
 class GUI(QMainWindow, Ui_MainWindow):
     def __init__(self,app):
         super(GUI, self).__init__()
-        StreamlabsClient(token)
+        # StreamlabsClient(token)
+        LocalClient()
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
