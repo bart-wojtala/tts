@@ -199,8 +199,6 @@ class GUI(QMainWindow, Ui_MainWindow):
                     tts_engine = TextToSpeechEngine(donation.name, donation.message)
                     file_name = tts_engine.generate_audio()
                     self.playback_wav(file_name)
-                while not new_donations:
-                    text_ready.emit("Sta1:Waiting for incoming donations...")
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
