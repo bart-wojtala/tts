@@ -62,7 +62,7 @@ class AudioGenerator:
             mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
 
             with torch.no_grad():
-                audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
+                audio = waveglow.infer(mel_outputs_postnet, sigma=1)
             # audio_data = audio[0].data.cpu().numpy()
             audio_denoised = denoiser(audio, strength=0.001)[:, 0]
             audio_data = audio_denoised.cpu().numpy()[0]
