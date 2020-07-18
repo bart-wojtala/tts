@@ -17,6 +17,7 @@ from text import text_to_sequence
 
 class AudioGenerator:
     models = {
+        "woman:": "tacotron2_statedict.pt",
         "david:": "attenborough_checkpoint_547000",
         "neil:": "neil_tyson_checkpoint_500000"
     }

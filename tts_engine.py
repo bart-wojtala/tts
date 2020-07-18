@@ -2,7 +2,8 @@ from models import VoiceMessage
 from audio_generator import AudioGenerator
 
 class TextToSpeechEngine:
-    available_voices = ['david:', 'neil:']
+    available_voices = ['woman:', 'david:', 'neil:']
+    default_voice = 'woman:'
 
     def __init__(self, name, donation_message):
         self.name = name
@@ -12,6 +13,26 @@ class TextToSpeechEngine:
         for i in range(0, len(words)):
             sentence = ''
             voice = ''
+            if i == 0 and not words[0].endswith(':'):
+                if i < len(words):
+                    voice = self.default_voice
+                    for j in range(i, len(words)):
+                        if not words[j] in self.available_voices:
+                            if len(sentence) == 0:
+                                sentence += words[j]
+                            else:
+                                sentence += ' ' + words[j]
+                        else:
+                            if sentence[-1] != '.':
+                                sentence += '.'
+                            voice_message = VoiceMessage(voice, sentence)
+                            messages_to_generate.append(voice_message)
+                            break
+                        if j == len(words) - 1:
+                            if sentence[-1] != '.':
+                                sentence += '.'
+                            voice_message = VoiceMessage(voice, sentence)
+                            messages_to_generate.append(voice_message)
             if words[i].endswith(':'):
                 if words[i] in self.available_voices and i < len(words):
                     voice = words[i]
