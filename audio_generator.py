@@ -14,6 +14,7 @@ from layers import TacotronSTFT, STFT
 from audio_processing import griffin_lim
 from train import load_model
 from text import text_to_sequence
+from denoiser import Denoiser
 
 class AudioGenerator:
     models = {
@@ -39,6 +40,7 @@ class AudioGenerator:
         waveglow.cuda().eval().half()
         for k in waveglow.convinv:
             k.float()
+        denoiser = Denoiser(waveglow)
 
         joined_audio = np.empty(1,)
         silence = np.zeros(11000,)
@@ -61,7 +63,9 @@ class AudioGenerator:
 
             with torch.no_grad():
                 audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
-            audio_data = audio[0].data.cpu().numpy()
+            # audio_data = audio[0].data.cpu().numpy()
+            audio_denoised = denoiser(audio, strength=0.001)[:, 0]
+            audio_data = audio_denoised.cpu().numpy()[0]
             
             audio_data = np.concatenate((audio_data, silence))
             scaled_audio = np.int16(audio_data/np.max(np.abs(audio_data)) * 32767)
