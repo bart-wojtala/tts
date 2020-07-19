@@ -18,11 +18,12 @@ class TextToSpeechEngine:
                 if i < len(words):
                     voice = self.default_voice
                     for j in range(i, len(words)):
-                        if not words[j] in self.available_voices:
+                        word = words[j]
+                        if not word in self.available_voices:
                             if len(sentence) == 0:
-                                sentence += words[j]
+                                sentence += word
                             else:
-                                sentence += ' ' + words[j]
+                                sentence += ' ' + word
                         else:
                             if sentence[-1] not in sentence_separators:
                                 sentence += '.'
@@ -38,11 +39,12 @@ class TextToSpeechEngine:
                 if words[i] in self.available_voices and i < len(words):
                     voice = words[i]
                     for j in range(i + 1, len(words)):
-                        if not words[j] in self.available_voices:
+                        word = words[j]
+                        if not word in self.available_voices:
                             if len(sentence) == 0:
-                                sentence += words[j]
+                                sentence += word
                             else:
-                                sentence += ' ' + words[j]
+                                sentence += ' ' + word
                         else:
                             if sentence[-1] not in sentence_separators:
                                 sentence += '.'
