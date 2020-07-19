@@ -50,6 +50,11 @@ class AudioGenerator:
                 hparams.max_decoder_steps=100000
             else:
                 hparams.max_decoder_steps=10000
+            
+            message_extended = False
+            if len(message.message) < 11:
+                message.message = message.message + " ----------------."
+                message_extended = True
 
             model = load_model(hparams)
             model.load_state_dict(torch.load(models_path + self.models[message.voice])['state_dict'])
@@ -66,9 +71,21 @@ class AudioGenerator:
             # audio_data = audio[0].data.cpu().numpy()
             audio_denoised = denoiser(audio, strength=0.001)[:, 0]
             audio_data = audio_denoised.cpu().numpy()[0]
-            
-            audio_data = np.concatenate((audio_data, silence))
+
+            # audio_data = np.concatenate((audio_data, silence))
             scaled_audio = np.int16(audio_data/np.max(np.abs(audio_data)) * 32767)
+            if message_extended:
+                cut_idx = 0
+                silence_length = 0
+                for idx, val in enumerate(scaled_audio):
+                    if val == 0:
+                        silence_length += 1
+                    if silence_length > 500:
+                        cut_idx = idx
+                        break
+                scaled_audio = scaled_audio[:cut_idx]
+
+            scaled_audio = np.concatenate((scaled_audio, silence))
             joined_audio = np.concatenate((joined_audio, scaled_audio))
 
             torch.cuda.empty_cache()
