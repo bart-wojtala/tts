@@ -9,6 +9,7 @@ class TextToSpeechEngine:
         self.name = name
         words = donation_message.split()
         messages_to_generate = []
+        sentence_separators = ['.', '?', '!']
 
         for i in range(0, len(words)):
             sentence = ''
@@ -23,13 +24,13 @@ class TextToSpeechEngine:
                             else:
                                 sentence += ' ' + words[j]
                         else:
-                            if sentence[-1] != '.':
+                            if sentence[-1] not in sentence_separators:
                                 sentence += '.'
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
                             break
                         if j == len(words) - 1:
-                            if sentence[-1] != '.':
+                            if sentence[-1] not in sentence_separators:
                                 sentence += '.'
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
@@ -43,13 +44,13 @@ class TextToSpeechEngine:
                             else:
                                 sentence += ' ' + words[j]
                         else:
-                            if sentence[-1] != '.':
+                            if sentence[-1] not in sentence_separators:
                                 sentence += '.'
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
                             break
                         if j == len(words) - 1:
-                            if sentence[-1] != '.':
+                            if sentence[-1] not in sentence_separators:
                                 sentence += '.'
                             voice_message = VoiceMessage(voice, sentence)
                             messages_to_generate.append(voice_message)
