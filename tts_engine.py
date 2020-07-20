@@ -5,8 +5,7 @@ class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:']
     default_voice = 'woman:'
 
-    def __init__(self, name, donation_message):
-        self.name = name
+    def __init__(self, donation_message):
         words = donation_message.split()
         messages_to_generate = []
         sentence_separators = ['.', '?', '!']
@@ -64,6 +63,6 @@ class TextToSpeechEngine:
 
     def generate_audio(self):
         if self.messages_to_generate:
-            audio_generator = AudioGenerator(self.name, self.messages_to_generate)
+            audio_generator = AudioGenerator(self.messages_to_generate)
             return audio_generator.generate()
         return

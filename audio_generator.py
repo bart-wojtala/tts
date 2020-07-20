@@ -1,10 +1,6 @@
-from datetime import datetime
-from scipy.io.wavfile import write
-
 import numpy as np
 import torch
 
-import os
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
@@ -23,17 +19,13 @@ class AudioGenerator:
         "neil:": "neil_tyson_checkpoint_500000"
     }
 
-    def __init__(self, name, messages):
-        self.name = name
+    def __init__(self, messages):
         self.messages = messages
 
     def generate(self):
         hparams = create_hparams()
         hparams.sampling_rate = 22050
         models_path = "tts/models/"
-        generated_audio_path = "generated_audio/"
-        if not os.path.exists(generated_audio_path):
-            os.makedirs(generated_audio_path)
 
         waveglow_path = models_path + 'waveglow_256channels.pt'
         waveglow = torch.load(waveglow_path)['model']
@@ -91,6 +83,4 @@ class AudioGenerator:
             torch.cuda.empty_cache()
             
         scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
-        file_name = generated_audio_path + "audio_" + str(datetime.timestamp(datetime.now())) + "_" + self.name + ".wav"
-        write(file_name, hparams.sampling_rate, scaled_audio)
-        return file_name
+        return scaled_audio, hparams.sampling_rate

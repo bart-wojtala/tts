@@ -1,4 +1,6 @@
+from datetime import datetime
 import socketio
+import os
 import sys
 from PyQt5 import Qt
 from PyQt5 import QtCore,QtGui
@@ -8,6 +10,7 @@ from ui_layout import Ui_MainWindow
 import time
 import pygame
 import traceback
+from scipy.io.wavfile import write
 from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
 
@@ -125,6 +128,10 @@ class GUI(QMainWindow, Ui_MainWindow):
         pygame.mixer.init(frequency=22050,size=-16, channels=1)
         self.channel = pygame.mixer.Channel(0)
 
+        self.generated_audio_path = "generated_audio/"
+        if not os.path.exists(self.generated_audio_path):
+            os.makedirs(self.generated_audio_path)
+
         self.ClientStartBtn.clicked.connect(self.start)
         self.ClientStopBtn.clicked.connect(self.stop)
         self.threadpool = QThreadPool()
@@ -198,8 +205,10 @@ class GUI(QMainWindow, Ui_MainWindow):
             text_ready.emit("Sta1:Waiting for incoming donations...")
             while new_donations:
                 donation = new_donations.pop(0)
-                tts_engine = TextToSpeechEngine(donation.name, donation.message)
-                file_name = tts_engine.generate_audio()
+                tts_engine = TextToSpeechEngine(donation.message)
+                audio, sampling_rate = tts_engine.generate_audio()
+                file_name = self.generated_audio_path + "audio_" + str(datetime.timestamp(datetime.now())) + "_" + donation.name + ".wav"
+                write(file_name, sampling_rate, audio)
                 donations_to_play.append(DonationAudio(donation, file_name))
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
