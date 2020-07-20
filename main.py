@@ -213,7 +213,6 @@ class GUI(QMainWindow, Ui_MainWindow):
                 res_json = response.json()
                 audio = np.array(res_json["audio"], dtype=np.int16)
                 sampling_rate = res_json["rate"]
-                print(audio.dtype)
 
                 file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
                 write(file_name, sampling_rate, audio)

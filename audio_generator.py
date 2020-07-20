@@ -37,7 +37,6 @@ class AudioGenerator:
         joined_audio = np.empty(1,)
         silence = np.zeros(11000,)
         for message in self.messages:
-            print(message.voice, message.message)
             if len(message.message) > 127:
                 hparams.max_decoder_steps=100000
             else:
