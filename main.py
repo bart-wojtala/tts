@@ -1,4 +1,3 @@
-from datetime import datetime
 import socketio
 import os
 import sys
@@ -207,7 +206,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                 donation = new_donations.pop(0)
                 tts_engine = TextToSpeechEngine(donation.message)
                 audio, sampling_rate = tts_engine.generate_audio()
-                file_name = self.generated_audio_path + "audio_" + str(datetime.timestamp(datetime.now())) + "_" + donation.name + ".wav"
+                file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
                 write(file_name, sampling_rate, audio)
                 donations_to_play.append(DonationAudio(donation, file_name))
             time.sleep(0.5)
