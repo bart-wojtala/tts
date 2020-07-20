@@ -20,6 +20,8 @@ class TextToSpeechEngine:
                     for j in range(i, len(words)):
                         word = words[j]
                         if not word in self.available_voices:
+                            if word.isdigit() and len(word) > 36:
+                                word = word[0:36]
                             if len(sentence) == 0:
                                 sentence += word
                             else:
@@ -41,6 +43,8 @@ class TextToSpeechEngine:
                     for j in range(i + 1, len(words)):
                         word = words[j]
                         if not word in self.available_voices:
+                            if word.isdigit() and len(word) > 36:
+                                word = word[0:36]
                             if len(sentence) == 0:
                                 sentence += word
                             else:
