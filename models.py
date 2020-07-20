@@ -8,3 +8,7 @@ class Donation:
         self.name = name
         self.message = message
         
+class DonationAudio:
+    def __init__(self, donation, file):
+        self.donation = donation
+        self.file = file

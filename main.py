@@ -8,7 +8,7 @@ from ui_layout import Ui_MainWindow
 import time
 import pygame
 import traceback
-from models import Donation
+from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
 
 class LocalClient:
@@ -62,6 +62,7 @@ token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IjE5NTgyN0IxRDJBRDMxRE
 _mutex1 = QMutex()
 _running = False
 new_donations = []
+donations_to_play = []
 
 class WorkerSignals(QObject):
     textready = pyqtSignal(str) 
@@ -127,7 +128,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStartBtn.clicked.connect(self.start)
         self.ClientStopBtn.clicked.connect(self.stop)
         self.threadpool = QThreadPool()
-        self.threadpool.setMaxThreadCount(2)
+        self.threadpool.setMaxThreadCount(3)
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
         self.signals = GUISignals()  
     
@@ -166,7 +167,14 @@ class GUI(QMainWindow, Ui_MainWindow):
         worker.signals.finished.connect(self.thread_complete)
         worker.signals.textready.connect(self.draw_text)
 
-        self.threadpool.start(worker) 
+        self.threadpool.start(worker)
+
+        worker2 = Worker(self.play_audio_fn, self.channel)
+        worker2.signals.result.connect(self.print_output)
+        worker2.signals.finished.connect(self.thread_complete)
+        worker2.signals.textready.connect(self.draw_text)
+
+        self.threadpool.start(worker2) 
         
     def stop(self):
         global _running
@@ -187,18 +195,12 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            if not channel.get_busy():
-                text_ready.emit("Sta1:Waiting for incoming donations...")
-                while new_donations:
-                    donation = new_donations.pop(0)
-                    name = donation.name
-                    msg = donation.message
-                    text_ready.emit("Log1:\n###########################")
-                    text_ready.emit("Log1:" + name + ' donated message:')
-                    text_ready.emit("Log1:" + msg)
-                    tts_engine = TextToSpeechEngine(donation.name, donation.message)
-                    file_name = tts_engine.generate_audio()
-                    self.playback_wav(file_name)
+            text_ready.emit("Sta1:Waiting for incoming donations...")
+            while new_donations:
+                donation = new_donations.pop(0)
+                tts_engine = TextToSpeechEngine(donation.name, donation.message)
+                file_name = tts_engine.generate_audio()
+                donations_to_play.append(DonationAudio(donation, file_name))
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
@@ -206,6 +208,28 @@ class GUI(QMainWindow, Ui_MainWindow):
         text_ready.emit('Log1:\nDisconnected')
         text_ready.emit('Sta1:Ready')
         return 'Return value of execute_this_fn'
+
+    def play_audio_fn(self, channel, progress_callback, elapsed_callback, text_ready):
+        while True:
+            _mutex1.lock()
+            if _running == False:
+                _mutex1.unlock()
+                break
+            else:
+                _mutex1.unlock()
+            if not channel.get_busy():
+                while donations_to_play:
+                    time.sleep(2)
+                    donation_audio = donations_to_play.pop(0)
+                    name = donation_audio.donation.name
+                    msg = donation_audio.donation.message
+                    file = donation_audio.file
+                    text_ready.emit("Log1:\n###########################")
+                    text_ready.emit("Log1:" + name + ' donated message:')
+                    text_ready.emit("Log1:" + msg)
+                    self.playback_wav(file)
+            time.sleep(0.5)
+        return 'Return value of play_audio_fn'
 
     def playback_wav(self,wav):
         sound = pygame.mixer.Sound(wav)
@@ -215,6 +239,7 @@ class GUI(QMainWindow, Ui_MainWindow):
     def skip_wav(self):
         if self.channel.get_busy():
             self.channel.stop()
+            self.channel = pygame.mixer.Channel(0)
         
 
 if __name__ == '__main__':
