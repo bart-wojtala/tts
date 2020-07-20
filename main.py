@@ -12,6 +12,8 @@ import traceback
 from scipy.io.wavfile import write
 from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
+import requests
+import numpy as np
 
 class LocalClient:
     def __init__(self):
@@ -109,6 +111,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         super(GUI, self).__init__()
         # StreamlabsClient(token)
         LocalClient()
+        self.url = "http://localhost:5000/"
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -204,8 +207,14 @@ class GUI(QMainWindow, Ui_MainWindow):
             text_ready.emit("Sta1:Waiting for incoming donations...")
             while new_donations:
                 donation = new_donations.pop(0)
-                tts_engine = TextToSpeechEngine(donation.message)
-                audio, sampling_rate = tts_engine.generate_audio()
+                # tts_engine = TextToSpeechEngine(donation.message)
+                # audio, sampling_rate = tts_engine.generate_audio()
+                response = requests.get(self.url + donation.message)
+                res_json = response.json()
+                audio = np.array(res_json["audio"], dtype=np.int16)
+                sampling_rate = res_json["rate"]
+                print(audio.dtype)
+
                 file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
                 write(file_name, sampling_rate, audio)
                 donations_to_play.append(DonationAudio(donation, file_name))
