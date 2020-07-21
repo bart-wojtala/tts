@@ -120,6 +120,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.logs2 = []
         self.max_log_lines = 100
         self.max_log2_lines = 100
+        self.connected = False
         
         self.ClientSkipBtn.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
@@ -171,6 +172,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         _mutex1.lock()
         _running = True
         _mutex1.unlock()
+        self.connected = True
         worker = Worker(self.execute_this_fn, self.channel)
         worker.signals.result.connect(self.print_output)
         worker.signals.finished.connect(self.thread_complete)
@@ -205,18 +207,24 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             text_ready.emit("Sta1:Waiting for incoming donations...")
-            while new_donations:
+            while new_donations and self.connected:
                 donation = new_donations.pop(0)
                 # tts_engine = TextToSpeechEngine(donation.message)
                 # audio, sampling_rate = tts_engine.generate_audio()
-                response = requests.get(self.url + donation.message)
-                res_json = response.json()
-                audio = np.array(res_json["audio"], dtype=np.int16)
-                sampling_rate = res_json["rate"]
+                try:
+                    response = requests.get(self.url + donation.message)
+                    res_json = response.json()
+                    audio = np.array(res_json["audio"], dtype=np.int16)
+                    sampling_rate = res_json["rate"]
 
-                file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
-                write(file_name, sampling_rate, audio)
-                donations_to_play.append(DonationAudio(donation, file_name))
+                    file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
+                    write(file_name, sampling_rate, audio)
+                    donations_to_play.append(DonationAudio(donation, file_name))
+                except:
+                    self.connected = False
+                    text_ready.emit("Log1:\n## Can't connect to TTS server! ##")
+                    self.stop()
+                    new_donations.insert(0, donation)
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
