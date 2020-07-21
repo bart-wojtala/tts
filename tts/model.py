@@ -444,7 +444,9 @@ class Decoder(nn.Module):
                 break
             elif len(mel_outputs) == self.max_decoder_steps:
                 print("Warning! Reached max decoder steps")
-                break
+                # TTS
+                # Return function output after reaching max decoder steps to avoid generating long audio sequences
+                return mel_outputs, gate_outputs, alignments
 
             decoder_input = mel_output
 
