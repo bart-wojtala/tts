@@ -222,7 +222,6 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipBtn.setDisabled(True)
         text_ready.emit('Log1:\nDisconnected')
-        text_ready.emit('Sta1:Ready')
         return 'Return value of execute_this_fn'
 
     def play_audio_fn(self, channel, progress_callback, elapsed_callback, text_ready):
@@ -243,6 +242,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit("Log1:\n###########################")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
+                    text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.playback_wav(file)
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
