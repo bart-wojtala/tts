@@ -25,6 +25,8 @@ class AudioGenerator:
     def generate(self):
         hparams = create_hparams()
         hparams.sampling_rate = 22050
+        hparams.p_attention_dropout=0,
+        hparams.p_decoder_dropout=0,
         models_path = "tts/models/"
 
         waveglow_path = models_path + 'waveglow_256channels.pt'
