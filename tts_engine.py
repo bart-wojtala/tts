@@ -21,6 +21,7 @@ class TextToSpeechEngine:
                         if not word in self.available_voices:
                             if word.isdigit() and len(word) > 36:
                                 word = word[0:36]
+                            word = word.replace(',', ', ')
                             if len(sentence) == 0:
                                 sentence += word
                             else:
@@ -44,6 +45,7 @@ class TextToSpeechEngine:
                         if not word in self.available_voices:
                             if word.isdigit() and len(word) > 36:
                                 word = word[0:36]
+                            word = word.replace(',', ', ')
                             if len(sentence) == 0:
                                 sentence += word
                             else:
