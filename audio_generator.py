@@ -23,7 +23,7 @@ class AudioGenerator:
     }
 
     synth_voices = {
-        "stephen:": "english-us"
+        "steven:": "english-us"
     }
 
     def __init__(self, messages):
