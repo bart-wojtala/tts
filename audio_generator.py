@@ -2,6 +2,7 @@ import numpy as np
 import torch
 
 import sys
+import os
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
 from hparams import create_hparams
@@ -109,7 +110,8 @@ class AudioGenerator:
                 engine.setProperty('voice', self.synth_voices[message.voice])
                 engine.save_to_file(message.message, 'temp.wav')
                 engine.runAndWait()
-                file = read('temp.wav')
+                cwd = os.getcwd()
+                file = read(cwd + 'temp.wav')
                 audio = np.array(file[1], dtype=np.int16)
                 audio = np.concatenate((audio, silence))
                 joined_audio = np.concatenate((joined_audio, audio))
