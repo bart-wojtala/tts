@@ -8,7 +8,7 @@ from hparams import create_hparams
 from model import Tacotron2
 from layers import TacotronSTFT, STFT
 from audio_processing import griffin_lim
-from train import load_model
+# from train import load_model
 from text import text_to_sequence
 from denoiser import Denoiser
 import pyttsx3
@@ -27,6 +27,16 @@ class AudioGenerator:
 
     def __init__(self, messages):
         self.messages = messages
+
+    def load_model(self, hparams):
+        model = Tacotron2(hparams).cuda()
+        if hparams.fp16_run:
+            model.decoder.attention_layer.score_mask_value = finfo('float16').min
+
+        if hparams.distributed_run:
+            model = apply_gradient_allreduce(model)
+
+        return model
 
     def generate(self):
         hparams = create_hparams()
