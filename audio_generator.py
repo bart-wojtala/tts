@@ -1,6 +1,8 @@
 import numpy as np
 import torch
 
+import os
+import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
@@ -111,10 +113,17 @@ class AudioGenerator:
                 engine.setProperty('rate', 140)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
-                file = read(temp_file)
-                audio = np.array(file[1], dtype=np.int16)
-                audio = np.concatenate((audio, silence))
-                joined_audio = np.concatenate((joined_audio, audio))
+
+                while not os.path.exists(temp_file):
+                    time.sleep(0.1)
+
+                if os.path.isfile(temp_file):
+                    print(os.path.abspath("."))
+                    file = read(os.path.join(os.path.abspath("."), temp_file))
+                    audio = np.array(file[1], dtype=np.int16)
+                    audio = np.concatenate((audio, silence))
+                    joined_audio = np.concatenate((joined_audio, audio))
+                    os.remove(temp_file)
 
         scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
         return scaled_audio, hparams.sampling_rate
