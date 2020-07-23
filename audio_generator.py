@@ -2,7 +2,6 @@ import numpy as np
 import torch
 
 import sys
-import os
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
 from hparams import create_hparams
@@ -106,12 +105,13 @@ class AudioGenerator:
 
                 torch.cuda.empty_cache()
             else:
+                temp_file = 'temp.wav'
                 engine = pyttsx3.init()
                 engine.setProperty('voice', self.synth_voices[message.voice])
-                engine.save_to_file(message.message, 'temp.wav')
+                engine.setProperty('rate', 140)
+                engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
-                cwd = os.getcwd()
-                file = read(cwd + 'temp.wav')
+                file = read(temp_file)
                 audio = np.array(file[1], dtype=np.int16)
                 audio = np.concatenate((audio, silence))
                 joined_audio = np.concatenate((joined_audio, audio))
