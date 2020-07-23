@@ -111,7 +111,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         super(GUI, self).__init__()
         # StreamlabsClient(token)
         LocalClient()
-        self.url = "http://localhost:8080/tts"
+        self.instance_url = '34.90.8.81'
+        self.url = "http://" + self.instance_url + ":9000/tts"
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
