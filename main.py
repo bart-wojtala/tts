@@ -242,8 +242,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            if not channel.get_busy():
-                while donations_to_play:
+            while donations_to_play:
+                if not channel.get_busy():
                     time.sleep(2)
                     donation_audio = donations_to_play.pop(0)
                     name = donation_audio.donation.name
