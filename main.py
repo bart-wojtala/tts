@@ -21,7 +21,7 @@ class LocalClient:
         
         @sio.on('event')
         def on_event(event):
-            print("New message: | " + donation.message + " | from: " + donation.name)
+            print("New message: | " + event['message'] + " | from: " + event['username'])
             donation = Donation(event['username'], event['message'])
             new_donations.append(donation)
 
