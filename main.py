@@ -21,6 +21,7 @@ class LocalClient:
         
         @sio.on('event')
         def on_event(event):
+            print("New message: | " + donation.message + " | from: " + donation.name)
             donation = Donation(event['username'], event['message'])
             new_donations.append(donation)
 
@@ -212,6 +213,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                 donation = new_donations.pop(0)
                 # tts_engine = TextToSpeechEngine(donation.message)
                 # audio, sampling_rate = tts_engine.generate_audio()
+                print("Handling message: | " + donation.message + " | from: " + donation.name)
                 try:
                     params = {'message': donation.message}
                     response = requests.get(self.url, params)
