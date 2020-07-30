@@ -108,7 +108,7 @@ class GUISignals(QObject):
     elapsed = pyqtSignal(int)
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self,app):
+    def __init__(self, app):
         super(GUI, self).__init__()
         # StreamlabsClient(token)
         LocalClient()
@@ -130,7 +130,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.log_window.ensureCursorVisible()
 
         pygame.mixer.quit()
-        pygame.mixer.init(frequency=22050,size=-16, channels=1)
+        pygame.mixer.init(frequency=22050, size=-16, channels=1)
         self.channel = pygame.mixer.Channel(0)
 
         self.generated_audio_path = "generated_audio/"
@@ -145,7 +145,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.signals = GUISignals()  
     
     @pyqtSlot(str)
-    def draw_text(self,text):
+    def draw_text(self, text):
         obj = text[0:4]
         msg = text[5:]
         if obj=='Log1':
@@ -160,7 +160,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.statusbar.setText(msg)
 
     @pyqtSlot(int)
-    def print_elapsed(self,val):
+    def print_elapsed(self, val):
         pass
 
     def thread_complete(self):
@@ -259,7 +259,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
 
-    def playback_wav(self,wav):
+    def playback_wav(self, wav):
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
         self.ClientSkipBtn.setEnabled(True)
