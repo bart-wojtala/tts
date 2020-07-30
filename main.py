@@ -108,12 +108,12 @@ class GUISignals(QObject):
     elapsed = pyqtSignal(int)
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self, app):
+    def __init__(self, app, instance_url):
         super(GUI, self).__init__()
         # StreamlabsClient(token)
         LocalClient()
-        self.instance_url = '34.90.8.81'
-        self.url = "http://" + self.instance_url + ":9000/tts"
+        self.url = "http://" + instance_url + ":9000/tts"
+        print(self.url)
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -272,6 +272,6 @@ class GUI(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)
-    window = GUI(app)
+    window = GUI(app, '34.90.116.153')
     window.show()
     sys.exit(app.exec_())
