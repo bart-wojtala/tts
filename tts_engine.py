@@ -2,7 +2,7 @@ from models import VoiceMessage
 from audio_generator import AudioGenerator
 
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:', 'steven:']
+    available_voices = ['woman:', 'david:', 'neil:', 'stephen:']
     default_voice = 'woman:'
 
     def __init__(self, donation_message):

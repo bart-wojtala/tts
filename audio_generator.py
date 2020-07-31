@@ -24,7 +24,7 @@ class AudioGenerator:
     }
 
     synth_voices = {
-        "steven:": "default"
+        "stephen:": "default"
     }
 
     def __init__(self, messages):
