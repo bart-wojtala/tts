@@ -110,7 +110,7 @@ class AudioGenerator:
                 temp_file = 'temp.wav'
                 engine = pyttsx3.init()
                 engine.setProperty('voice', self.synth_voices[message.voice])
-                engine.setProperty('rate', 140)
+                engine.setProperty('rate', 120)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
 
