@@ -13,7 +13,7 @@ def convert_message():
     print(message)
     tts_engine = TextToSpeechEngine(message)
     audio_sequences = tts_engine.generate_audio()
-    return audio_sequences
+    return jsonify(audio_sequences)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=9000)
