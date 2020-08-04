@@ -126,7 +126,7 @@ class AudioGenerator:
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, silence))
                     # joined_audio = np.concatenate((joined_audio, audio))
-                    audio_sequences.append(AudioSequence(audio, hparams.sampling_rate))
+                    audio_sequences.append(AudioSequence(audio.tolist(), hparams.sampling_rate))
                     os.remove(temp_file)
 
         # scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
