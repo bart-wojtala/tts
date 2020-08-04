@@ -1,6 +1,6 @@
 from models import VoiceMessage
 from audio_generator import AudioGenerator
-import json
+from marshmallow import Schema, fields
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:']
@@ -68,6 +68,11 @@ class TextToSpeechEngine:
         if self.messages_to_generate:
             audio_generator = AudioGenerator(self.messages_to_generate)
             audio_sequences = audio_generator.generate()
-            json_string = json.dumps([audio.__dict__ for audio in audio_sequences])
+            audio_schema = AudioSchema()
+            json_string = audio_schema.dumps(audio_sequences, many=True)
             return json_string
         return []
+
+class AudioSchema(Schema):
+    audio = fields.Str()
+    rate = fields.Str()
