@@ -12,3 +12,8 @@ class DonationAudio:
     def __init__(self, donation, file):
         self.donation = donation
         self.file = file
+
+class AudioSequence:
+    def __init__(self, audio, rate):
+        self.audio = audio
+        self.rate = rate
