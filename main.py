@@ -124,6 +124,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.max_log2_lines = 100
         self.connected = False
         self.current_audio_length = 0
+        self.files = []
         
         self.ClientSkipBtn.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
@@ -261,8 +262,13 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit("Log1:" + msg)
                     text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
-                    for f in files:
-                        self.playback_wav(f)
+                    self.files = files
+                    # for f in files:
+                    #     self.playback_wav(f)
+                    while self.current_audio_length > 0:
+                        if not channel.get_busy() and len(self.files) > 0:
+                            self.playback_wav(self.files.pop(0))
+
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
 
@@ -274,6 +280,7 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def skip_wav(self):
         if self.channel.get_busy():
+            self.files = []
             self.channel.stop()
             self.channel = pygame.mixer.Channel(0)
             self.current_audio_length = 0
