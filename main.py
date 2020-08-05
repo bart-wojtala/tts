@@ -272,7 +272,17 @@ class GUI(QMainWindow, Ui_MainWindow):
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
 
-    def playback_wav(self, wav):
+    def playback_wav(self, file):
+        voice = file.voice
+        wav = file.message
+        if voice == "satan:":
+            pygame.mixer.quit()
+            pygame.mixer.init(frequency=11000, size=-16, channels=1)
+            self.channel = pygame.mixer.Channel(0)
+        else:
+            pygame.mixer.quit()
+            pygame.mixer.init(frequency=22050, size=-16, channels=1)
+            self.channel = pygame.mixer.Channel(0)
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
         self.current_audio_length -= 1

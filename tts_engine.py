@@ -105,7 +105,7 @@ class TextToSpeechEngine:
                     sound.export(file_name, format="wav")
                 else:
                     write(file_name, sampling_rate, audio)
-                files.append(file_name)
+                files.append(VoiceMessage(message.voice, file_name))
                 i += 1
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
