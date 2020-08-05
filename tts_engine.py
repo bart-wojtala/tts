@@ -4,9 +4,12 @@ import numpy as np
 import requests
 import time
 from scipy.io.wavfile import write
+import soundfile as sf
+import pyrubberband as pyrb
+from pydub import AudioSegment
 
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:', 'stephen:']
+    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:']
     default_voice = 'woman:'
 
     def __init__(self, donation, url, path):
@@ -83,7 +86,25 @@ class TextToSpeechEngine:
                 sampling_rate = res_json["rate"]
 
                 file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(i) + ".wav"
-                write(file_name, sampling_rate, audio)
+                if message.voice == "satan:":
+                    temp_file_name = "generated_audio/test.wav"
+                    write(temp_file_name, sampling_rate, audio)
+
+                    fixed_framerate = 11000
+                    sound = AudioSegment.from_file(temp_file_name)
+                    sound = sound.set_frame_rate(fixed_framerate)
+                    write(file_name, fixed_framerate, audio)
+
+                    y, sr = sf.read(file_name)
+
+                    y_stretch = pyrb.time_stretch(y, sr, 1.6)
+                    y_shift = pyrb.pitch_shift(y, sr, 1.6)
+                    sf.write(file_name, y_stretch, sr, format='wav')
+
+                    sound = AudioSegment.from_wav(file_name)
+                    sound.export(file_name, format="wav")
+                else:
+                    write(file_name, sampling_rate, audio)
                 files.append(file_name)
                 i += 1
             return DonationAudio(self.donation, files)
