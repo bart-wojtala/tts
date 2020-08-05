@@ -11,7 +11,7 @@ import pygame
 import traceback
 from scipy.io.wavfile import write
 from models import Donation, DonationAudio
-# from tts_engine import TextToSpeechEngine
+from tts_engine import TextToSpeechEngine
 import requests
 import numpy as np
 
@@ -123,6 +123,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.max_log_lines = 100
         self.max_log2_lines = 100
         self.connected = False
+        self.current_audio_length = 0
         
         self.ClientSkipBtn.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
@@ -215,15 +216,19 @@ class GUI(QMainWindow, Ui_MainWindow):
                 # audio, sampling_rate = tts_engine.generate_audio()
                 print("Handling message: | " + donation.message + " | from: " + donation.name)
                 try:
-                    params = {'message': donation.message}
-                    response = requests.get(self.url, params)
-                    res_json = response.json()
-                    audio = np.array(res_json["audio"], dtype=np.int16)
-                    sampling_rate = res_json["rate"]
+                    # params = {'message': donation.message}
+                    # response = requests.get(self.url, params)
+                    # res_json = response.json()
+                    # audio = np.array(res_json["audio"], dtype=np.int16)
+                    # sampling_rate = res_json["rate"]
 
-                    file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
-                    write(file_name, sampling_rate, audio)
-                    donations_to_play.append(DonationAudio(donation, file_name))
+                    # file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
+                    # write(file_name, sampling_rate, audio)
+                    # donations_to_play.append(DonationAudio(donation, file_name))
+
+                    tts_engine = TextToSpeechEngine(donation, self.url, self.generated_audio_path)
+                    donation_audio = tts_engine.generate_audio()
+                    donations_to_play.append(donation_audio)
                 except:
                     self.connected = False
                     text_ready.emit("Log1:\n## Can't connect to TTS server! ##")
@@ -245,29 +250,33 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             while donations_to_play:
-                if not channel.get_busy():
+                if not channel.get_busy() and self.current_audio_length == 0:
                     time.sleep(2)
                     donation_audio = donations_to_play.pop(0)
                     name = donation_audio.donation.name
                     msg = donation_audio.donation.message
-                    file = donation_audio.file
+                    files = donation_audio.files
                     text_ready.emit("Log1:\n###########################")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
                     text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
-                    self.playback_wav(file)
+                    self.current_audio_length = donation_audio.length
+                    for f in files:
+                        self.playback_wav(f)
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
 
     def playback_wav(self, wav):
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
+        self.current_audio_length -= 1
         self.ClientSkipBtn.setEnabled(True)
 
     def skip_wav(self):
         if self.channel.get_busy():
             self.channel.stop()
             self.channel = pygame.mixer.Channel(0)
+            self.current_audio_length = 0
         
 
 if __name__ == '__main__':
