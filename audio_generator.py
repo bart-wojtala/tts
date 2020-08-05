@@ -25,7 +25,7 @@ class AudioGenerator:
 
     synth_voices = {
         "stephen:": "default",
-        "satan": "en-scottish"
+        "satan:": "en-scottish"
     }
 
     def __init__(self, messages):
