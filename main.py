@@ -11,7 +11,7 @@ import pygame
 import traceback
 from scipy.io.wavfile import write
 from models import Donation, DonationAudio
-from tts_engine import TextToSpeechEngine
+# from tts_engine import TextToSpeechEngine
 import requests
 import numpy as np
 
@@ -223,6 +223,7 @@ class GUI(QMainWindow, Ui_MainWindow):
 
                     file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
                     write(file_name, sampling_rate, audio)
+                    donations_to_play.append(DonationAudio(donation, file_name))
                 except:
                     self.connected = False
                     text_ready.emit("Log1:\n## Can't connect to TTS server! ##")
@@ -246,17 +247,15 @@ class GUI(QMainWindow, Ui_MainWindow):
             while donations_to_play:
                 if not channel.get_busy():
                     time.sleep(2)
-                    donation= donations_to_play.pop(0)
-                    name = donation.donation.name
-                    msg = donation.donation.message
-                    files = donation.donation.sequence.audio_list
-                    self.audio_length = donation.donation.sequence.length
+                    donation_audio = donations_to_play.pop(0)
+                    name = donation_audio.donation.name
+                    msg = donation_audio.donation.message
+                    file = donation_audio.file
                     text_ready.emit("Log1:\n###########################")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
                     text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
-                    for file in files:
-                        self.playback_wav(file)
+                    self.playback_wav(file)
             time.sleep(0.5)
         return 'Return value of play_audio_fn'
 
