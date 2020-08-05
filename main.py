@@ -123,7 +123,6 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.max_log_lines = 100
         self.max_log2_lines = 100
         self.connected = False
-        self.audio_length = 0
         
         self.ClientSkipBtn.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
@@ -216,17 +215,14 @@ class GUI(QMainWindow, Ui_MainWindow):
                 # audio, sampling_rate = tts_engine.generate_audio()
                 print("Handling message: | " + donation.message + " | from: " + donation.name)
                 try:
-                    # params = {'message': donation.message}
-                    # response = requests.get(self.url, params)
-                    # res_json = response.json()
-                    # audio = np.array(res_json["audio"], dtype=np.int16)
-                    # sampling_rate = res_json["rate"]
+                    params = {'message': donation.message}
+                    response = requests.get(self.url, params)
+                    res_json = response.json()
+                    audio = np.array(res_json["audio"], dtype=np.int16)
+                    sampling_rate = res_json["rate"]
 
-                    # file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
-                    # write(file_name, sampling_rate, audio)
-                    tts_engine = TextToSpeechEngine(donation, self.url, self.generated_audio_path)
-                    audio_sequence = tts_engine.generate_audio()
-                    donations_to_play.append(DonationAudio(donation, audio_sequence))
+                    file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
+                    write(file_name, sampling_rate, audio)
                 except:
                     self.connected = False
                     text_ready.emit("Log1:\n## Can't connect to TTS server! ##")
@@ -267,7 +263,6 @@ class GUI(QMainWindow, Ui_MainWindow):
     def playback_wav(self, wav):
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
-        self.audio_length -= 1
         self.ClientSkipBtn.setEnabled(True)
 
     def skip_wav(self):
