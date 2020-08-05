@@ -258,7 +258,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     name = donation_audio.donation.name
                     msg = donation_audio.donation.message
                     files = donation_audio.files
-                    text_ready.emit("Log1:\n###########################")
+                    text_ready.emit("Log1:\n###########################\n")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
                     text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
