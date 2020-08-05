@@ -1,15 +1,17 @@
 from models import VoiceMessage, DonationAudio
 # from audio_generator import AudioGenerator
+import sys
 import numpy as np
 import requests
 import time
-from scipy.io.wavfile import write
+from scipy.io.wavfile import write, read
+from scipy.signal import lfilter, butter
 import soundfile as sf
 import pyrubberband as pyrb
 from pydub import AudioSegment
 
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:']
+    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:']
     default_voice = 'woman:'
 
     def __init__(self, donation, url, path):
@@ -103,6 +105,14 @@ class TextToSpeechEngine:
 
                     sound = AudioSegment.from_wav(file_name)
                     sound.export(file_name, format="wav")
+                elif message.voice == "voicemail:":
+                    temp_file_name = self.path + "test.wav"
+                    write(temp_file_name, sampling_rate, audio)
+                    fs,audio = read("generated_audio/test.wav")
+                    low_freq = 300.0
+                    high_freq = 3000.0
+                    filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
+                    write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
                 else:
                     write(file_name, sampling_rate, audio)
                 files.append(VoiceMessage(message.voice, file_name))
@@ -111,3 +121,15 @@ class TextToSpeechEngine:
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
         return
+
+def butter_params(low_freq, high_freq, fs, order=5):
+    nyq = 0.5 * fs
+    low = low_freq / nyq
+    high = high_freq / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+def butter_bandpass_filter(data, low_freq, high_freq, fs, order=5):
+    b, a = butter_params(low_freq, high_freq, fs, order=order)
+    y = lfilter(b, a, data)
+    return y

@@ -21,7 +21,8 @@ class AudioGenerator:
         "woman:": "tacotron2_statedict.pt",
         "david:": "attenborough_checkpoint_547000",
         "neil:": "neil_tyson_checkpoint_500000",
-        "satan:": "tacotron2_statedict.pt"
+        "satan:": "tacotron2_statedict.pt",
+        "voicemail:": "tacotron2_statedict.pt"
     }
 
     synth_voices = {
