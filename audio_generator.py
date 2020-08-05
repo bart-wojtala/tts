@@ -119,7 +119,6 @@ class AudioGenerator:
                     time.sleep(0.1)
 
                 if os.path.isfile(temp_file):
-                    print(os.path.abspath("."))
                     file = read(os.path.join(os.path.abspath("."), temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, silence))

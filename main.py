@@ -113,7 +113,6 @@ class GUI(QMainWindow, Ui_MainWindow):
         # StreamlabsClient(token)
         LocalClient()
         self.url = "http://" + instance_url + ":9000/tts"
-        print(self.url)
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -215,7 +214,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                 donation = new_donations.pop(0)
                 # tts_engine = TextToSpeechEngine(donation.message)
                 # audio, sampling_rate = tts_engine.generate_audio()
-                print("Handling message: | " + donation.message + " | from: " + donation.name)
+                print("Handling message from: " + donation.name + "| " + donation.message)
                 try:
                     # params = {'message': donation.message}
                     # response = requests.get(self.url, params)
