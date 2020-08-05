@@ -9,11 +9,11 @@ class Donation:
         self.message = message
         
 class DonationAudio:
-    def __init__(self, donation, file):
+    def __init__(self, donation, sequence):
         self.donation = donation
-        self.file = file
+        self.sequence = sequence
 
 class AudioSequence:
-    def __init__(self, audio, rate):
-        self.audio = audio
-        self.rate = rate
+    def __init__(self, audio_list, length):
+        self.audio_list = audio_list
+        self.length = length

@@ -1,13 +1,19 @@
-from models import VoiceMessage
-from audio_generator import AudioGenerator
-from marshmallow import Schema, fields
+from models import VoiceMessage, AudioSequence
+# from audio_generator import AudioGenerator
+import requests
+import numpy as np
+import time
+from scipy.io.wavfile import write
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:']
     default_voice = 'woman:'
 
-    def __init__(self, donation_message):
-        words = donation_message.split()
+    def __init__(self, donation, url, path):
+        self.url = url
+        self.path = path
+        self.name = donation.name
+        words = donation.message.split()
         messages_to_generate = []
         sentence_separators = ['.', '?', '!']
 
@@ -66,10 +72,17 @@ class TextToSpeechEngine:
 
     def generate_audio(self):
         if self.messages_to_generate:
-            audio_generator = AudioGenerator(self.messages_to_generate)
-            return audio_generator.generate()
-        return
-
-class AudioSchema(Schema):
-    audio = fields.Str()
-    rate = fields.Str()
+            audio_sequences = []
+            for message in self.messages_to_generate:
+                params = {'message': message}
+                response = requests.get(self.url, params)
+                res_json = response.json()
+                audio = np.array(res_json["audio"], dtype=np.int16)
+                sampling_rate = res_json["rate"]
+                file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + ".wav"
+                write(file_name, sampling_rate, audio)
+                audio_sequences.append(file_name)
+            # audio_generator = AudioGenerator(self.messages_to_generate)
+            # return audio_generator.generate()
+            return AudioSequence(file_name, len(file_name))
+        return []
