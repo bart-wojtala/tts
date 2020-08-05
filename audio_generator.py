@@ -15,7 +15,6 @@ from text import text_to_sequence
 from denoiser import Denoiser
 import pyttsx3
 from scipy.io.wavfile import read
-from models import AudioSequence
 
 class AudioGenerator:
     models = {
@@ -55,7 +54,6 @@ class AudioGenerator:
 
         joined_audio = np.empty(1,)
         silence = np.zeros(11000,)
-        audio_sequences = []
         for message in self.messages:
             if message.voice in self.models:
                 if len(message.message) > 127:
@@ -105,8 +103,7 @@ class AudioGenerator:
                     scaled_audio = scaled_audio[:cut_idx]
 
                 scaled_audio = np.concatenate((scaled_audio, silence))
-                # joined_audio = np.concatenate((joined_audio, scaled_audio))
-                audio_sequences.append(AudioSequence(scaled_audio, hparams.sampling_rate))
+                joined_audio = np.concatenate((joined_audio, scaled_audio))
 
                 torch.cuda.empty_cache()
             else:
@@ -125,10 +122,8 @@ class AudioGenerator:
                     file = read(os.path.join(os.path.abspath("."), temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, silence))
-                    # joined_audio = np.concatenate((joined_audio, audio))
-                    audio_sequences.append(AudioSequence(audio.tolist(), hparams.sampling_rate))
+                    joined_audio = np.concatenate((joined_audio, audio))
                     os.remove(temp_file)
 
-        # scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
-        # return scaled_audio, hparams.sampling_rate
-        return audio_sequences
+        scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
+        return scaled_audio, hparams.sampling_rate

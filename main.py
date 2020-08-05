@@ -272,6 +272,6 @@ class GUI(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)
-    window = GUI(app, '34.90.116.153')
+    window = GUI(app, '35.204.151.211')
     window.show()
     sys.exit(app.exec_())

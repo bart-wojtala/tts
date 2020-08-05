@@ -67,11 +67,8 @@ class TextToSpeechEngine:
     def generate_audio(self):
         if self.messages_to_generate:
             audio_generator = AudioGenerator(self.messages_to_generate)
-            audio_sequences = audio_generator.generate()
-            audio_schema = AudioSchema()
-            json_string = audio_schema.dumps(audio_sequences, many=True)
-            return json_string
-        return []
+            return audio_generator.generate()
+        return
 
 class AudioSchema(Schema):
     audio = fields.Str()
