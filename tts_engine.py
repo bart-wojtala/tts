@@ -75,7 +75,7 @@ class TextToSpeechEngine:
         if self.messages_to_generate:
             files = []
             for message in self.messages_to_generate:
-                params = {'message': message}
+                params = {'voice': message.voice, 'message': message.message}
                 response = requests.get(self.url, params)
                 res_json = response.json()
                 audio = np.array(res_json["audio"], dtype=np.int16)
