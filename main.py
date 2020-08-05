@@ -21,7 +21,7 @@ class LocalClient:
         
         @sio.on('event')
         def on_event(event):
-            print("New message: | " + event['message'] + " | from: " + event['username'])
+            print("New message from " + event['username'] + " | " + event['message'])
             donation = Donation(event['username'], event['message'])
             new_donations.append(donation)
 
@@ -116,6 +116,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
+        self.setFixedWidth(600)
+        self.setFixedHeight(600)
 
         self.logs = []
         self.logs2 = []
@@ -214,7 +216,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                 donation = new_donations.pop(0)
                 # tts_engine = TextToSpeechEngine(donation.message)
                 # audio, sampling_rate = tts_engine.generate_audio()
-                print("Handling message from: " + donation.name + "| " + donation.message)
+                print("Handling message from " + donation.name + " | " + donation.message)
                 try:
                     # params = {'message': donation.message}
                     # response = requests.get(self.url, params)
