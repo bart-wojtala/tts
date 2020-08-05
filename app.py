@@ -12,8 +12,8 @@ def convert_message():
     message = request.args.get('message')
     print(message)
     tts_engine = TextToSpeechEngine(message)
-    audio_sequences = tts_engine.generate_audio()
-    return jsonify(audio_sequences)
+    audio, sampling_rate = tts_engine.generate_audio()
+    return jsonify(audio=audio.tolist(), rate=sampling_rate)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=9000)
