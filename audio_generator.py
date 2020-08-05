@@ -20,12 +20,12 @@ class AudioGenerator:
     models = {
         "woman:": "tacotron2_statedict.pt",
         "david:": "attenborough_checkpoint_547000",
-        "neil:": "neil_tyson_checkpoint_500000"
+        "neil:": "neil_tyson_checkpoint_500000",
+        "satan:": "tacotron2_statedict.pt"
     }
 
     synth_voices = {
-        "stephen:": "default",
-        "satan:": "en-scottish"
+        "stephen:": "default"
     }
 
     def __init__(self, messages):
