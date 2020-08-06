@@ -11,7 +11,7 @@ import pyrubberband as pyrb
 from pydub import AudioSegment
 
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:']
+    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:', 'darthvader:']
     default_voice = 'woman:'
 
     def __init__(self, donation, url, path):

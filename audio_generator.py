@@ -22,11 +22,17 @@ class AudioGenerator:
         "david:": "attenborough_checkpoint_547000",
         "neil:": "neil_tyson_checkpoint_500000",
         "satan:": "tacotron2_statedict.pt",
-        "voicemail:": "tacotron2_statedict.pt"
+        "voicemail:": "tacotron2_statedict.pt",
+        "darthvader:": "jej_checkpoint_904500"
     }
 
     synth_voices = {
         "stephen:": "default"
+    }
+
+    waveglow = {
+        "default": "waveglow_256channels.pt",
+        "darthvader:": "jej_waveglow_165k.pt"
     }
 
     def __init__(self, messages):
@@ -47,17 +53,29 @@ class AudioGenerator:
         hparams.sampling_rate = 22050
         models_path = "tts/models/"
 
-        waveglow_path = models_path + 'waveglow_256channels.pt'
-        waveglow = torch.load(waveglow_path)['model']
-        waveglow.cuda().eval().half()
-        for k in waveglow.convinv:
-            k.float()
-        denoiser = Denoiser(waveglow)
+        # waveglow_path = models_path + 'waveglow_256channels.pt'
+        # waveglow = torch.load(waveglow_path)['model']
+        # waveglow.cuda().eval().half()
+        # for k in waveglow.convinv:
+        #     k.float()
+        # denoiser = Denoiser(waveglow)
 
         joined_audio = np.empty(1,)
         silence = np.zeros(11000,)
         for message in self.messages:
             if message.voice in self.models:
+                waveglow_path = ''
+                if message.voice == "darthvader:":
+                    waveglow_path = models_path + self.waveglow[message.voice]
+                else:
+                    waveglow_path = models_path + self.waveglow['default']
+                
+                waveglow = torch.load(waveglow_path)['model']
+                waveglow.cuda().eval().half()
+                for k in waveglow.convinv:
+                    k.float()
+                denoiser = Denoiser(waveglow)
+
                 if len(message.message) > 127:
                     hparams.max_decoder_steps=100000
                 else:
