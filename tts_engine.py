@@ -83,22 +83,21 @@ class TextToSpeechEngine:
         if self.messages_to_generate:
             files = []
             for message in self.messages_to_generate:
-                file_name = self.request_audio(message)
+                params = {'voice': message.voice, 'message': message.message}
+                response = requests.get(self.endpoint_tts, params)
+                res_json = response.json()
+                audio = np.array(res_json["audio"], dtype=np.int16)
+                sampling_rate = res_json["rate"]
+                file_name = self.request_audio(message.voice, audio, sampling_rate)
                 files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
         return
 
-    def request_audio(self, message):
-        params = {'voice': message.voice, 'message': message.message}
-        response = requests.get(self.endpoint_tts, params)
-        res_json = response.json()
-        audio = np.array(res_json["audio"], dtype=np.int16)
-        sampling_rate = res_json["rate"]
-
+    def request_audio(self, voice, audio, sampling_rate):
         file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
-        if message.voice == "satan:":
+        if voice == "satan:":
             temp_file_name = "generated_audio/test.wav"
             write(temp_file_name, sampling_rate, audio)
 
@@ -115,7 +114,7 @@ class TextToSpeechEngine:
 
             sound = AudioSegment.from_wav(file_name)
             sound.export(file_name, format="wav")
-        elif message.voice == "voicemail:":
+        elif voice == "voicemail:":
             temp_file_name = self.path + "test.wav"
             write(temp_file_name, sampling_rate, audio)
             fs,audio = read("generated_audio/test.wav")
