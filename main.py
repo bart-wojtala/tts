@@ -228,7 +228,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     # write(file_name, sampling_rate, audio)
                     # donations_to_play.append(DonationAudio(donation, file_name))
 
-                    tts_engine = TextToSpeechEngine(donation, self.url, self.generated_audio_path)
+                    tts_engine = TextToSpeechEngine(donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
                     donations_to_play.append(donation_audio)
                 except:

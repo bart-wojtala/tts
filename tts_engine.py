@@ -15,9 +15,9 @@ class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:', 'darthvader:']
     default_voice = 'woman:'
 
-    def __init__(self, donation, url, path):
+    def __init__(self, donation, name, url, path):
         self.donation = donation
-        self.name = donation.name
+        self.name = name
         self.url = url
         self.endpoint_tts = self.url + "/tts"
         self.endpoint_single_tts = self.url + "/singletts"
@@ -82,14 +82,34 @@ class TextToSpeechEngine:
     def generate_audio(self):
         if self.messages_to_generate:
             files = []
-            for message in self.messages_to_generate:
-                params = {'voice': message.voice, 'message': message.message}
-                response = requests.get(self.endpoint_tts, params)
-                res_json = response.json()
-                audio = np.array(res_json["audio"], dtype=np.int16)
-                sampling_rate = res_json["rate"]
-                file_name = self.request_audio(message.voice, audio, sampling_rate)
-                files.append(VoiceMessage(message.voice, file_name))
+            messages_to_send = []
+            single_message = ''
+            for index, message in enumerate(self.messages_to_generate):
+                if message.voice == "darthvader:" or message.voice == "voicemail:":
+                    messages_to_send.append(message)
+                else:
+                    single_message += message.voice + ' ' + message.message + ' '
+                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "darthvader:" or self.messages_to_generate[index + 1].voice == "voicemail:"):
+                        messages_to_send.append(single_message)
+                        single_message = ''
+
+            for message in messages_to_send:
+                if(isinstance(message, str)):
+                    params = {'message': message}
+                    response = requests.get(self.endpoint_single_tts, params)
+                    res_json = response.json()
+                    audio = np.array(res_json["audio"], dtype=np.int16)
+                    sampling_rate = res_json["rate"]
+                    file_name = self.request_audio(self.default_voice, audio, sampling_rate)
+                    files.append(VoiceMessage(self.default_voice, file_name))
+                else:
+                    params = {'voice': message.voice, 'message': message.message}
+                    response = requests.get(self.endpoint_tts, params)
+                    res_json = response.json()
+                    audio = np.array(res_json["audio"], dtype=np.int16)
+                    sampling_rate = res_json["rate"]
+                    file_name = self.request_audio(message.voice, audio, sampling_rate)
+                    files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
