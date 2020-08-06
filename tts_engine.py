@@ -113,10 +113,6 @@ class TextToSpeechEngine:
                     high_freq = 3000.0
                     filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
                     write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
-                elif message.voice == "darthvader:":
-                    fs, effect = read("extras/breathing.wav")
-                    audio = np.concatenate((effect, audio))
-                    write(file_name, sampling_rate, audio)
                 else:
                     write(file_name, sampling_rate, audio)
                 files.append(VoiceMessage(message.voice, file_name))

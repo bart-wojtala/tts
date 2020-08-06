@@ -121,6 +121,9 @@ class AudioGenerator:
                             cut_idx = idx
                             break
                     scaled_audio = scaled_audio[:cut_idx]
+                if message.voice == "darthvader:":
+                    _, effect = read("extras/breathing.wav")
+                    scaled_audio = np.concatenate((effect, scaled_audio))
 
                 scaled_audio = np.concatenate((scaled_audio, silence))
                 joined_audio = np.concatenate((joined_audio, scaled_audio))
