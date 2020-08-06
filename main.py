@@ -227,9 +227,10 @@ class GUI(QMainWindow, Ui_MainWindow):
                     # file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
                     # write(file_name, sampling_rate, audio)
                     # donations_to_play.append(DonationAudio(donation, file_name))
-
+                    start_time = time.time()
                     tts_engine = TextToSpeechEngine(donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
+                    print("\n--- Generating audio took %s seconds ---\n" % round((time.time() - start_time), 2))
                     donations_to_play.append(donation_audio)
                 except:
                     self.connected = False
