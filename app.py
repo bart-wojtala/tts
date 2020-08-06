@@ -26,7 +26,7 @@ def convert_message():
 def convert_single_message():
     message = request.args.get('message')
     print(message)
-    tts_engine = TextToSpeechEngine(message, "", "", "")
+    tts_engine = TextToSpeechEngine(message, "", "", None)
     audio, sampling_rate = tts_engine.generate_single_audio()
     return jsonify(audio=audio.tolist(), rate=sampling_rate)
 

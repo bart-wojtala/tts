@@ -22,7 +22,10 @@ class TextToSpeechEngine:
         self.endpoint_tts = self.url + "/tts"
         self.endpoint_single_tts = self.url + "/singletts"
         self.path = path
-        words = donation.message.split()
+        if path:
+            words = donation.message.split()
+        else:
+            words = donation.split()
         messages_to_generate = []
         sentence_separators = ['.', '?', '!']
 
