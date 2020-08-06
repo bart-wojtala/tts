@@ -43,7 +43,7 @@ class AudioProcessing(object):
 
 	def __init__(self, input_audio_path):
 		self.sample_freq, self.audio_data = read(input_audio_path)
-		self.audio_data = AudioProcessing.convert_to_mono_audio(self.audio_data)
+		# self.audio_data = AudioProcessing.convert_to_mono_audio(self.audio_data)
 
 	def save_to_file(self, output_path):
 		'''Writes a WAV file representation of the processed audio data'''
