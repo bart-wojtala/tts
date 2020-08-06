@@ -18,6 +18,8 @@ class TextToSpeechEngine:
         self.donation = donation
         self.name = donation.name
         self.url = url
+        self.endpoint_tts = self.url + "/tts"
+        self.endpoint_single_tts = self.url + "/singletts"
         self.path = path
         words = donation.message.split()
         messages_to_generate = []
@@ -82,7 +84,7 @@ class TextToSpeechEngine:
             i = 0
             for message in self.messages_to_generate:
                 params = {'voice': message.voice, 'message': message.message}
-                response = requests.get(self.url, params)
+                response = requests.get(self.endpoint_tts, params)
                 res_json = response.json()
                 audio = np.array(res_json["audio"], dtype=np.int16)
                 sampling_rate = res_json["rate"]
@@ -120,6 +122,13 @@ class TextToSpeechEngine:
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
+        return
+
+    def generate_single_audio(self):
+        if self.messages_to_generate:
+            from audio_generator import AudioGenerator
+            audio_generator = AudioGenerator(self.messages_to_generate)
+            return audio_generator.generate()
         return
 
 def butter_params(low_freq, high_freq, fs, order=5):
