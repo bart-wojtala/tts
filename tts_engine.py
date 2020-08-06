@@ -99,26 +99,25 @@ class TextToSpeechEngine:
             for message in messages_to_send:
                 if(isinstance(message, str)):
                     params = {'message': message}
-                    response = requests.get(self.endpoint_single_tts, params)
-                    res_json = response.json()
-                    audio = np.array(res_json["audio"], dtype=np.int16)
-                    sampling_rate = res_json["rate"]
-                    file_name = self.request_audio(self.default_voice, audio, sampling_rate)
+                    audio, sampling_rate = self.request_audio(self.endpoint_single_tts, params)
+                    file_name = self.write_audio_file(self.default_voice, audio, sampling_rate)
                     files.append(VoiceMessage(self.default_voice, file_name))
                 else:
                     params = {'voice': message.voice, 'message': message.message}
-                    response = requests.get(self.endpoint_tts, params)
-                    res_json = response.json()
-                    audio = np.array(res_json["audio"], dtype=np.int16)
-                    sampling_rate = res_json["rate"]
-                    file_name = self.request_audio(message.voice, audio, sampling_rate)
+                    audio, sampling_rate = self.request_audio(self.endpoint_tts, params)
+                    file_name = self.write_audio_file(message.voice, audio, sampling_rate)
                     files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
         return
 
-    def request_audio(self, voice, audio, sampling_rate):
+    def request_audio(self, endpoint, params):
+        response = requests.get(endpoint, params)
+        res_json = response.json()
+        return np.array(res_json["audio"], dtype=np.int16), res_json["rate"]
+
+    def write_audio_file(self, voice, audio, sampling_rate):
         file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
         if voice == "satan:":
             temp_file_name = "generated_audio/test.wav"
