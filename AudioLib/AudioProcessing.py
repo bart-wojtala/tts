@@ -123,7 +123,7 @@ class AudioProcessing(object):
 		x, y = signal.butter(order, cutoff, btype='highpass', analog=False)
 		self.audio_data = signal.filtfilt(x, y, self.audio_data)
 
-	def set_bandpass(self, cutoff_low, cutoff_high, order=5):
+	def set_bandpass(self, cutoff_low, cutoff_high, order=4):
 		'''Applies a band pass filter'''
 		cutoff = np.zeros(2)
 		nyquist = self.sample_freq / 2.0

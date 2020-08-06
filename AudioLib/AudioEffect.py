@@ -46,9 +46,9 @@ class AudioEffect(object):
 	def robotic(input_path, output_path):
 		'''Applies a robotic effect to a given input audio file'''
 		sound = AudioProcessing(input_path)
-		sound.set_volume(1.5)
+		sound.set_volume(0.8)
 		sound.set_echo(0.01)
-		sound.set_bandpass(300, 4000)
+		sound.set_bandpass(110, 11024)
 		sound.save_to_file(output_path)
 
 	@staticmethod
