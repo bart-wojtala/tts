@@ -88,11 +88,11 @@ class TextToSpeechEngine:
             messages_to_send = []
             single_message = ''
             for index, message in enumerate(self.messages_to_generate):
-                if message.voice == "darthvader:" or message.voice == "voicemail:":
+                if message.voice == "satan:" or message.voice == "voicemail:":
                     messages_to_send.append(message)
                 else:
                     single_message += message.voice + ' ' + message.message + ' '
-                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "darthvader:" or self.messages_to_generate[index + 1].voice == "voicemail:"):
+                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:"):
                         messages_to_send.append(single_message)
                         single_message = ''
 
