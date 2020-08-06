@@ -9,6 +9,7 @@ from scipy.signal import lfilter, butter
 import soundfile as sf
 import pyrubberband as pyrb
 from pydub import AudioSegment
+from random import randint
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:', 'darthvader:']
@@ -81,48 +82,50 @@ class TextToSpeechEngine:
     def generate_audio(self):
         if self.messages_to_generate:
             files = []
-            i = 0
             for message in self.messages_to_generate:
-                params = {'voice': message.voice, 'message': message.message}
-                response = requests.get(self.endpoint_tts, params)
-                res_json = response.json()
-                audio = np.array(res_json["audio"], dtype=np.int16)
-                sampling_rate = res_json["rate"]
-
-                file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(i) + ".wav"
-                if message.voice == "satan:":
-                    temp_file_name = "generated_audio/test.wav"
-                    write(temp_file_name, sampling_rate, audio)
-
-                    fixed_framerate = 11000
-                    sound = AudioSegment.from_file(temp_file_name)
-                    sound = sound.set_frame_rate(fixed_framerate)
-                    write(file_name, fixed_framerate, audio)
-
-                    y, sr = sf.read(file_name)
-
-                    y_stretch = pyrb.time_stretch(y, sr, 1.6)
-                    y_shift = pyrb.pitch_shift(y, sr, 1.6)
-                    sf.write(file_name, y_stretch, sr, format='wav')
-
-                    sound = AudioSegment.from_wav(file_name)
-                    sound.export(file_name, format="wav")
-                elif message.voice == "voicemail:":
-                    temp_file_name = self.path + "test.wav"
-                    write(temp_file_name, sampling_rate, audio)
-                    fs,audio = read("generated_audio/test.wav")
-                    low_freq = 200.0
-                    high_freq = 3000.0
-                    filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
-                    write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
-                else:
-                    write(file_name, sampling_rate, audio)
+                file_name = self.request_audio(message)
                 files.append(VoiceMessage(message.voice, file_name))
-                i += 1
             return DonationAudio(self.donation, files)
             # audio_generator = AudioGenerator(self.messages_to_generate)
             # return audio_generator.generate()
         return
+
+    def request_audio(self, message):
+        params = {'voice': message.voice, 'message': message.message}
+        response = requests.get(self.endpoint_tts, params)
+        res_json = response.json()
+        audio = np.array(res_json["audio"], dtype=np.int16)
+        sampling_rate = res_json["rate"]
+
+        file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
+        if message.voice == "satan:":
+            temp_file_name = "generated_audio/test.wav"
+            write(temp_file_name, sampling_rate, audio)
+
+            fixed_framerate = 11000
+            sound = AudioSegment.from_file(temp_file_name)
+            sound = sound.set_frame_rate(fixed_framerate)
+            write(file_name, fixed_framerate, audio)
+
+            y, sr = sf.read(file_name)
+
+            y_stretch = pyrb.time_stretch(y, sr, 1.6)
+            y_shift = pyrb.pitch_shift(y, sr, 1.6)
+            sf.write(file_name, y_stretch, sr, format='wav')
+
+            sound = AudioSegment.from_wav(file_name)
+            sound.export(file_name, format="wav")
+        elif message.voice == "voicemail:":
+            temp_file_name = self.path + "test.wav"
+            write(temp_file_name, sampling_rate, audio)
+            fs,audio = read("generated_audio/test.wav")
+            low_freq = 200.0
+            high_freq = 3000.0
+            filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
+            write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
+        else:
+            write(file_name, sampling_rate, audio)
+        return file_name
 
     def generate_single_audio(self):
         if self.messages_to_generate:
