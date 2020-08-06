@@ -109,7 +109,7 @@ class TextToSpeechEngine:
                     temp_file_name = self.path + "test.wav"
                     write(temp_file_name, sampling_rate, audio)
                     fs,audio = read("generated_audio/test.wav")
-                    low_freq = 300.0
+                    low_freq = 200.0
                     high_freq = 3000.0
                     filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
                     write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
