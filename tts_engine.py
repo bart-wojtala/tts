@@ -30,107 +30,43 @@ class TextToSpeechEngine:
         self.sentence_separators = ['.', '?', '!']
 
         for i in range(0, len(self.words)):
-            sentence = ''
-            voice = ''
             if i == 0 and not self.words[0].endswith(':'):
                 if i < len(self.words):
-                    voice = self.default_voice
-                    for j in range(i, len(self.words)):
-                        word = self.words[j]
-                        if not word in self.available_voices:
-                            if word.isdigit() and len(word) > 36:
-                                word = word[0:36]
-                            word = word.replace(',', ', ')
-                            if len(sentence) == 0:
-                                sentence += word
-                            else:
-                                sentence += ' ' + word
-                        else:
-                            if sentence[-1] not in self.sentence_separators:
-                                sentence += '.'
-                            voice_message = VoiceMessage(voice, sentence)
-                            self.messages_to_generate.append(voice_message)
-                            break
-                        if j == len(self.words) - 1:
-                            if sentence[-1] not in self.sentence_separators:
-                                sentence += '.'
-                            voice_message = VoiceMessage(voice, sentence)
-                            self.messages_to_generate.append(voice_message)
+                    self.create_voice_message(i, self.default_voice)
             elif i == 0 and self.words[0].endswith(':'):
                 if i < len(self.words):
-                    if self.words[0] in self.available_voices:
-                        voice = self.words[i]
-                        for j in range(i, len(self.words)):
-                            word = self.words[j]
-                            if not word in self.available_voices:
-                                if word.isdigit() and len(word) > 36:
-                                    word = word[0:36]
-                                word = word.replace(',', ', ')
-                                if len(sentence) == 0:
-                                    sentence += word
-                                else:
-                                    sentence += ' ' + word
-                            else:
-                                if sentence[-1] not in self.sentence_separators:
-                                    sentence += '.'
-                                voice_message = VoiceMessage(voice, sentence)
-                                self.messages_to_generate.append(voice_message)
-                                break
-                            if j == len(self.words) - 1:
-                                if sentence[-1] not in self.sentence_separators:
-                                    sentence += '.'
-                                voice_message = VoiceMessage(voice, sentence)
-                                self.messages_to_generate.append(voice_message)
+                    if self.words[i] in self.available_voices:
+                        self.create_voice_message(i, self.words[i])
                     else:
-                        voice = self.default_voice
-                        sentence += self.words[0][:-1] + ' '
-                        for j in range(i + 1, len(self.words)):
-                            word = self.words[j]
-                            if not word in self.available_voices:
-                                if word.isdigit() and len(word) > 36:
-                                    word = word[0:36]
-                                word = word.replace(',', ', ')
-                                if len(sentence) == 0:
-                                    sentence += word
-                                else:
-                                    sentence += ' ' + word
-                            else:
-                                if sentence[-1] not in self.sentence_separators:
-                                    sentence += '.'
-                                voice_message = VoiceMessage(voice, sentence)
-                                self.messages_to_generate.append(voice_message)
-                                break
-                            if j == len(self.words) - 1:
-                                if sentence[-1] not in self.sentence_separators:
-                                    sentence += '.'
-                                voice_message = VoiceMessage(voice, sentence)
-                                self.messages_to_generate.append(voice_message)
-
+                        self.create_voice_message(i + 1, self.default_voice, self.words[0])
             if i != 0 and self.words[i].endswith(':'):
                 if self.words[i] in self.available_voices and i < len(self.words):
-                    voice = self.words[i]
-                    for j in range(i + 1, len(self.words)):
-                        word = self.words[j]
-                        if not word in self.available_voices:
-                            if word.isdigit() and len(word) > 36:
-                                word = word[0:36]
-                            word = word.replace(',', ', ')
-                            if len(sentence) == 0:
-                                sentence += word
-                            else:
-                                sentence += ' ' + word
-                        else:
-                            if sentence[-1] not in self.sentence_separators:
-                                sentence += '.'
-                            voice_message = VoiceMessage(voice, sentence)
-                            self.messages_to_generate.append(voice_message)
-                            break
-                        if j == len(self.words) - 1:
-                            if sentence[-1] not in self.sentence_separators:
-                                sentence += '.'
-                            voice_message = VoiceMessage(voice, sentence)
-                            self.messages_to_generate.append(voice_message)
+                    self.create_voice_message(i + 1, self.words[i])
 
+    def create_voice_message(self, start, voice, init_word=''):
+        sentence = init_word
+        for i in range(start, len(self.words)):
+            word = self.words[i]
+            if not word in self.available_voices:
+                if word.isdigit() and len(word) > 36:
+                    word = word[0:36]
+                word = word.replace(',', ', ')
+                if len(sentence) == 0:
+                    sentence += word
+                else:
+                    sentence += ' ' + word
+            else:
+                if sentence[-1] not in self.sentence_separators:
+                    sentence += '.'
+                voice_message = VoiceMessage(voice, sentence)
+                self.messages_to_generate.append(voice_message)
+                break
+            if i == len(self.words) - 1:
+                if sentence[-1] not in self.sentence_separators:
+                    sentence += '.'
+                voice_message = VoiceMessage(voice, sentence)
+                self.messages_to_generate.append(voice_message)
+        
     def generate_audio(self):
         if self.messages_to_generate:
             files = []
