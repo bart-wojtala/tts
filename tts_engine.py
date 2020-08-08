@@ -36,7 +36,7 @@ class TextToSpeechEngine:
             elif i == 0 and self.words[0].endswith(':'):
                 if i < len(self.words):
                     if self.words[i] in self.available_voices:
-                        self.create_voice_message(i, self.words[i])
+                        self.create_voice_message(i + 1, self.words[i])
                     else:
                         self.create_voice_message(i + 1, self.default_voice, self.words[0])
             if i != 0 and self.words[i].endswith(':'):
