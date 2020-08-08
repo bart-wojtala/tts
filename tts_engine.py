@@ -102,7 +102,7 @@ class TextToSpeechEngine:
     def write_audio_file(self, voice, audio, sampling_rate):
         file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
         if voice == "satan:":
-            temp_file_name = self.path + "test.wav"
+            temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
 
             fixed_framerate = 11000
@@ -119,7 +119,7 @@ class TextToSpeechEngine:
             sound = AudioSegment.from_wav(file_name)
             sound.export(file_name, format="wav")
         elif voice == "voicemail:":
-            temp_file_name = self.path + "test.wav"
+            temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
             fs,audio = read(temp_file_name)
             low_freq = 200.0
