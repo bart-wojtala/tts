@@ -14,11 +14,7 @@ def convert_message():
     message = request.args.get('message')
     voice = request.args.get('voice')
     log_message(message, voice)
-    # tts_engine = TextToSpeechEngine(message)
-    # audio, sampling_rate = tts_engine.generate_audio()
-    message_list = []
-    message_list.append(VoiceMessage(voice, message))
-    audio_generator = AudioGenerator(message_list)
+    audio_generator = AudioGenerator([VoiceMessage(voice, message)])
     audio, sampling_rate = audio_generator.generate()
     return jsonify(audio=audio.tolist(), rate=sampling_rate)
 
