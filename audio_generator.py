@@ -148,4 +148,7 @@ class AudioGenerator:
                     os.remove(temp_file)
 
         scaled_audio = np.int16(joined_audio/np.max(np.abs(joined_audio)) * 32767)
+        if scaled_audio[0] == 32767:
+            scaled_audio = scaled_audio[1:]
+
         return scaled_audio, hparams.sampling_rate
