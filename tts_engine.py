@@ -105,7 +105,7 @@ class TextToSpeechEngine:
     def write_audio_file(self, voice, audio, sampling_rate):
         file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
         if voice == "satan:":
-            temp_file_name = "generated_audio/test.wav"
+            temp_file_name = self.path + "test.wav"
             write(temp_file_name, sampling_rate, audio)
 
             fixed_framerate = 11000
@@ -124,7 +124,7 @@ class TextToSpeechEngine:
         elif voice == "voicemail:":
             temp_file_name = self.path + "test.wav"
             write(temp_file_name, sampling_rate, audio)
-            fs,audio = read("generated_audio/test.wav")
+            fs,audio = read(temp_file_name)
             low_freq = 200.0
             high_freq = 3000.0
             filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
