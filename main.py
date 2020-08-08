@@ -21,8 +21,10 @@ class LocalClient:
         
         @sio.on('event')
         def on_event(event):
-            print("New message from " + event['username'] + " | " + event['message'])
-            donation = Donation(event['username'], event['message'])
+            message = event['message']
+            name = event['username']
+            print("\n--- New message from " + event['username'] + " | " + event['message'])
+            donation = Donation(name, message)
             new_donations.append(donation)
 
         @sio.event
@@ -46,7 +48,10 @@ class StreamlabsClient:
         @sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
-                donation = Donation(event['message'][0]['name'], event['message'][0]['message'])
+                message = event['message'][0]['message']
+                name = event['message'][0]['name']
+                print("\n--- New donation from " + name + " | " + message)
+                donation = Donation(name, message)
                 new_donations.append(donation)
 
         @sio.event
@@ -214,23 +219,12 @@ class GUI(QMainWindow, Ui_MainWindow):
             text_ready.emit("Sta1:Waiting for incoming donations...")
             while new_donations and self.connected:
                 donation = new_donations.pop(0)
-                # tts_engine = TextToSpeechEngine(donation.message)
-                # audio, sampling_rate = tts_engine.generate_audio()
-                print("Handling message from " + donation.name + " | " + donation.message)
+                print("\n--- Handling message from " + donation.name + " | " + donation.message)
                 try:
-                    # params = {'message': donation.message}
-                    # response = requests.get(self.url, params)
-                    # res_json = response.json()
-                    # audio = np.array(res_json["audio"], dtype=np.int16)
-                    # sampling_rate = res_json["rate"]
-
-                    # file_name = self.generated_audio_path + time.strftime("%Y%m%d-%H%M%S_") + donation.name + ".wav"
-                    # write(file_name, sampling_rate, audio)
-                    # donations_to_play.append(DonationAudio(donation, file_name))
                     start_time = time.time()
                     tts_engine = TextToSpeechEngine(donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
-                    print("\n--- Generating audio took %s seconds ---\n" % round((time.time() - start_time), 2))
+                    print("\n--- Generating audio took %s seconds" % round((time.time() - start_time), 2))
                     donations_to_play.append(donation_audio)
                 except:
                     self.connected = False
@@ -265,8 +259,6 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
                     self.files = files
-                    # for f in files:
-                    #     self.playback_wav(f)
                     while self.current_audio_length > 0:
                         if not channel.get_busy() and len(self.files) > 0:
                             self.playback_wav(self.files.pop(0))

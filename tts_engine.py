@@ -1,5 +1,4 @@
 from models import VoiceMessage, DonationAudio
-# from audio_generator import AudioGenerator
 import sys
 import numpy as np
 import requests
@@ -82,7 +81,7 @@ class TextToSpeechEngine:
                         single_message = ''
 
             for message in messages_to_send:
-                if(isinstance(message, str)):
+                if isinstance(message, str):
                     params = {'message': message}
                     audio, sampling_rate = self.request_audio(self.endpoint_single_tts, params)
                     file_name = self.write_audio_file(self.default_voice, audio, sampling_rate)
@@ -93,8 +92,6 @@ class TextToSpeechEngine:
                     file_name = self.write_audio_file(message.voice, audio, sampling_rate)
                     files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
-            # audio_generator = AudioGenerator(self.messages_to_generate)
-            # return audio_generator.generate()
         return
 
     def request_audio(self, endpoint, params):
