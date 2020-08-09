@@ -132,9 +132,9 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.current_audio_length = 0
         self.files = []
         
-        self.ClientSkipBtn.clicked.connect(self.skip_wav)
+        self.ClientSkipAudio.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
-        self.ClientSkipBtn.setDisabled(True)
+        self.ClientSkipAudio.setDisabled(True)
         self.log_window.ensureCursorVisible()
 
         pygame.mixer.quit()
@@ -207,7 +207,7 @@ class GUI(QMainWindow, Ui_MainWindow):
     def execute_this_fn(self, channel, progress_callback, elapsed_callback, text_ready):
         self.ClientStartBtn.setDisabled(True)
         self.ClientStopBtn.setEnabled(True)
-        self.ClientSkipBtn.setEnabled(True)
+        self.ClientSkipAudio.setEnabled(True)
         text_ready.emit('Log1:Initializing')
         while True:
             _mutex1.lock()
@@ -234,7 +234,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
-        self.ClientSkipBtn.setDisabled(True)
+        self.ClientSkipAudio.setDisabled(True)
         text_ready.emit('Log1:\nDisconnected')
         return 'Return value of execute_this_fn'
 
@@ -280,7 +280,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
         self.current_audio_length -= 1
-        self.ClientSkipBtn.setEnabled(True)
+        self.ClientSkipAudio.setEnabled(True)
 
     def skip_wav(self):
         if self.channel.get_busy():
