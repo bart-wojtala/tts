@@ -14,6 +14,7 @@ from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
 import requests
 import numpy as np
+from configparser import ConfigParser
 
 class LocalClient:
     def __init__(self):
@@ -68,7 +69,6 @@ class StreamlabsClient:
 
         sio.connect('https://sockets.streamlabs.com?token=' + token)
 
-token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IjE5NTgyN0IxRDJBRDMxREUzQjJBIiwicmVhZF9vbmx5Ijp0cnVlLCJwcmV2ZW50X21hc3RlciI6dHJ1ZSwidHdpdGNoX2lkIjoiMzk2NTk5NTkifQ.jG1vs8NfnS2T5HTcJ_on9-_HokkiO0ACLYevhgUqnfo"
 _mutex1 = QMutex()
 _running = False
 new_donations = []
@@ -113,10 +113,12 @@ class GUISignals(QObject):
     elapsed = pyqtSignal(int)
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self, app, instance_url):
+    def __init__(self, app, instance_url, streamlabs_token=''):
         super(GUI, self).__init__()
-        # StreamlabsClient(token)
-        LocalClient()
+        if streamlabs_token:
+            StreamlabsClient(streamlabs_token)
+        else:
+            LocalClient()
         self.url = "http://" + instance_url + ":9000"
         self.app = app
         self.setupUi(self)
@@ -291,7 +293,11 @@ class GUI(QMainWindow, Ui_MainWindow):
         
 
 if __name__ == '__main__':
+    config = ConfigParser()
+    config.read('config.ini')
+    url = config['GCP']['url']
+    token = config['Streamlabs']['token']
     app = Qt.QApplication(sys.argv)
-    window = GUI(app, '35.204.151.211')
+    window = GUI(app, url)
     window.show()
     sys.exit(app.exec_())
