@@ -296,7 +296,7 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     url = config['GCP']['url']
-    token = config['Streamlabs']['token']
+    # token = config['Streamlabs']['token']
     app = Qt.QApplication(sys.argv)
     window = GUI(app, url)
     window.show()
