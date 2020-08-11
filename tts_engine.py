@@ -10,8 +10,10 @@ import pyrubberband as pyrb
 from pydub import AudioSegment
 from random import randint
 
+
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:', 'stephen:', 'satan:', 'voicemail:', 'darthvader:']
+    available_voices = ['woman:', 'david:', 'neil:',
+                        'stephen:', 'satan:', 'voicemail:', 'darthvader:']
     default_voice = 'woman:'
 
     def __init__(self, donation, name, url, path):
@@ -37,7 +39,8 @@ class TextToSpeechEngine:
                     if self.words[i] in self.available_voices:
                         self.create_voice_message(i + 1, self.words[i])
                     else:
-                        self.create_voice_message(i + 1, self.default_voice, self.words[0])
+                        self.create_voice_message(
+                            i + 1, self.default_voice, self.words[0])
             if i != 0 and self.words[i].endswith(':'):
                 if self.words[i] in self.available_voices and i < len(self.words):
                     self.create_voice_message(i + 1, self.words[i])
@@ -65,7 +68,7 @@ class TextToSpeechEngine:
                     sentence += '.'
                 voice_message = VoiceMessage(voice, sentence)
                 self.messages_to_generate.append(voice_message)
-        
+
     def generate_audio(self):
         if self.messages_to_generate:
             files = []
@@ -83,13 +86,18 @@ class TextToSpeechEngine:
             for message in messages_to_send:
                 if isinstance(message, str):
                     params = {'message': message}
-                    audio, sampling_rate = self.request_audio(self.endpoint_single_tts, params)
-                    file_name = self.write_audio_file(self.default_voice, audio, sampling_rate)
+                    audio, sampling_rate = self.request_audio(
+                        self.endpoint_single_tts, params)
+                    file_name = self.write_audio_file(
+                        self.default_voice, audio, sampling_rate)
                     files.append(VoiceMessage(self.default_voice, file_name))
                 else:
-                    params = {'voice': message.voice, 'message': message.message}
-                    audio, sampling_rate = self.request_audio(self.endpoint_tts, params)
-                    file_name = self.write_audio_file(message.voice, audio, sampling_rate)
+                    params = {'voice': message.voice,
+                              'message': message.message}
+                    audio, sampling_rate = self.request_audio(
+                        self.endpoint_tts, params)
+                    file_name = self.write_audio_file(
+                        message.voice, audio, sampling_rate)
                     files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
         return
@@ -100,7 +108,9 @@ class TextToSpeechEngine:
         return np.array(res_json["audio"], dtype=np.int16), res_json["rate"]
 
     def write_audio_file(self, voice, audio, sampling_rate):
-        file_name = self.path + time.strftime("%Y%m%d-%H%M%S_") + self.name + str(randint(0, 100)) + ".wav"
+        file_name = self.path + \
+            time.strftime("%Y%m%d-%H%M%S_") + self.name + \
+            str(randint(0, 100)) + ".wav"
         if voice == "satan:":
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
@@ -121,11 +131,12 @@ class TextToSpeechEngine:
         elif voice == "voicemail:":
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
-            fs,audio = read(temp_file_name)
+            fs, audio = read(temp_file_name)
             low_freq = 200.0
             high_freq = 3000.0
-            filtered_signal = butter_bandpass_filter(audio, low_freq, high_freq, fs, order=6)
-            write(file_name, fs, np.array(filtered_signal, dtype = np.int16))
+            filtered_signal = butter_bandpass_filter(
+                audio, low_freq, high_freq, fs, order=6)
+            write(file_name, fs, np.array(filtered_signal, dtype=np.int16))
         else:
             write(file_name, sampling_rate, audio)
         return file_name
@@ -137,12 +148,14 @@ class TextToSpeechEngine:
             return audio_generator.generate()
         return
 
+
 def butter_params(low_freq, high_freq, fs, order=5):
     nyq = 0.5 * fs
     low = low_freq / nyq
     high = high_freq / nyq
     b, a = butter(order, [low, high], btype='band')
     return b, a
+
 
 def butter_bandpass_filter(data, low_freq, high_freq, fs, order=5):
     b, a = butter_params(low_freq, high_freq, fs, order=order)

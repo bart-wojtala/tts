@@ -2,9 +2,9 @@ import socketio
 import os
 import sys
 from PyQt5 import Qt
-from PyQt5 import QtCore,QtGui
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QTimer
-from PyQt5.QtWidgets import QWidget,QMainWindow,QHeaderView, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QMainWindow, QHeaderView, QMessageBox, QFileDialog
 from ui_layout import Ui_MainWindow
 import time
 import pygame
@@ -16,15 +16,17 @@ import requests
 import numpy as np
 from configparser import ConfigParser
 
+
 class LocalClient:
     def __init__(self):
         sio = socketio.Client()
-        
+
         @sio.on('event')
         def on_event(event):
             message = event['message']
             name = event['username']
-            print("\n--- New message from " + event['username'] + " | " + event['message'])
+            print("\n--- New message from " +
+                  event['username'] + " | " + event['message'])
             donation = Donation(name, message)
             new_donations.append(donation)
 
@@ -42,10 +44,11 @@ class LocalClient:
 
         sio.connect('http://localhost:3000')
 
+
 class StreamlabsClient:
     def __init__(self, token):
         sio = socketio.Client()
-        
+
         @sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
@@ -69,18 +72,21 @@ class StreamlabsClient:
 
         sio.connect('https://sockets.streamlabs.com?token=' + token)
 
+
 _mutex1 = QMutex()
 _running = False
 new_donations = []
 donations_to_play = []
 
+
 class WorkerSignals(QObject):
-    textready = pyqtSignal(str) 
+    textready = pyqtSignal(str)
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
     result = pyqtSignal(object)
     progress = pyqtSignal(int)
     elapsed = pyqtSignal(int)
+
 
 class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
@@ -89,9 +95,9 @@ class Worker(QRunnable):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-        self.signals = WorkerSignals()    
+        self.signals = WorkerSignals()
 
-        self.kwargs['progress_callback'] = self.signals.progress        
+        self.kwargs['progress_callback'] = self.signals.progress
         self.kwargs['elapsed_callback'] = self.signals.elapsed
         self.kwargs['text_ready'] = self.signals.textready
 
@@ -108,9 +114,11 @@ class Worker(QRunnable):
         finally:
             self.signals.finished.emit()
 
+
 class GUISignals(QObject):
-    progress = pyqtSignal(int)   
+    progress = pyqtSignal(int)
     elapsed = pyqtSignal(int)
+
 
 class GUI(QMainWindow, Ui_MainWindow):
     def __init__(self, app, instance_url, streamlabs_token=''):
@@ -133,7 +141,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.connected = False
         self.current_audio_length = 0
         self.files = []
-        
+
         self.ClientSkipAudio.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
@@ -151,14 +159,15 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStopBtn.clicked.connect(self.stop)
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(3)
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-        self.signals = GUISignals()  
-    
+        print("Multithreading with maximum %d threads" %
+              self.threadpool.maxThreadCount())
+        self.signals = GUISignals()
+
     @pyqtSlot(str)
     def draw_text(self, text):
         obj = text[0:4]
         msg = text[5:]
-        if obj=='Log1':
+        if obj == 'Log1':
             if len(self.logs2) > self.max_log2_lines:
                 self.logs2.pop(0)
             self.logs2.append(msg)
@@ -166,7 +175,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.log_window.setPlainText(log_text)
             self.log_window.verticalScrollBar().setValue(
                 self.log_window.verticalScrollBar().maximum())
-        if obj=='Sta1':
+        if obj == 'Sta1':
             self.statusbar.setText(msg)
 
     @pyqtSlot(int)
@@ -197,8 +206,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         worker2.signals.finished.connect(self.thread_complete)
         worker2.signals.textready.connect(self.draw_text)
 
-        self.threadpool.start(worker2) 
-        
+        self.threadpool.start(worker2)
+
     def stop(self):
         global _running
         _mutex1.lock()
@@ -221,16 +230,20 @@ class GUI(QMainWindow, Ui_MainWindow):
             text_ready.emit("Sta1:Waiting for incoming donations...")
             while new_donations and self.connected:
                 donation = new_donations.pop(0)
-                print("\n--- Handling message from " + donation.name + " | " + donation.message)
+                print("\n--- Handling message from " +
+                      donation.name + " | " + donation.message)
                 try:
                     start_time = time.time()
-                    tts_engine = TextToSpeechEngine(donation, donation.name, self.url, self.generated_audio_path)
+                    tts_engine = TextToSpeechEngine(
+                        donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
-                    print("\n--- Generating audio took %s seconds" % round((time.time() - start_time), 2))
+                    print("\n--- Generating audio took %s seconds" %
+                          round((time.time() - start_time), 2))
                     donations_to_play.append(donation_audio)
                 except:
                     self.connected = False
-                    text_ready.emit("Log1:\n## Can't connect to TTS server! ##")
+                    text_ready.emit(
+                        "Log1:\n## Can't connect to TTS server! ##")
                     self.stop()
                     new_donations.insert(0, donation)
             time.sleep(0.5)
@@ -258,7 +271,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit("Log1:\n###########################\n")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
-                    text_ready.emit('Sta1:Currently playing -> ' + name + ' | ' + msg)
+                    text_ready.emit(
+                        'Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
                     self.files = files
                     while self.current_audio_length > 0:
@@ -290,7 +304,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.channel.stop()
             self.channel = pygame.mixer.Channel(0)
             self.current_audio_length = 0
-        
+
 
 if __name__ == '__main__':
     config = ConfigParser()
