@@ -146,6 +146,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
         self.log_window.ensureCursorVisible()
+        self.volumeSlider.valueChanged.connect(self.change_volume)
 
         pygame.mixer.quit()
         pygame.mixer.init(frequency=22050, size=-16, channels=1)
@@ -304,6 +305,10 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.channel.stop()
             self.channel = pygame.mixer.Channel(0)
             self.current_audio_length = 0
+
+    def change_volume(self):
+        value = self.volumeSlider.value()
+        self.channel.set_volume(value/100)
 
 
 if __name__ == '__main__':

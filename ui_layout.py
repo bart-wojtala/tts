@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class Ui_MainWindow(object):
@@ -69,6 +70,10 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         self.gridLayout_2.addWidget(
             self.statusbar, 0, 0, 1, 1, QtCore.Qt.AlignLeft)
+        self.volumeSlider = QtWidgets.QSlider(
+            Qt.Horizontal, self.centralwidget)
+        self.gridLayout_2.addWidget(
+            self.volumeSlider, 1, 0, 1, 0, QtCore.Qt.AlignRight)
         spacerItem3 = QtWidgets.QSpacerItem(
             40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem3, 0, 1, 1, 1)
@@ -89,3 +94,9 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(
             self.tab_1), _translate("MainWindow", "StreamElements"))
         self.statusbar.setText(_translate("MainWindow", "Ready"))
+        self.volumeSlider.setMinimum(0)
+        self.volumeSlider.setMaximum(100)
+        self.volumeSlider.setSingleStep(1)
+        self.volumeSlider.setTickInterval(10)
+        self.volumeSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.volumeSlider.setValue(100)
