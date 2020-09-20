@@ -1,3 +1,9 @@
+import os
+import time
+import sys
+sys.path.append('tts/')
+sys.path.append('tts/waveglow/')
+
 from scipy.io.wavfile import read
 import pyttsx3
 from denoiser import Denoiser
@@ -8,12 +14,6 @@ from model import Tacotron2
 from hparams import create_hparams
 import numpy as np
 import torch
-
-import os
-import time
-import sys
-sys.path.append('tts/')
-sys.path.append('tts/waveglow/')
 # from train import load_model
 
 
