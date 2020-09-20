@@ -24,7 +24,8 @@ class AudioGenerator:
         "neil:": "neil_tyson_checkpoint_500000",
         "satan:": "tacotron2_statedict.pt",
         "voicemail:": "tacotron2_statedict.pt",
-        "darthvader:": "jej_checkpoint_904500"
+        "darthvader:": "jej_checkpoint_904500", 
+        "trump:": "trump_7752"
     }
 
     synth_voices = {

@@ -13,7 +13,7 @@ from random import randint
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:',
-                        'stephen:', 'satan:', 'voicemail:', 'darthvader:']
+                        'stephen:', 'satan:', 'voicemail:', 'darthvader:', 'trump:']
     default_voice = 'woman:'
 
     def __init__(self, donation, name, url, path):
