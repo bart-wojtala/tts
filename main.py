@@ -26,8 +26,9 @@ class LocalClient:
         def on_event(event):
             message = event['message']
             name = event['username']
-            print("\n--- New message from " +
-                  event['username'] + " | " + event['message'])
+            message_time = event['messageTime']
+            print("\n--- " + message_time + "| " +
+                  name + " sent a message: " + message)
             donation = Donation(name, message)
             new_donations.append(donation)
 
