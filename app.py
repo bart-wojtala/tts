@@ -20,7 +20,7 @@ def convert_message():
     return jsonify(audio=audio.tolist(), rate=sampling_rate)
 
 
-@app.route('/singletts', methods=['GET'])
+@app.route('/tts/single', methods=['GET'])
 def convert_single_message():
     message = request.args.get('message')
     log_message(message)

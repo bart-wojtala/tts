@@ -22,7 +22,7 @@ class TextToSpeechEngine:
         self.name = name
         self.url = url
         self.endpoint_tts = self.url + "/tts"
-        self.endpoint_single_tts = self.url + "/singletts"
+        self.endpoint_single_tts = self.endpoint_tts + "/single"
         self.path = path
         if path:
             self.words = donation.message.split()
