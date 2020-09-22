@@ -15,6 +15,7 @@ from tts_engine import TextToSpeechEngine
 import requests
 import numpy as np
 from configparser import ConfigParser
+from datetime import datetime
 
 
 class LocalClient:
@@ -54,7 +55,10 @@ class StreamlabsClient:
             if(event['type'] == 'donation'):
                 message = event['message'][0]['message']
                 name = event['message'][0]['name']
-                print("\n--- New donation from " + name + " | " + message)
+                amount = event['message'][0]['formatted_amount']
+                current_time = datetime.now().strftime("%H:%M:%S")
+                print("\n--- " + current_time + "| " + name +
+                      " donated " + amount + ": " + message)
                 donation = Donation(name, message)
                 new_donations.append(donation)
 
