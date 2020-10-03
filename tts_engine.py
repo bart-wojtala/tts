@@ -13,8 +13,8 @@ from AudioLib import AudioEffect
 
 
 class TextToSpeechEngine:
-    available_voices = ['woman:', 'david:', 'neil:',
-                        'stephen:', 'satan:', 'voicemail:', 'darthvader:', 'trump:']
+    available_voices = ['woman:', 'david:', 'neil:', 'stephen:',
+                        'satan:', 'voicemail:', 'darthvader:', 'trump:', 'gandalf:']
     default_voice = 'woman:'
 
     def __init__(self, donation, name, url, path):
