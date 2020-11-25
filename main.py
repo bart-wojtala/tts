@@ -19,7 +19,7 @@ from datetime import datetime
 
 
 class LocalClient:
-    def __init__(self):
+    def __init__(self, donations_list):
         sio = socketio.Client()
 
         @sio.on('event')
@@ -30,7 +30,7 @@ class LocalClient:
             print("\n--- " + message_time + "| " +
                   name + " sent a message: " + message)
             donation = Donation(name, message)
-            new_donations.append(donation)
+            donations_list.append(donation)
 
         @sio.event
         def connect():
@@ -48,7 +48,7 @@ class LocalClient:
 
 
 class StreamlabsClient:
-    def __init__(self, token):
+    def __init__(self, donations_list, token):
         sio = socketio.Client()
 
         @sio.on('event')
@@ -61,7 +61,7 @@ class StreamlabsClient:
                 print("\n--- " + current_time + "| " + name +
                       " donated " + amount + ": " + message)
                 donation = Donation(name, message)
-                new_donations.append(donation)
+                donations_list.append(donation)
 
         @sio.event
         def connect():
@@ -80,8 +80,6 @@ class StreamlabsClient:
 
 _mutex1 = QMutex()
 _running = False
-new_donations = []
-donations_to_play = []
 
 
 class WorkerSignals(QObject):
@@ -128,10 +126,12 @@ class GUISignals(QObject):
 class GUI(QMainWindow, Ui_MainWindow):
     def __init__(self, app, instance_url, streamlabs_token=''):
         super(GUI, self).__init__()
+        self.donation_list = []
+        self.donations_to_play = []
         if streamlabs_token:
-            StreamlabsClient(streamlabs_token)
+            StreamlabsClient(self.donation_list, streamlabs_token)
         else:
-            LocalClient()
+            LocalClient(self.donation_list)
         self.url = "http://" + instance_url + ":9000"
         self.app = app
         self.setupUi(self)
@@ -234,8 +234,8 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             text_ready.emit("Sta1:Waiting for incoming donations...")
-            while new_donations and self.connected:
-                donation = new_donations.pop(0)
+            while self.donation_list and self.connected:
+                donation = self.donation_list.pop(0)
                 print("\n--- Handling message from " +
                       donation.name + " | " + donation.message)
                 try:
@@ -245,13 +245,13 @@ class GUI(QMainWindow, Ui_MainWindow):
                     donation_audio = tts_engine.generate_audio()
                     print("\n--- Generating audio took %s seconds" %
                           round((time.time() - start_time), 2))
-                    donations_to_play.append(donation_audio)
+                    self.donations_to_play.append(donation_audio)
                 except:
                     self.connected = False
                     text_ready.emit(
                         "Log1:\n## Can't connect to TTS server! ##")
                     self.stop()
-                    new_donations.insert(0, donation)
+                    self.donation_list.insert(0, donation)
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
@@ -267,10 +267,10 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            while donations_to_play:
+            while self.donations_to_play:
                 if not channel.get_busy() and self.current_audio_length == 0:
                     time.sleep(2)
-                    donation_audio = donations_to_play.pop(0)
+                    donation_audio = self.donations_to_play.pop(0)
                     name = donation_audio.donation.name
                     msg = donation_audio.donation.message
                     files = donation_audio.files
