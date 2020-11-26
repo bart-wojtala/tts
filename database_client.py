@@ -18,5 +18,5 @@ class DatabaseClient:
         self.donations_collection.update_one(query, newvalues, upsert=True)
 
     def get_first_donation_in_queue(self):
-        first_donation = self.donations_collection.find_one()
-        return first_donation
+        donation = self.donations_collection.find_one()
+        return Donation(donation['messageId'], donation['name'], donation['message'])
