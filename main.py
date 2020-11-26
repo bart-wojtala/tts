@@ -10,6 +10,7 @@ import time
 import pygame
 import traceback
 from scipy.io.wavfile import write
+from database_client import DatabaseClient
 from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
 import requests
@@ -19,18 +20,19 @@ from datetime import datetime
 
 
 class LocalClient:
-    def __init__(self, donations_list):
+    def __init__(self, database_client):
         sio = socketio.Client()
 
         @sio.on('event')
         def on_event(event):
+            messageId = event['messageId']
             message = event['message']
             name = event['username']
             message_time = event['messageTime']
             print("\n--- " + message_time + "| " +
                   name + " sent a message: " + message)
-            donation = Donation(name, message)
-            donations_list.append(donation)
+            donation = Donation(messageId, name, message)
+            database_client.add_donation(donation)
 
         @sio.event
         def connect():
@@ -48,20 +50,21 @@ class LocalClient:
 
 
 class StreamlabsClient:
-    def __init__(self, donations_list, token):
+    def __init__(self, database_client, token):
         sio = socketio.Client()
 
         @sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
+                messageId = event['event_id']
                 message = event['message'][0]['message']
                 name = event['message'][0]['name']
                 amount = event['message'][0]['formatted_amount']
                 current_time = datetime.now().strftime("%H:%M:%S")
                 print("\n--- " + current_time + "| " + name +
                       " donated " + amount + ": " + message)
-                donation = Donation(name, message)
-                donations_list.append(donation)
+                donation = Donation(messageId, name, message)
+                database_client.add_donation(donation)
 
         @sio.event
         def connect():
@@ -126,12 +129,12 @@ class GUISignals(QObject):
 class GUI(QMainWindow, Ui_MainWindow):
     def __init__(self, app, instance_url, streamlabs_token=''):
         super(GUI, self).__init__()
-        self.donation_list = []
         self.donations_to_play = []
+        self.database_client = DatabaseClient()
         if streamlabs_token:
-            StreamlabsClient(self.donation_list, streamlabs_token)
+            StreamlabsClient(self.database_client, streamlabs_token)
         else:
-            LocalClient(self.donation_list)
+            LocalClient(self.database_client)
         self.url = "http://" + instance_url + ":9000"
         self.app = app
         self.setupUi(self)
@@ -234,8 +237,8 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             text_ready.emit("Sta1:Waiting for incoming donations...")
-            while self.donation_list and self.connected:
-                donation = self.donation_list.pop(0)
+            while self.database_client.is_donations_collection_not_empty() and self.connected:
+                donation = self.database_client.get_first_donation_in_queue()
                 print("\n--- Handling message from " +
                       donation.name + " | " + donation.message)
                 try:
@@ -246,12 +249,12 @@ class GUI(QMainWindow, Ui_MainWindow):
                     print("\n--- Generating audio took %s seconds" %
                           round((time.time() - start_time), 2))
                     self.donations_to_play.append(donation_audio)
+                    self.database_client.delete_donation(donation.messageId)
                 except:
                     self.connected = False
                     text_ready.emit(
                         "Log1:\n## Can't connect to TTS server! ##")
                     self.stop()
-                    self.donation_list.insert(0, donation)
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
