@@ -23,3 +23,6 @@ class DatabaseClient:
 
     def delete_donation(self, messageId):
         self.donations_collection.delete_one({'messageId': messageId})
+
+    def is_donations_collection_not_empty(self):
+        return False if self.donations_collection.count_documents({}) == 0 else True
