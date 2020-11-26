@@ -5,7 +5,8 @@ class VoiceMessage:
 
 
 class Donation:
-    def __init__(self, name, message):
+    def __init__(self, messageId, name, message):
+        self.messageId = messageId
         self.name = name
         self.message = message
 
