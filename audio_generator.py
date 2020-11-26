@@ -26,7 +26,7 @@ class AudioGenerator:
         "voicemail:": "tacotron2_statedict.pt",
         "darthvader:": "jej_checkpoint_904500", 
         "trump:": "trump_7752",
-        "gandalf:": "gandalf_checkpoint_6014"
+        "gandalf:": "gandalf_checkpoint_23932"
     }
 
     synth_voices = {
