@@ -20,3 +20,6 @@ class DatabaseClient:
     def get_first_donation_in_queue(self):
         donation = self.donations_collection.find_one()
         return Donation(donation['messageId'], donation['name'], donation['message'])
+
+    def delete_donation(self, messageId):
+        self.donations_collection.delete_one({'messageId': messageId})
