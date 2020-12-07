@@ -142,6 +142,15 @@ class TextToSpeechEngine:
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
             AudioEffect.robotic(temp_file_name, file_name)
+
+            y, sr = sf.read(file_name)
+
+            y_stretch = pyrb.time_stretch(y, sr, 0.9)
+            y_shift = pyrb.pitch_shift(y, sr, 0.9)
+            sf.write(file_name, y_stretch, sr, format='wav')
+
+            sound = AudioSegment.from_wav(file_name)
+            sound.export(file_name, format="wav")
         else:
             write(file_name, sampling_rate, audio)
         return file_name
