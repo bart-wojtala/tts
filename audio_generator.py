@@ -26,7 +26,8 @@ class AudioGenerator:
         "voicemail:": "tacotron2_statedict.pt",
         "darthvader:": "jej_checkpoint_904500", 
         "trump:": "trump_7752",
-        "gandalf:": "gandalf_checkpoint_23932"
+        "gandalf:": "gandalf_checkpoint_23932",
+        "keanu:": "keanu_18720"
     }
 
     synth_voices = {
@@ -85,12 +86,15 @@ class AudioGenerator:
                 else:
                     hparams.max_decoder_steps = 10000
 
-                if len(message.message) < 6:
-                    hparams.gate_threshold = 0.05
-                elif len(message.message) >= 6 and len(message.message) < 15:
+                if message.voice == 'keanu:':
                     hparams.gate_threshold = 0.1
                 else:
-                    hparams.gate_threshold = 0.5
+                    if len(message.message) < 6:
+                        hparams.gate_threshold = 0.05
+                    elif len(message.message) >= 6 and len(message.message) < 15:
+                        hparams.gate_threshold = 0.1
+                    else:
+                        hparams.gate_threshold = 0.5
 
                 message_extended = False
                 if len(message.message) < 11:
