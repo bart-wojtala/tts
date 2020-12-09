@@ -86,16 +86,12 @@ class AudioGenerator:
                 else:
                     hparams.max_decoder_steps = 10000
 
-                if message.voice == 'keanu:':
-                    hparams.max_decoder_steps = 100000
+                if len(message.message) < 6:
+                    hparams.gate_threshold = 0.05
+                elif len(message.message) >= 6 and len(message.message) < 15:
                     hparams.gate_threshold = 0.1
                 else:
-                    if len(message.message) < 6:
-                        hparams.gate_threshold = 0.05
-                    elif len(message.message) >= 6 and len(message.message) < 15:
-                        hparams.gate_threshold = 0.1
-                    else:
-                        hparams.gate_threshold = 0.5
+                    hparams.gate_threshold = 0.5
 
                 message_extended = False
                 if len(message.message) < 11:
