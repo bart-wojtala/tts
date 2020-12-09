@@ -27,7 +27,7 @@ class AudioGenerator:
         "darthvader:": "jej_checkpoint_904500", 
         "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
-        "keanu:": "keanu_25896"
+        "keanu:": "keanu_22360"
     }
 
     synth_voices = {
@@ -87,6 +87,7 @@ class AudioGenerator:
                     hparams.max_decoder_steps = 10000
 
                 if message.voice == 'keanu:':
+                    hparams.max_decoder_steps = 100000
                     hparams.gate_threshold = 0.1
                 else:
                     if len(message.message) < 6:
