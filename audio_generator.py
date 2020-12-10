@@ -27,7 +27,7 @@ class AudioGenerator:
         "darthvader:": "jej_checkpoint_904500", 
         "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
-        "keanu:": "keanu_22360"
+        "keanu:": "keanu_34112"
     }
 
     synth_voices = {
