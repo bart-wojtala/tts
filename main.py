@@ -303,6 +303,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             pygame.mixer.init(frequency=22050, size=-16, channels=1)
             self.channel = pygame.mixer.Channel(0)
         sound = pygame.mixer.Sound(wav)
+        self.channel.set_volume(self.volumeSlider.value()/100)
         self.channel.queue(sound)
         self.current_audio_length -= 1
         self.ClientSkipAudio.setEnabled(True)
@@ -316,7 +317,6 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def change_volume(self):
         value = self.volumeSlider.value()
-        self.channel.set_volume(value/100)
 
 
 if __name__ == '__main__':
