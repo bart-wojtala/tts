@@ -24,7 +24,7 @@ class AudioGenerator:
         "neil:": "neil_tyson_checkpoint_500000",
         "satan:": "tacotron2_statedict.pt",
         "voicemail:": "tacotron2_statedict.pt",
-        "darthvader:": "jej_checkpoint_904500", 
+        "vader:": "jej_checkpoint_904500",
         "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
         "keanu:": "keanu_34112"
@@ -36,7 +36,7 @@ class AudioGenerator:
 
     waveglow = {
         "default": "waveglow_256channels.pt",
-        "darthvader:": "jej_waveglow_165k.pt"
+        "vader:": "jej_waveglow_165k.pt"
     }
 
     def __init__(self, messages):
@@ -70,7 +70,7 @@ class AudioGenerator:
         for message in self.messages:
             if message.voice in self.models:
                 waveglow_path = ''
-                if message.voice == "darthvader:":
+                if message.voice == "vader:":
                     waveglow_path = models_path + self.waveglow[message.voice]
                 else:
                     waveglow_path = models_path + self.waveglow['default']
@@ -130,7 +130,7 @@ class AudioGenerator:
                             cut_idx = idx
                             break
                     scaled_audio = scaled_audio[:cut_idx]
-                if message.voice == "darthvader:":
+                if message.voice == "vader:":
                     _, effect = read("extras/breathing.wav")
                     scaled_audio = np.concatenate((effect, scaled_audio))
 

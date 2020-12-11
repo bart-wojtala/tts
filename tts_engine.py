@@ -14,7 +14,7 @@ from AudioLib import AudioEffect
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:',
-                        'satan:', 'voicemail:', 'darthvader:', 'trump:', 'gandalf:', 'keanu:']
+                        'satan:', 'voicemail:', 'vader:', 'trump:', 'gandalf:', 'keanu:']
     default_voice = 'woman:'
 
     def __init__(self, donation, name, url, path):
@@ -76,11 +76,11 @@ class TextToSpeechEngine:
             messages_to_send = []
             single_message = ''
             for index, message in enumerate(self.messages_to_generate):
-                if message.voice == "satan:" or message.voice == "voicemail:" or message.voice == "darthvader:":
+                if message.voice == "satan:" or message.voice == "voicemail:" or message.voice == "vader:":
                     messages_to_send.append(message)
                 else:
                     single_message += message.voice + ' ' + message.message + ' '
-                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:" or self.messages_to_generate[index + 1].voice == "darthvader:"):
+                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:" or self.messages_to_generate[index + 1].voice == "vader:"):
                         messages_to_send.append(single_message)
                         single_message = ''
 
@@ -138,7 +138,7 @@ class TextToSpeechEngine:
             filtered_signal = butter_bandpass_filter(
                 audio, low_freq, high_freq, fs, order=6)
             write(file_name, fs, np.array(filtered_signal, dtype=np.int16))
-        elif voice == "darthvader:":
+        elif voice == "vader:":
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
             AudioEffect.robotic(temp_file_name, file_name)
