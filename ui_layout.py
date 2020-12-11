@@ -62,6 +62,22 @@ class Ui_MainWindow(object):
         self.log_window.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
         self.log_window.setObjectName("log_window")
         self.verticalLayout_2.addWidget(self.log_window)
+        self.label_2 = QtWidgets.QLabel(self.tab_1)
+        self.label_2.setObjectName("label_2")
+        self.verticalLayout_2.addWidget(self.label_2)
+        self.log_window2 = QtWidgets.QPlainTextEdit(self.tab_1)
+        sizePolicy2 = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(
+            self.log_window2.sizePolicy().hasHeightForWidth())
+        self.log_window2.setSizePolicy(sizePolicy2)
+        self.log_window2.setAutoFillBackground(False)
+        self.log_window2.setReadOnly(True)
+        self.log_window2.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self.log_window2.setObjectName("log_window2")
+        self.verticalLayout_2.addWidget(self.log_window2)
         self.tabWidget.addTab(self.tab_1, "")
         self.verticalLayout_1.addWidget(self.tabWidget)
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -91,6 +107,8 @@ class Ui_MainWindow(object):
         self.ClientStopBtn.setText(_translate("MainWindow", "Stop"))
         self.ClientSkipAudio.setText(_translate("MainWindow", "Skip"))
         self.label_1.setText(_translate("MainWindow", "Status:"))
+        self.label_2.setText(_translate(
+            "MainWindow", "Currently processed message:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(
             self.tab_1), _translate("MainWindow", "StreamElements"))
         self.statusbar.setText(_translate("MainWindow", "Ready"))

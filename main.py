@@ -29,8 +29,6 @@ class LocalClient:
             message = event['message']
             name = event['username']
             message_time = event['messageTime']
-            print("\n--- " + message_time + "| " +
-                  name + " sent a message: " + message)
             donation = Donation(messageId, name, message)
             database_client.add_donation(donation)
 
@@ -61,8 +59,6 @@ class StreamlabsClient:
                 name = event['message'][0]['name']
                 amount = event['message'][0]['formatted_amount']
                 current_time = datetime.now().strftime("%H:%M:%S")
-                print("\n--- " + current_time + "| " + name +
-                      " donated " + amount + ": " + message)
                 donation = Donation(messageId, name, message)
                 database_client.add_donation(donation)
 
@@ -154,6 +150,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
         self.log_window.ensureCursorVisible()
+        self.log_window2.ensureCursorVisible()
         self.volumeSlider.valueChanged.connect(self.change_volume)
 
         pygame.mixer.quit()
@@ -184,6 +181,8 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.log_window.setPlainText(log_text)
             self.log_window.verticalScrollBar().setValue(
                 self.log_window.verticalScrollBar().maximum())
+        if obj == 'Log2':
+            self.log_window2.setPlainText(msg)
         if obj == 'Sta1':
             self.statusbar.setText(msg)
 
@@ -236,18 +235,17 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            text_ready.emit("Sta1:Waiting for incoming donations...")
             while self.database_client.is_donations_collection_not_empty() and self.connected:
                 donation = self.database_client.get_first_donation_in_queue()
-                print("\n--- Handling message from " +
-                      donation.name + " | " + donation.message)
+                text_ready.emit('Log2:Message from: ' +
+                                donation.name + " | " + donation.message)
                 try:
                     start_time = time.time()
                     tts_engine = TextToSpeechEngine(
                         donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
-                    print("\n--- Generating audio took %s seconds" %
-                          round((time.time() - start_time), 2))
+                    text_ready.emit("Sta1:Generating audio took: " +
+                                    str(round((time.time() - start_time), 2)) + "seconds")
                     self.donations_to_play.append(donation_audio)
                     self.database_client.delete_donation(donation.messageId)
                 except:
