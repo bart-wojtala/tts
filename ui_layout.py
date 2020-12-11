@@ -42,6 +42,9 @@ class Ui_MainWindow(object):
         self.ClientSkipAudio = QtWidgets.QPushButton(self.tab_1)
         self.ClientSkipAudio.setObjectName("ClientSkipAudio")
         self.horizontalLayout_2.addWidget(self.ClientSkipAudio)
+        self.ClientRemoveAudio = QtWidgets.QPushButton(self.tab_1)
+        self.ClientRemoveAudio.setObjectName("ClientRemoveAudio")
+        self.horizontalLayout_2.addWidget(self.ClientRemoveAudio)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         spacerItem2 = QtWidgets.QSpacerItem(
             20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
@@ -105,7 +108,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.ClientStartBtn.setText(_translate("MainWindow", "Start"))
         self.ClientStopBtn.setText(_translate("MainWindow", "Stop"))
-        self.ClientSkipAudio.setText(_translate("MainWindow", "Skip"))
+        self.ClientSkipAudio.setText(_translate("MainWindow", "Skip current"))
+        self.ClientRemoveAudio.setText(_translate("MainWindow", "Delete first"))
         self.label_1.setText(_translate("MainWindow", "Status:"))
         self.label_2.setText(_translate(
             "MainWindow", "Currently processed message:"))

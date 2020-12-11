@@ -149,6 +149,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientSkipAudio.clicked.connect(self.skip_wav)
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
+        self.ClientRemoveAudio.clicked.connect(self.delete_first_message)
+        self.ClientRemoveAudio.setDisabled(True)
         self.log_window.ensureCursorVisible()
         self.log_window2.ensureCursorVisible()
         self.volumeSlider.valueChanged.connect(self.change_volume)
@@ -236,6 +238,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             while self.database_client.is_donations_collection_not_empty() and self.connected:
+                self.ClientRemoveAudio.setEnabled(True)
                 donation = self.database_client.get_first_donation_in_queue()
                 text_ready.emit('Log2:Message from: ' +
                                 donation.name + " | " + donation.message)
@@ -257,6 +260,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
+        self.ClientRemoveAudio.setDisabled(True)
         text_ready.emit('Log1:\nDisconnected')
         return 'Return value of execute_this_fn'
 
@@ -312,6 +316,10 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.channel.stop()
             self.channel = pygame.mixer.Channel(0)
             self.current_audio_length = 0
+
+    def delete_first_message(self):
+        donation = self.database_client.get_first_donation_in_queue()
+        self.database_client.delete_donation(donation.messageId)
 
     def change_volume(self):
         value = self.volumeSlider.value()
