@@ -3,6 +3,7 @@ import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
+import subprocess
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -143,15 +144,17 @@ class AudioGenerator:
                 # torch.cuda.empty_cache()
             else:
                 temp_file = 'temp.wav'
-                engine = pyttsx3.init()
-                engine.setProperty('voice', self.synth_voices[message.voice])
-                engine.setProperty('rate', 120)
-                engine.save_to_file(message.message, temp_file)
-                engine.runAndWait()
+                # engine = pyttsx3.init()
+                # engine.setProperty('voice', self.synth_voices[message.voice])
+                # engine.setProperty('rate', 120)
+                # engine.save_to_file(message.message, temp_file)
+                # engine.runAndWait()
 
-                # while not os.path.exists(temp_file):
-                #     time.sleep(1)
-                time.sleep(3)
+                subprocess.call(["espeak", "-w " + temp_file, "-s 120", "Gachibass clap."])
+
+                while not os.path.exists(temp_file):
+                    time.sleep(0.5)
+                # time.sleep(3)
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
