@@ -6,7 +6,7 @@ sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
 from espeakng import ESpeakNG
 import wave
-import StringIO
+import io
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -174,7 +174,7 @@ class AudioGenerator:
                 esng.voice = self.synth_voices[message.voice]
                 esng.speed = 120
                 wavs = esng.synth_wav(message.message)
-                wave.open(StringIO.StringIO(wavs))
+                wave.open(io.StringIO(wavs))
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
