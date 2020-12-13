@@ -4,9 +4,6 @@ import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
-from espeakng import ESpeakNG
-import wave
-import io
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -148,11 +145,11 @@ class AudioGenerator:
             else:
                 temp_file = 'temp.wav'
                 # espeak_log_file = 'log.txt'
-                # engine = pyttsx3.init()
-                # engine.setProperty('voice', self.synth_voices[message.voice])
-                # engine.setProperty('rate', 120)
-                # engine.save_to_file(message.message, temp_file)
-                # engine.runAndWait()
+                engine = pyttsx3.init()
+                engine.setProperty('voice', self.synth_voices[message.voice])
+                engine.setProperty('rate', 120)
+                engine.save_to_file(message.message, temp_file)
+                engine.runAndWait()
                 # cmd = ["espeak", "-w " + temp_file,
                 #        "-s 120", message.message]
 
@@ -168,13 +165,7 @@ class AudioGenerator:
 
                 # while not os.path.exists(temp_file):
                 #     time.sleep(0.5)
-                # time.sleep(3)
-
-                esng = ESpeakNG()
-                esng.voice = self.synth_voices[message.voice]
-                esng.speed = 120
-                wavs = esng.synth_wav(message.message)
-                wave.open(io.StringIO(wavs))
+                time.sleep(3)
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
