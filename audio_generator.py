@@ -174,6 +174,7 @@ class AudioGenerator:
                     self.joined_audio = np.concatenate(
                         (self.joined_audio, audio))
                     os.remove(temp_file)
+                    del engine
 
         scaled_audio = np.int16(
             self.joined_audio/np.max(np.abs(self.joined_audio)) * 32767)
