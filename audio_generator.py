@@ -150,16 +150,22 @@ class AudioGenerator:
                 # engine.setProperty('rate', 120)
                 # engine.save_to_file(message.message, temp_file)
                 # engine.runAndWait()
-                # cmd = ["espeak", "-w " + temp_file,
-                #        "-s 120", message.message]
-                # f = open(espeak_log_file, 'w')
+                cmd = ["espeak", "-w " + temp_file,
+                       "-s 120", message.message]
+
                 # subprocess.run(cmd, stdout=f, stderr=f)
-                os.system('espeak -w ' + temp_file + '-s 120 ' + message.message)
+
+                proc = subprocess.Popen(cmd)
+                try:
+                    proc.communicate(timeout=5)
+                except:
+                    proc.terminate()
+                finally:
+                    proc.terminate()
 
                 while not os.path.exists(temp_file):
                     time.sleep(0.5)
                 # time.sleep(3)
-                # f.close()
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
