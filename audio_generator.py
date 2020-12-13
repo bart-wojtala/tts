@@ -150,10 +150,10 @@ class AudioGenerator:
                 # engine.save_to_file(message.message, temp_file)
                 # engine.runAndWait()
                 cmd = ["espeak", "-w " + temp_file,
-                       "-s 120", "Gachibass clap."]
+                       "-s 120", message.message]
                 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
                 try:
-                    _, errs = proc.communicate(timeout=5)
+                    proc.communicate(timeout=5)
                 except:
                     proc.kill()
                 finally:
