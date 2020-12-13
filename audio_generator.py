@@ -149,8 +149,8 @@ class AudioGenerator:
                 # engine.setProperty('rate', 120)
                 # engine.save_to_file(message.message, temp_file)
                 # engine.runAndWait()
-
-                subprocess.run(["espeak", "-w " + temp_file, "-s 120", "Gachibass clap."], close_fds=True)
+                subprocess.run(["espeak", "-w " + temp_file, "-s 120",
+                                "Gachibass clap."], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
                 while not os.path.exists(temp_file):
                     time.sleep(0.5)
