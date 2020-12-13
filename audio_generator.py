@@ -4,6 +4,9 @@ import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
+from espeakng import ESpeakNG
+import wave
+import StringIO
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -144,28 +147,34 @@ class AudioGenerator:
                 # torch.cuda.empty_cache()
             else:
                 temp_file = 'temp.wav'
-                espeak_log_file = 'log.txt'
+                # espeak_log_file = 'log.txt'
                 # engine = pyttsx3.init()
                 # engine.setProperty('voice', self.synth_voices[message.voice])
                 # engine.setProperty('rate', 120)
                 # engine.save_to_file(message.message, temp_file)
                 # engine.runAndWait()
-                cmd = ["espeak", "-w " + temp_file,
-                       "-s 120", message.message]
+                # cmd = ["espeak", "-w " + temp_file,
+                #        "-s 120", message.message]
 
                 # subprocess.run(cmd, stdout=f, stderr=f)
 
-                proc = subprocess.Popen(cmd)
-                try:
-                    proc.communicate(timeout=5)
-                except:
-                    proc.terminate()
-                finally:
-                    proc.terminate()
+                # proc = subprocess.Popen(cmd)
+                # try:
+                #     proc.communicate(timeout=5)
+                # except:
+                #     proc.terminate()
+                # finally:
+                #     proc.terminate()
 
-                while not os.path.exists(temp_file):
-                    time.sleep(0.5)
+                # while not os.path.exists(temp_file):
+                #     time.sleep(0.5)
                 # time.sleep(3)
+
+                esng = ESpeakNG()
+                esng.voice = self.synth_voices[message.voice]
+                esng.speed = 120
+                wavs = esng.synth_wav(message.message)
+                wave.open(StringIO.StringIO(wavs))
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
