@@ -149,7 +149,7 @@ class AudioGenerator:
                 engine.runAndWait()
 
                 while not os.path.isfile(temp_file):
-                    time.sleep(1)
+                    time.sleep(1.5)
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
