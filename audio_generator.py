@@ -1,9 +1,9 @@
+import subprocess
 import os
 import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
-import subprocess
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -149,8 +149,15 @@ class AudioGenerator:
                 # engine.setProperty('rate', 120)
                 # engine.save_to_file(message.message, temp_file)
                 # engine.runAndWait()
-                subprocess.run(["espeak", "-w " + temp_file, "-s 120",
-                                "Gachibass clap."], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                cmd = ["espeak", "-w " + temp_file,
+                       "-s 120", "Gachibass clap."]
+                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                try:
+                    _, errs = proc.communicate(timeout=5)
+                except:
+                    proc.kill()
+                finally:
+                    proc.kill()
 
                 while not os.path.exists(temp_file):
                     time.sleep(0.5)
