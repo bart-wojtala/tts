@@ -144,7 +144,7 @@ class AudioGenerator:
                 # torch.cuda.empty_cache()
             else:
                 temp_file = 'temp.wav'
-                espeak_log_file = 'test.txt'
+                espeak_log_file = 'log.txt'
                 # engine = pyttsx3.init()
                 # engine.setProperty('voice', self.synth_voices[message.voice])
                 # engine.setProperty('rate', 120)
@@ -152,18 +152,13 @@ class AudioGenerator:
                 # engine.runAndWait()
                 cmd = ["espeak", "-w " + temp_file,
                        "-s 120", message.message]
-                with open(espeak_log_file, 'w') as f:
-                    proc = subprocess.Popen(cmd, shell=True, stdout=f)
-                    try:
-                        proc.communicate(timeout=5)
-                    except:
-                        proc.kill()
-                    finally:
-                        proc.kill()
+                f = open(espeak_log_file, 'w')
+                subprocess.run(cmd, stdout=f, stderr=f)
 
                 while not os.path.exists(temp_file):
                     time.sleep(0.5)
                 # time.sleep(3)
+                f.close()
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
