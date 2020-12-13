@@ -137,7 +137,8 @@ class AudioGenerator:
                     scaled_audio = np.concatenate((effect, scaled_audio))
 
                 scaled_audio = np.concatenate((scaled_audio, self.silence))
-                self.joined_audio = np.concatenate((self.joined_audio, scaled_audio))
+                self.joined_audio = np.concatenate(
+                    (self.joined_audio, scaled_audio))
 
                 # torch.cuda.empty_cache()
             else:
@@ -145,19 +146,19 @@ class AudioGenerator:
                 engine = pyttsx3.init()
                 engine.setProperty('voice', self.synth_voices[message.voice])
                 engine.setProperty('rate', 120)
-                engine.connect('finished-utterance', self.onEnd)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
 
-                # while not os.path.exists(temp_file):
-                #     time.sleep(1)
+                while not os.path.exists(temp_file):
+                    time.sleep(1)
 
-                # if os.path.isfile(temp_file):
-                #     file = read(os.path.join(os.path.abspath("."), temp_file))
-                #     audio = np.array(file[1], dtype=np.int16)
-                #     audio = np.concatenate((audio, silence))
-                #     joined_audio = np.concatenate((joined_audio, audio))
-                #     os.remove(temp_file)
+                if os.path.isfile(temp_file):
+                    file = read(os.path.join(os.path.abspath("."), temp_file))
+                    audio = np.array(file[1], dtype=np.int16)
+                    audio = np.concatenate((audio, self.silence))
+                    self.joined_audio = np.concatenate(
+                        (self.joined_audio, audio))
+                    os.remove(temp_file)
 
         scaled_audio = np.int16(
             self.joined_audio/np.max(np.abs(self.joined_audio)) * 32767)
@@ -165,12 +166,3 @@ class AudioGenerator:
             scaled_audio = scaled_audio[1:]
 
         return scaled_audio, hparams.sampling_rate
-
-    def onEnd(self, name, completed):
-        temp_file = 'temp.wav'
-        if os.path.isfile(temp_file):
-            file = read(os.path.join(os.path.abspath("."), temp_file))
-            audio = np.array(file[1], dtype=np.int16)
-            audio = np.concatenate((audio, self.silence))
-            self.joined_audio = np.concatenate((self.joined_audio, audio))
-            os.remove(temp_file)
