@@ -240,14 +240,14 @@ class GUI(QMainWindow, Ui_MainWindow):
             while self.database_client.is_donations_collection_not_empty() and self.connected:
                 donation = self.database_client.get_first_donation_in_queue()
                 text_ready.emit('Log2:Message from: ' +
-                                donation.name + " | " + donation.message)
+                                donation.name + "\n" + donation.message)
                 try:
                     start_time = time.time()
                     tts_engine = TextToSpeechEngine(
                         donation, donation.name, self.url, self.generated_audio_path)
                     donation_audio = tts_engine.generate_audio()
-                    text_ready.emit("Sta1:Generating audio took: " +
-                                    str(round((time.time() - start_time), 2)) + "seconds")
+                    text_ready.emit("Sta1:Generating message: " + donation.message +
+                                    "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
                     self.donations_to_play.append(donation_audio)
                     self.database_client.delete_donation(donation.messageId)
                 except:
@@ -280,8 +280,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit("Log1:\n###########################\n")
                     text_ready.emit("Log1:" + name + ' donated message:')
                     text_ready.emit("Log1:" + msg)
-                    text_ready.emit(
-                        'Sta1:Currently playing -> ' + name + ' | ' + msg)
+                    # text_ready.emit(
+                    #     'Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
                     self.files = files
                     while self.current_audio_length > 0:
