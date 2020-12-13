@@ -137,7 +137,7 @@ class AudioGenerator:
                 scaled_audio = np.concatenate((scaled_audio, silence))
                 joined_audio = np.concatenate((joined_audio, scaled_audio))
 
-                torch.cuda.empty_cache()
+                # torch.cuda.empty_cache()
             else:
                 temp_file = 'temp.wav'
                 engine = pyttsx3.init()
