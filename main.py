@@ -318,8 +318,9 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.current_audio_length = 0
 
     def delete_first_message(self):
-        donation = self.database_client.get_first_donation_in_queue()
-        self.database_client.delete_donation(donation.messageId)
+        if self.database_client.is_donations_collection_not_empty():
+            donation = self.database_client.get_first_donation_in_queue()
+            self.database_client.delete_donation(donation.messageId)
 
     def change_volume(self):
         value = self.volumeSlider.value()
