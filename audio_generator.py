@@ -149,8 +149,9 @@ class AudioGenerator:
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
 
-                while not os.path.exists(temp_file):
-                    time.sleep(1)
+                # while not os.path.exists(temp_file):
+                #     time.sleep(1)
+                time.sleep(3)
 
                 if os.path.isfile(temp_file):
                     file = read(os.path.join(os.path.abspath("."), temp_file))
