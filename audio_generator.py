@@ -1,3 +1,4 @@
+import gc
 from threading import Thread
 import subprocess
 import os
@@ -154,6 +155,8 @@ class AudioGenerator:
 
                 # while not os.path.isfile(temp_file):
                 #     time.sleep(1.5)
+
+                gc.collect()
 
                 t1 = Thread(target=self.generate_synth_audio)
                 t1.start()
