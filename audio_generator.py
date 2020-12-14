@@ -175,5 +175,5 @@ class AudioGenerator:
 
         return scaled_audio, hparams.sampling_rate
 
-    def generate_synth_audio():
+    def generate_synth_audio(self):
         subprocess.call(["espeak", "-w " + self.temp_file + " -s 120 ", self.synth_message])
