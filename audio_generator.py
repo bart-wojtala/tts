@@ -1,3 +1,4 @@
+from threading import Thread
 import subprocess
 import os
 import time
@@ -44,6 +45,8 @@ class AudioGenerator:
         self.messages = messages
         self.joined_audio = np.empty(1,)
         self.silence = np.zeros(11000,)
+        self.synth_message = ''
+        self.temp_file = 'temp.wav'
 
     def load_model(self, hparams):
         model = Tacotron2(hparams).cuda()
@@ -141,24 +144,29 @@ class AudioGenerator:
 
                 # torch.cuda.empty_cache()
             else:
-                temp_file = 'temp.wav'
-                engine = pyttsx3.init()
-                engine.setProperty('voice', self.synth_voices[message.voice])
-                engine.setProperty('rate', 120)
-                engine.save_to_file(message.message, temp_file)
-                engine.runAndWait()
+                # temp_file = 'temp.wav'
+                self.synth_message = message.message
+                # engine = pyttsx3.init()
+                # engine.setProperty('voice', self.synth_voices[message.voice])
+                # engine.setProperty('rate', 120)
+                # engine.save_to_file(message.message, temp_file)
+                # engine.runAndWait()
 
-                while not os.path.isfile(temp_file):
-                    time.sleep(1.5)
+                # while not os.path.isfile(temp_file):
+                #     time.sleep(1.5)
 
-                if os.path.isfile(temp_file):
-                    file = read(os.path.join(os.path.abspath("."), temp_file))
+                t1 = Thread(target=self.generate_synth_audio)
+                t1.start()
+                t1.join()
+
+                if os.path.isfile(self.temp_file):
+                    file = read(os.path.join(os.path.abspath("."), self.temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, self.silence))
                     self.joined_audio = np.concatenate(
                         (self.joined_audio, audio))
-                    os.remove(temp_file)
-                    del engine
+                    os.remove(self.temp_file)
+                    # del engine
 
         scaled_audio = np.int16(
             self.joined_audio/np.max(np.abs(self.joined_audio)) * 32767)
@@ -166,3 +174,6 @@ class AudioGenerator:
             scaled_audio = scaled_audio[1:]
 
         return scaled_audio, hparams.sampling_rate
+
+    def generate_synth_audio():
+        subprocess.call(["espeak", "-w " + self.temp_file + " -s 120 ", self.synth_message])
