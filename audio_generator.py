@@ -159,6 +159,9 @@ class AudioGenerator:
                 t1.start()
                 t1.join()
 
+                while not os.path.isfile(self.temp_file):
+                    time.sleep(1)
+
                 if os.path.isfile(self.temp_file):
                     file = read(os.path.join(os.path.abspath("."), self.temp_file))
                     audio = np.array(file[1], dtype=np.int16)
@@ -176,4 +179,4 @@ class AudioGenerator:
         return scaled_audio, hparams.sampling_rate
 
     def generate_synth_audio(self):
-        subprocess.call(["espeak", "-w " + self.temp_file + " -s 120 ", self.synth_message])
+        subprocess.call(["espeak", "-w " + self.temp_file, "-s 120", self.synth_message])
