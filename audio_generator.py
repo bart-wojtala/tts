@@ -2,6 +2,7 @@ import gc
 from threading import Thread
 import subprocess
 import os
+import platform
 import time
 import sys
 sys.path.append('tts/')
@@ -46,6 +47,7 @@ class AudioGenerator:
         self.messages = messages
         self.joined_audio = np.empty(1,)
         self.silence = np.zeros(11000,)
+        self.current_os = platform.system()
 
     def load_model(self, hparams):
         model = Tacotron2(hparams).cuda()
@@ -145,7 +147,12 @@ class AudioGenerator:
             else:
                 temp_file = 'temp.wav'
                 engine = pyttsx3.init()
-                engine.setProperty('voice', self.synth_voices[message.voice])
+                if self.current_os == 'Windows':
+                    engine.setProperty(
+                        'voice', 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en')
+                else:
+                    engine.setProperty(
+                        'voice', self.synth_voices[message.voice])
                 engine.setProperty('rate', 120)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
@@ -154,6 +161,7 @@ class AudioGenerator:
                     time.sleep(1.5)
 
                 if os.path.isfile(temp_file):
+                    del engine
                     file = read(os.path.join(os.path.abspath("."), temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, self.silence))
