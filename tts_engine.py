@@ -17,13 +17,14 @@ class TextToSpeechEngine:
                         'satan:', 'voicemail:', 'vader:', 'trump:', 'gandalf:', 'keanu:']
     default_voice = 'woman:'
 
-    def __init__(self, donation, name, url, path):
+    def __init__(self, donation, name, url='', path='', use_local_gpu=False):
         self.donation = donation
         self.name = name
         self.url = url
         self.endpoint_tts = self.url + "/tts"
         self.endpoint_single_tts = self.endpoint_tts + "/single"
         self.path = path
+        self.use_local_gpu = use_local_gpu
         if path:
             self.words = donation.message.split()
         else:
@@ -73,33 +74,42 @@ class TextToSpeechEngine:
     def generate_audio(self):
         if self.messages_to_generate:
             files = []
-            messages_to_send = []
-            single_message = ''
-            for index, message in enumerate(self.messages_to_generate):
-                if message.voice == "satan:" or message.voice == "voicemail:" or message.voice == "vader:":
-                    messages_to_send.append(message)
-                else:
-                    single_message += message.voice + ' ' + message.message + ' '
-                    if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:" or self.messages_to_generate[index + 1].voice == "vader:"):
-                        messages_to_send.append(single_message)
-                        single_message = ''
-
-            for message in messages_to_send:
-                if isinstance(message, str):
-                    params = {'message': message}
-                    audio, sampling_rate = self.request_audio(
-                        self.endpoint_single_tts, params)
-                    file_name = self.write_audio_file(
-                        self.default_voice, audio, sampling_rate)
-                    files.append(VoiceMessage(self.default_voice, file_name))
-                else:
-                    params = {'voice': message.voice,
-                              'message': message.message}
-                    audio, sampling_rate = self.request_audio(
-                        self.endpoint_tts, params)
+            if self.use_local_gpu:
+                from audio_generator import AudioGenerator
+                for index, message in enumerate(self.messages_to_generate):
+                    audio_generator = AudioGenerator([message])
+                    audio, sampling_rate = audio_generator.generate()
                     file_name = self.write_audio_file(
                         message.voice, audio, sampling_rate)
                     files.append(VoiceMessage(message.voice, file_name))
+            else:
+                messages_to_send = []
+                single_message = ''
+                for index, message in enumerate(self.messages_to_generate):
+                    if message.voice == "satan:" or message.voice == "voicemail:" or message.voice == "vader:":
+                        messages_to_send.append(message)
+                    else:
+                        single_message += message.voice + ' ' + message.message + ' '
+                        if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:" or self.messages_to_generate[index + 1].voice == "vader:"):
+                            messages_to_send.append(single_message)
+                            single_message = ''
+
+                for message in messages_to_send:
+                    if isinstance(message, str):
+                        params = {'message': message}
+                        audio, sampling_rate = self.request_audio(
+                            self.endpoint_single_tts, params)
+                        file_name = self.write_audio_file(
+                            self.default_voice, audio, sampling_rate)
+                        files.append(VoiceMessage(self.default_voice, file_name))
+                    else:
+                        params = {'voice': message.voice,
+                                'message': message.message}
+                        audio, sampling_rate = self.request_audio(
+                            self.endpoint_tts, params)
+                        file_name = self.write_audio_file(
+                            message.voice, audio, sampling_rate)
+                        files.append(VoiceMessage(message.voice, file_name))
             return DonationAudio(self.donation, files)
         return
 

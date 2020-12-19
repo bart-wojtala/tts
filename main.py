@@ -244,7 +244,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                 try:
                     start_time = time.time()
                     tts_engine = TextToSpeechEngine(
-                        donation, donation.name, self.url, self.generated_audio_path)
+                        donation, donation.name, self.url, self.generated_audio_path, True)
                     donation_audio = tts_engine.generate_audio()
                     text_ready.emit("Sta1:Generating message: " + donation.message +
                                     "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
