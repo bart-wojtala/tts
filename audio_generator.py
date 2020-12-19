@@ -40,7 +40,7 @@ class AudioGenerator:
 
     waveglow = {
         "default": "waveglow_256channels.pt",
-        "vader:": "jej_waveglow_165k.pt"
+        "vader:": "jej_waveglow_890k"
     }
 
     def __init__(self, messages):
