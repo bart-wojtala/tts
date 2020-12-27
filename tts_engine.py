@@ -101,10 +101,11 @@ class TextToSpeechEngine:
                             self.endpoint_single_tts, params)
                         file_name = self.write_audio_file(
                             self.default_voice, audio, sampling_rate)
-                        files.append(VoiceMessage(self.default_voice, file_name))
+                        files.append(VoiceMessage(
+                            self.default_voice, file_name))
                     else:
                         params = {'voice': message.voice,
-                                'message': message.message}
+                                  'message': message.message}
                         audio, sampling_rate = self.request_audio(
                             self.endpoint_tts, params)
                         file_name = self.write_audio_file(
