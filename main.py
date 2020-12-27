@@ -26,7 +26,7 @@ class LocalClient:
         @sio.on('event')
         def on_event(event):
             messageId = event['messageId']
-            message = event['message']
+            message = event['message'].lower()
             name = event['username']
             message_time = event['messageTime']
             donation = Donation(messageId, name, message)
@@ -54,7 +54,7 @@ class StreamlabsClient:
         @sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
-                messageId = event['event_id']
+                messageId = event['event_id'].lower()
                 message = event['message'][0]['message']
                 name = event['message'][0]['name']
                 amount = event['message'][0]['formatted_amount']
