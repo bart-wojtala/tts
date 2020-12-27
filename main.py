@@ -303,7 +303,10 @@ class GUI(QMainWindow, Ui_MainWindow):
             pygame.mixer.init(frequency=22050, size=-16, channels=1)
             self.channel = pygame.mixer.Channel(0)
         sound = pygame.mixer.Sound(wav)
-        self.channel.set_volume(self.volumeSlider.value()/100)
+        if voice == "keanu:":
+            self.channel.set_volume(self.volumeSlider.value()/100)
+        else:
+            self.channel.set_volume((self.volumeSlider.value()/100)*0.9)
         self.channel.queue(sound)
         self.current_audio_length -= 1
         self.ClientSkipAudio.setEnabled(True)
