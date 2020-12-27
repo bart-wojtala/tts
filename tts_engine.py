@@ -133,7 +133,6 @@ class TextToSpeechEngine:
             write(file_name, fixed_framerate, audio)
 
             y, sr = sf.read(file_name)
-
             y_stretch = pyrb.time_stretch(y, sr, 1.6)
             y_shift = pyrb.pitch_shift(y, sr, 1.6)
             sf.write(file_name, y_stretch, sr, format='wav')
@@ -155,7 +154,6 @@ class TextToSpeechEngine:
             AudioEffect.robotic(temp_file_name, file_name)
 
             y, sr = sf.read(file_name)
-
             y_stretch = pyrb.time_stretch(y, sr, 0.9)
             y_shift = pyrb.pitch_shift(y, sr, 0.9)
             sf.write(file_name, y_stretch, sr, format='wav')
