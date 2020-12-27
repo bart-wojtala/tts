@@ -145,3 +145,6 @@ tts/models/
 
 # TTS generated audio
 /generated_audio
+
+# Build output directory
+/output
