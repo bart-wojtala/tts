@@ -34,8 +34,13 @@ class AudioGenerator:
         "keanu:": "keanu_67912"
     }
 
-    synth_voices = {
+    synth_voices_linux = {
         "stephen:": "default"
+    }
+
+    synth_voices_windows = {
+        "stephen:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en",
+        "zira:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_ZIRA_11.0"
     }
 
     waveglow = {
@@ -149,10 +154,10 @@ class AudioGenerator:
                 engine = pyttsx3.init()
                 if self.current_os == 'Windows':
                     engine.setProperty(
-                        'voice', 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en')
+                        'voice', self.synth_voices_windows[message.voice])
                 else:
                     engine.setProperty(
-                        'voice', self.synth_voices[message.voice])
+                        'voice', self.synth_voices_linux[message.voice])
                 engine.setProperty('rate', 120)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
