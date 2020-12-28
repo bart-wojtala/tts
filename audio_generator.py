@@ -7,8 +7,6 @@ import time
 import sys
 sys.path.append('tts/')
 sys.path.append('tts/waveglow/')
-import soundfile as sf
-import pyrubberband as pyrb
 
 from scipy.io.wavfile import read
 import pyttsx3
@@ -160,7 +158,7 @@ class AudioGenerator:
                 else:
                     engine.setProperty(
                         'voice', self.synth_voices_linux[message.voice])
-                # engine.setProperty('rate', 120)
+                engine.setProperty('rate', 120)
                 engine.save_to_file(message.message, temp_file)
                 engine.runAndWait()
 
@@ -169,18 +167,6 @@ class AudioGenerator:
 
                 if os.path.isfile(temp_file):
                     del engine
-
-                    if message.voice == "stephen:":
-                        y, sr = sf.read(temp_file)
-                        y_stretch = pyrb.time_stretch(y, sr, 0.65)
-                        y_shift = pyrb.pitch_shift(y, sr, 0.65)
-                        sf.write(temp_file, y_stretch, sr, format='wav')
-                    elif message.voice == "zira:":
-                        y, sr = sf.read(temp_file)
-                        y_stretch = pyrb.time_stretch(y, sr, 0.8)
-                        y_shift = pyrb.pitch_shift(y, sr, 0.8)
-                        sf.write(temp_file, y_stretch, sr, format='wav')
-
                     file = read(os.path.join(os.path.abspath("."), temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, self.silence))
