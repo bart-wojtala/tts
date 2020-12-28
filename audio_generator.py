@@ -45,7 +45,8 @@ class AudioGenerator:
 
     waveglow = {
         "default": "waveglow_256channels.pt",
-        "vader:": "jej_waveglow_890k"
+        "vader:": "jej_waveglow_890k",
+        "david:": "attenborough_waveglow_1516200"
     }
 
     def __init__(self, messages):
@@ -81,7 +82,9 @@ class AudioGenerator:
             if message.voice in self.models:
                 waveglow_path = ''
                 if message.voice == "vader:":
-                    waveglow_path = models_path + self.waveglow[message.voice]
+                    waveglow_path = models_path + self.waveglow["vader:"]
+                elif message.voice == "keanu:":
+                    waveglow_path = models_path + self.waveglow["david:"]
                 else:
                     waveglow_path = models_path + self.waveglow['default']
 
