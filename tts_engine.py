@@ -15,7 +15,7 @@ from AudioLib import AudioEffect
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:',
                         'satan:', 'voicemail:', 'vader:', 'trump:', 'gandalf:', 'keanu:', 'zira:']
-    default_voice = 'woman:'
+    default_voice = 'keanu:'
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
         self.donation = donation
