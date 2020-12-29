@@ -25,6 +25,7 @@ class TextToSpeechEngine:
         self.endpoint_single_tts = self.endpoint_tts + "/single"
         self.path = path
         self.use_local_gpu = use_local_gpu
+        self.maximum_number_length = 36
         if path:
             self.words = donation.message.split()
         else:
@@ -52,8 +53,8 @@ class TextToSpeechEngine:
         for i in range(start, len(self.words)):
             word = self.words[i]
             if not word in self.available_voices:
-                if word.isdigit() and len(word) > 36:
-                    word = word[0:36]
+                if word.isdigit() and len(word) > self.maximum_number_length:
+                    word = word[0:self.maximum_number_length]
                 word = word.replace(',', ', ')
                 if len(sentence) == 0:
                     sentence += word
