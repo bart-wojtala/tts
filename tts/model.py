@@ -448,6 +448,8 @@ class Decoder(nn.Module):
                 # Return function output after reaching max decoder steps to avoid generating long audio sequences
                 # BART3S-TTS - Parse decoder outputs to avoid breaking tts app
                 mel_outputs, gate_outputs, alignments = self.parse_decoder_outputs(mel_outputs, gate_outputs, alignments)
+                # BART3S-TTS - Clear CUDA cache after reaching max decoder steps to avoid out of memory errors
+                torch.cuda.empty_cache()
                 return mel_outputs, gate_outputs, alignments
 
             decoder_input = mel_output
