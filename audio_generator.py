@@ -100,7 +100,10 @@ class AudioGenerator:
                     hparams.max_decoder_steps = 10000
 
                 if len(message.message) < 7:
-                    hparams.gate_threshold = 0.05
+                    hparams.gate_threshold = 0.01
+                    hparams.max_decoder_steps = 1000
+                    if message.voice == "vader:":
+                        hparams.gate_threshold = 0.005
                 elif len(message.message) >= 7 and len(message.message) < 15:
                     hparams.gate_threshold = 0.1
                 else:
@@ -108,7 +111,7 @@ class AudioGenerator:
 
                 message_extended = False
                 if len(message.message) < 11:
-                    message.message = message.message + " -----------------."
+                    message.message = message.message + " ----------------."
                     message_extended = True
 
                 model = self.load_model(hparams)
