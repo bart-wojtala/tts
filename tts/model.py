@@ -446,6 +446,8 @@ class Decoder(nn.Module):
                 print("Warning! Reached max decoder steps")
                 # TTS
                 # Return function output after reaching max decoder steps to avoid generating long audio sequences
+                # BART3S-TTS - Parse decoder outputs to avoid breaking tts app
+                mel_outputs, gate_outputs, alignments = self.parse_decoder_outputs(mel_outputs, gate_outputs, alignments)
                 return mel_outputs, gate_outputs, alignments
 
             decoder_input = mel_output
