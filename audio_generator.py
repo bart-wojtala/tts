@@ -99,18 +99,37 @@ class AudioGenerator:
                 else:
                     hparams.max_decoder_steps = 10000
 
-                if len(message.message) < 7:
+                trimmed_message_length = len(
+                    ''.join(c for c in message.message if c.isalnum()))
+                if trimmed_message_length < 7:
                     hparams.gate_threshold = 0.01
-                    hparams.max_decoder_steps = 1000
                     if message.voice == "vader:":
-                        hparams.gate_threshold = 0.005
-                elif len(message.message) >= 7 and len(message.message) < 15:
+                        hparams.max_decoder_steps = 1000
+                        hparams.gate_threshold = 0.001
+                        if any(char.isdigit() for char in message.message):
+                            hparams.max_decoder_steps = 10000
+                            hparams.gate_threshold = 0.5
+                    else:
+                        hparams.gate_threshold = 0.01
+                        if any(char.isdigit() for char in message.message):
+                            hparams.gate_threshold = 0.1
+                elif trimmed_message_length >= 7 and trimmed_message_length < 15:
                     hparams.gate_threshold = 0.1
+                    if message.voice == "vader:":
+                        hparams.max_decoder_steps = 1000
+                        hparams.gate_threshold = 0.001
+                        if any(char.isdigit() for char in message.message):
+                            hparams.max_decoder_steps = 100000
+                            hparams.gate_threshold = 0.5
+                    else:
+                        hparams.gate_threshold = 0.1
+                        if any(char.isdigit() for char in message.message):
+                            hparams.gate_threshold = 0.2
                 else:
                     hparams.gate_threshold = 0.5
 
                 message_extended = False
-                if len(message.message) < 11:
+                if trimmed_message_length < 11:
                     message.message = message.message + " ----------------."
                     message_extended = True
 
