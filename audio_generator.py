@@ -1,6 +1,3 @@
-import gc
-from threading import Thread
-import subprocess
 import os
 import platform
 import time
@@ -54,6 +51,8 @@ class AudioGenerator:
         self.joined_audio = np.empty(1,)
         self.silence = np.zeros(11000,)
         self.current_os = platform.system()
+        self.audio_length_parameter = 32767
+        self.default_sampling_rate = 22050
 
     def load_model(self, hparams):
         model = Tacotron2(hparams).cuda()
@@ -68,7 +67,7 @@ class AudioGenerator:
 
     def generate(self):
         hparams = create_hparams()
-        hparams.sampling_rate = 22050
+        hparams.sampling_rate = self.default_sampling_rate
         models_path = "tts/models/"
 
         # waveglow_path = models_path + 'waveglow_256channels.pt'
@@ -154,7 +153,7 @@ class AudioGenerator:
 
                 # audio_data = np.concatenate((audio_data, silence))
                 scaled_audio = np.int16(
-                    audio_data/np.max(np.abs(audio_data)) * 32767)
+                    audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
                 if message_extended:
                     cut_idx = 0
                     silence_length = 0
@@ -201,8 +200,8 @@ class AudioGenerator:
                     # del engine
 
         scaled_audio = np.int16(
-            self.joined_audio/np.max(np.abs(self.joined_audio)) * 32767)
-        if scaled_audio[0] == 32767:
+            self.joined_audio/np.max(np.abs(self.joined_audio)) * self.audio_length_parameter)
+        if scaled_audio[0] == self.audio_length_parameter:
             scaled_audio = scaled_audio[1:]
 
         return scaled_audio, hparams.sampling_rate
