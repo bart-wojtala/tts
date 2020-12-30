@@ -34,6 +34,8 @@ class TextToSpeechEngine:
         self.sentence_separators = ['.', '?', '!']
 
         for i in range(0, len(self.words)):
+            if len(''.join(i for i in self.words if i.isalnum())) < 2:
+                break
             if i == 0 and not self.words[0].endswith(':'):
                 if i < len(self.words):
                     self.create_voice_message(i, self.default_voice)
@@ -53,13 +55,17 @@ class TextToSpeechEngine:
         for i in range(start, len(self.words)):
             word = self.words[i]
             if not word in self.available_voices:
+                add_word_to_sentence = True
                 if word.isdigit() and len(word) > self.maximum_number_length:
                     word = word[0:self.maximum_number_length]
+                elif not word.isalpha() and not word.isnumeric() and word.isalnum():
+                    add_word_to_sentence = False
                 word = word.replace(',', ', ')
-                if len(sentence) == 0:
-                    sentence += word
-                else:
-                    sentence += ' ' + word
+                if add_word_to_sentence:
+                    if len(sentence) == 0:
+                        sentence += word
+                    else:
+                        sentence += ' ' + word
             else:
                 if sentence[-1] not in self.sentence_separators:
                     sentence += '.'
