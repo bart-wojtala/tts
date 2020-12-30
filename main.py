@@ -15,6 +15,7 @@ from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
 from configparser import ConfigParser
 from datetime import datetime
+import qdarkstyle
 
 
 class LocalClient:
@@ -335,6 +336,7 @@ if __name__ == '__main__':
     url = config['GCP']['url']
     # token = config['Streamlabs']['token']
     app = Qt.QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet())
     window = GUI(app, url)
     window.show()
     sys.exit(app.exec_())
