@@ -2,9 +2,9 @@ import socketio
 import os
 import sys
 from PyQt5 import Qt
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QTimer
-from PyQt5.QtWidgets import QWidget, QMainWindow, QHeaderView, QMessageBox, QFileDialog
+from PyQt5 import QtCore
+from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool
+from PyQt5.QtWidgets import QMainWindow
 from ui_layout import Ui_MainWindow
 import time
 import pygame
@@ -13,8 +13,6 @@ from scipy.io.wavfile import write
 from database_client import DatabaseClient
 from models import Donation, DonationAudio
 from tts_engine import TextToSpeechEngine
-import requests
-import numpy as np
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -247,12 +245,12 @@ class GUI(QMainWindow, Ui_MainWindow):
                         donation, donation.name, self.url, self.generated_audio_path, True)
                     donation_audio = tts_engine.generate_audio()
                     if donation_audio:
-                        text_ready.emit("Sta1:Message: " + donation.message +
-                                    "\nwas automatically skipped!")
+                        text_ready.emit("Sta1:Generating message: " + donation.message +
+                                        "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
                         self.donations_to_play.append(donation_audio)
                     else:
-                        text_ready.emit("Sta1:Generating message: " + donation.message +
-                                    "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
+                        text_ready.emit(
+                            "Sta1:Message: " + donation.message + "\nwas automatically skipped!")
                     self.database_client.delete_donation(donation.messageId)
                 except:
                     self.connected = False
