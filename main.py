@@ -246,9 +246,13 @@ class GUI(QMainWindow, Ui_MainWindow):
                     tts_engine = TextToSpeechEngine(
                         donation, donation.name, self.url, self.generated_audio_path, True)
                     donation_audio = tts_engine.generate_audio()
-                    text_ready.emit("Sta1:Generating message: " + donation.message +
+                    if donation_audio:
+                        text_ready.emit("Sta1:Message: " + donation.message +
+                                    "\nwas automatically skipped!")
+                        self.donations_to_play.append(donation_audio)
+                    else:
+                        text_ready.emit("Sta1:Generating message: " + donation.message +
                                     "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
-                    self.donations_to_play.append(donation_audio)
                     self.database_client.delete_donation(donation.messageId)
                 except:
                     self.connected = False
