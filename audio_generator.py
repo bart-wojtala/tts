@@ -142,7 +142,7 @@ class AudioGenerator:
                 sequence = torch.autograd.Variable(
                     torch.from_numpy(sequence)).cuda().long()
 
-                mel_outputs, mel_outputs_postnet, _, alignments = model.inference(
+                mel_outputs, mel_outputs_postnet, _, alignments, requires_cutting = model.inference(
                     sequence)
 
                 with torch.no_grad():
@@ -154,7 +154,7 @@ class AudioGenerator:
                 # audio_data = np.concatenate((audio_data, silence))
                 scaled_audio = np.int16(
                     audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
-                if message_extended:
+                if message_extended or requires_cutting:
                     cut_idx = 0
                     silence_length = 0
                     for idx, val in enumerate(scaled_audio):

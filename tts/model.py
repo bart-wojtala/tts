@@ -431,6 +431,8 @@ class Decoder(nn.Module):
 
         self.initialize_decoder_states(memory, mask=None)
 
+        # BART3S-TTS - Add a parameter to check if audio requires cutting
+        requires_cutting = False
         mel_outputs, gate_outputs, alignments = [], [], []
         while True:
             decoder_input = self.prenet(decoder_input)
@@ -448,6 +450,8 @@ class Decoder(nn.Module):
                 # Return function output after reaching max decoder steps to avoid generating long audio sequences
                 # BART3S-TTS - Clear CUDA cache after reaching max decoder steps to avoid out of memory errors
                 torch.cuda.empty_cache()
+                # BART3S-TTS - Add a parameter to check if audio requires cutting
+                requires_cutting = True
                 break
                 # return mel_outputs, gate_outputs, alignments
 
@@ -455,8 +459,8 @@ class Decoder(nn.Module):
 
         mel_outputs, gate_outputs, alignments = self.parse_decoder_outputs(
             mel_outputs, gate_outputs, alignments)
-
-        return mel_outputs, gate_outputs, alignments
+        # BART3S-TTS - Add a parameter to check if audio requires cutting
+        return mel_outputs, gate_outputs, alignments, requires_cutting
 
 
 class Tacotron2(nn.Module):
@@ -522,13 +526,14 @@ class Tacotron2(nn.Module):
     def inference(self, inputs):
         embedded_inputs = self.embedding(inputs).transpose(1, 2)
         encoder_outputs = self.encoder.inference(embedded_inputs)
-        mel_outputs, gate_outputs, alignments = self.decoder.inference(
+        # BART3S-TTS - Add a parameter to check if audio requires cutting
+        mel_outputs, gate_outputs, alignments, requires_cutting = self.decoder.inference(
             encoder_outputs)
 
         mel_outputs_postnet = self.postnet(mel_outputs)
         mel_outputs_postnet = mel_outputs + mel_outputs_postnet
-
+        # BART3S-TTS - Add a parameter to check if audio requires cutting
         outputs = self.parse_output(
-            [mel_outputs, mel_outputs_postnet, gate_outputs, alignments])
+            [mel_outputs, mel_outputs_postnet, gate_outputs, alignments, requires_cutting])
 
         return outputs
