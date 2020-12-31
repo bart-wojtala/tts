@@ -1,6 +1,8 @@
 from models import VoiceMessage, DonationAudio
 import sys
+import math
 import numpy as np
+import re
 import requests
 import time
 from scipy.io.wavfile import write, read
@@ -26,8 +28,30 @@ class TextToSpeechEngine:
         self.path = path
         self.use_local_gpu = use_local_gpu
         self.maximum_number_length = 36
+        self.maximum_word_length = 10
+        self.words = []
         if path:
-            self.words = donation.message.split()
+            # self.words = donation.message.split()
+            words_list = donation.message.split()
+            last_voice = ''
+            for word in words_list:
+                word_length = len(word)
+                if word_length > self.maximum_word_length and not word in self.available_voices and last_voice != "stephen:" and last_voice != "zira:":
+                    splits = math.ceil(word_length / self.maximum_word_length)
+                    for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
+                        if i != (splits - 1) * self.maximum_word_length:
+                            self.words.append(
+                                word[i:i + self.maximum_word_length])
+                            if last_voice == "vader:":
+                                self.words.append(',and')
+                            else:
+                                self.words.append(',')
+                        else:
+                            self.words.append(word[i:])
+                else:
+                    if word in self.available_voices:
+                        last_voice = word
+                    self.words.append(word)
         else:
             self.words = donation.split()
         self.messages_to_generate = []
