@@ -16,7 +16,7 @@ from AudioLib import AudioEffect
 
 class TextToSpeechEngine:
     available_voices = ['woman:', 'david:', 'neil:', 'stephen:',
-                        'satan:', 'voicemail:', 'vader:', 'trump:', 'gandalf:', 'keanu:', 'zira:']
+                        'satan:', 'voicemail:', 'vader:', 'trump:', 'gandalf:', 'keanu:', 'mszira:', 'msdavid:']
     default_voice = 'keanu:'
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
@@ -36,7 +36,7 @@ class TextToSpeechEngine:
             last_voice = ''
             for word in words_list:
                 word_length = len(word)
-                if word_length > self.maximum_word_length and not word in self.available_voices and last_voice != "stephen:" and last_voice != "zira:":
+                if word_length > self.maximum_word_length and not word in self.available_voices and last_voice != "stephen:" and last_voice != "mszira:" and last_voice != "msdavid:":
                     splits = math.ceil(word_length / self.maximum_word_length)
                     for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
                         if i != (splits - 1) * self.maximum_word_length:
