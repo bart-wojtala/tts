@@ -32,7 +32,7 @@ class TextToSpeechEngine:
         self.words = []
         if path:
             # self.words = donation.message.split()
-            words_list = donation.message.split()
+            words_list = donation.message.translate({ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
             last_voice = ''
             for word in words_list:
                 word_length = len(word)
