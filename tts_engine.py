@@ -28,7 +28,7 @@ class TextToSpeechEngine:
         self.path = path
         self.use_local_gpu = use_local_gpu
         self.maximum_number_length = 36
-        self.maximum_word_length = 10
+        self.maximum_word_length = 11
         self.words = []
         if path:
             # self.words = donation.message.split()
