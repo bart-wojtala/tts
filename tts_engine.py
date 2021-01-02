@@ -1,5 +1,6 @@
 from models import VoiceMessage, DonationAudio
 import sys
+import enchant
 import math
 import numpy as np
 import re
@@ -30,27 +31,34 @@ class TextToSpeechEngine:
         self.maximum_number_length = 36
         self.maximum_word_length = 11
         self.words = []
+        self.dictionary = enchant.Dict("en_US")
         if path:
             # self.words = donation.message.split()
-            words_list = donation.message.translate({ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
+            words_list = donation.message.translate(
+                {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
             last_voice = ''
+            allowed_voices = ["msdavid:", "mszira:", "stephen:"]
             for word in words_list:
-                word_length = len(word)
-                if word_length > self.maximum_word_length and not word in self.available_voices and last_voice != "stephen:" and last_voice != "mszira:" and last_voice != "msdavid:":
-                    splits = math.ceil(word_length / self.maximum_word_length)
-                    for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
-                        if i != (splits - 1) * self.maximum_word_length:
-                            self.words.append(
-                                word[i:i + self.maximum_word_length])
-                            if last_voice == "vader:":
-                                self.words.append(',and')
+                if not self.dictionary.check(word):
+                    word_length = len(word)
+                    if word_length > self.maximum_word_length and not word in self.available_voices and not last_voice in allowed_voices:
+                        splits = math.ceil(
+                            word_length / self.maximum_word_length)
+                        for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
+                            if i != (splits - 1) * self.maximum_word_length:
+                                self.words.append(
+                                    word[i:i + self.maximum_word_length])
+                                if last_voice == "vader:":
+                                    self.words.append(',and')
+                                else:
+                                    self.words.append(',')
                             else:
-                                self.words.append(',')
-                        else:
-                            self.words.append(word[i:])
+                                self.words.append(word[i:])
+                    else:
+                        if word in self.available_voices:
+                            last_voice = word
+                        self.words.append(word)
                 else:
-                    if word in self.available_voices:
-                        last_voice = word
                     self.words.append(word)
         else:
             self.words = donation.split()
