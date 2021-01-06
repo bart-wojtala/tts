@@ -29,7 +29,8 @@ class AudioGenerator:
         "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
         "keanu:": "keanu_67912",
-        "samuel:": "slj_42372"
+        "samuel:": "slj_42372",
+        "hal:": "hal_9000"
     }
 
     synth_voices_linux = {
@@ -84,7 +85,7 @@ class AudioGenerator:
                 waveglow_path = ''
                 if message.voice == "vader:":
                     waveglow_path = models_path + self.waveglow["vader:"]
-                elif message.voice == "keanu:":
+                elif message.voice == "keanu:" or message.voice == "hal:":
                     waveglow_path = models_path + self.waveglow["david:"]
                 else:
                     waveglow_path = models_path + self.waveglow['default']
