@@ -28,7 +28,8 @@ class AudioGenerator:
         "vader:": "jej_checkpoint_904500",
         "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
-        "keanu:": "keanu_67912"
+        "keanu:": "keanu_67912",
+        "samuel:": "slj_42372"
     }
 
     synth_voices_linux = {
