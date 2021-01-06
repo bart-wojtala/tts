@@ -20,17 +20,17 @@ import torch
 
 class AudioGenerator:
     models = {
-        "woman:": "tacotron2_statedict.pt",
         "david:": "attenborough_checkpoint_547000",
-        "neil:": "neil_tyson_checkpoint_500000",
-        "satan:": "tacotron2_statedict.pt",
-        "voicemail:": "tacotron2_statedict.pt",
-        "vader:": "jej_checkpoint_904500",
-        "trump:": "trump_7752",
         "gandalf:": "gandalf_checkpoint_23932",
+        "hal:": "hal_9000",
         "keanu:": "keanu_67912",
+        "neil:": "neil_tyson_checkpoint_500000",
         "samuel:": "slj_42372",
-        "hal:": "hal_9000"
+        "satan:": "tacotron2_statedict.pt",
+        "trump:": "trump_7752",
+        "vader:": "jej_checkpoint_904500",
+        "woman:": "tacotron2_statedict.pt",
+        "voicemail:": "tacotron2_statedict.pt"
     }
 
     synth_voices_linux = {
@@ -38,15 +38,15 @@ class AudioGenerator:
     }
 
     synth_voices_windows = {
-        "stephen:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en",
+        "msdavid:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_DAVID_11.0",
         "mszira:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_ZIRA_11.0",
-        "msdavid:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_DAVID_11.0"
+        "stephen:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en"
     }
 
     waveglow = {
+        "david:": "attenborough_waveglow_1516200",
         "default": "waveglow_256channels.pt",
-        "vader:": "jej_waveglow_890k",
-        "david:": "attenborough_waveglow_1516200"
+        "vader:": "jej_waveglow_890k"
     }
 
     def __init__(self, messages):
