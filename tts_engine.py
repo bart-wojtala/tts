@@ -36,6 +36,11 @@ class TextToSpeechEngine:
             # self.words = donation.message.split()
             words_list = donation.message.translate(
                 {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
+
+            for i, word in enumerate(words_list):
+                word_split = re.findall(r'[A-Za-z]+|\d+', word)
+                words_list[i:i+1] = word_split
+
             last_voice = ''
             allowed_voices = ["msdavid:", "mszira:", "stephen:"]
             for word in words_list:
