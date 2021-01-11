@@ -31,7 +31,7 @@ class AudioGenerator:
         "trump:": "trump_7752",
         "vader:": "jej_checkpoint_904500",
         "woman:": "tacotron2_statedict.pt",
-        "voicemail:": "tacotron2_statedict.pt"
+        "vmail:": "tacotron2_statedict.pt"
     }
 
     synth_voices_linux = {

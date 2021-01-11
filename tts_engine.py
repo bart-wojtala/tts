@@ -17,7 +17,7 @@ from AudioLib import AudioEffect
 
 class TextToSpeechEngine:
     available_voices = ['david:',  'gandalf:', 'glados:', 'hal:', 'keanu:', 'msdavid:', 'mszira:',
-                        'neil:', 'samuel:', 'satan:', 'stephen:', 'trump:', 'vader:', 'voicemail:', 'woman:']
+                        'neil:', 'samuel:', 'satan:', 'stephen:', 'trump:', 'vader:', 'vmail:', 'woman:']
     default_voice = 'keanu:'
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
@@ -131,11 +131,11 @@ class TextToSpeechEngine:
                 messages_to_send = []
                 single_message = ''
                 for index, message in enumerate(self.messages_to_generate):
-                    if message.voice == "satan:" or message.voice == "voicemail:" or message.voice == "vader:":
+                    if message.voice == "satan:" or message.voice == "vmail:" or message.voice == "vader:":
                         messages_to_send.append(message)
                     else:
                         single_message += message.voice + ' ' + message.message + ' '
-                        if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "voicemail:" or self.messages_to_generate[index + 1].voice == "vader:"):
+                        if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "vmail:" or self.messages_to_generate[index + 1].voice == "vader:"):
                             messages_to_send.append(single_message)
                             single_message = ''
 
@@ -184,7 +184,7 @@ class TextToSpeechEngine:
 
             sound = AudioSegment.from_wav(file_name)
             sound.export(file_name, format="wav")
-        elif voice == "voicemail:":
+        elif voice == "vmail:":
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)
             fs, audio = read(temp_file_name)
