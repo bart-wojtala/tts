@@ -22,6 +22,7 @@ class AudioGenerator:
     models = {
         "david:": "attenborough_checkpoint_547000",
         "gandalf:": "gandalf_checkpoint_23932",
+        "glados:": "glados_5925",
         "hal:": "hal_9000",
         "keanu:": "keanu_67912",
         "neil:": "neil_tyson_checkpoint_500000",
