@@ -13,6 +13,7 @@ import pyrubberband as pyrb
 from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
+from word_dictionary import WordDictionary
 
 
 class TextToSpeechEngine:
@@ -32,6 +33,7 @@ class TextToSpeechEngine:
         self.maximum_word_length = 11
         self.words = []
         self.dictionary = enchant.Dict("en_US")
+        self.word_dictionary = WordDictionary()
         if path:
             # self.words = donation.message.split()
             words_list = donation.message.translate(
@@ -41,6 +43,10 @@ class TextToSpeechEngine:
                 word_split = re.findall(r'[A-Za-z]+|\d+', word)
                 if len(word_split) > 1:
                     words_list[i:i+1] = word_split
+
+            for i, word in enumerate(words_list):
+                if self.word_dictionary.is_in_dictionary(word):
+                    words_list[i] = self.word_dictionary.replace_word(word)
 
             last_voice = ''
             allowed_voices = ["msdavid:", "mszira:", "stephen:"]
