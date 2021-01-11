@@ -20,6 +20,7 @@ class TextToSpeechEngine:
     available_voices = ['david:',  'gandalf:', 'glados:', 'hal:', 'keanu:', 'msdavid:', 'mszira:',
                         'neil:', 'samuel:', 'satan:', 'stephen:', 'trump:', 'vader:', 'vmail:', 'woman:']
     default_voice = 'keanu:'
+    synth_voices = ["msdavid:", "mszira:", "stephen:"]
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
         self.donation = donation
@@ -34,6 +35,8 @@ class TextToSpeechEngine:
         self.words = []
         self.dictionary = enchant.Dict("en_US")
         self.word_dictionary = WordDictionary()
+        self.last_used_voice = ''
+
         if path:
             # self.words = donation.message.split()
             words_list = donation.message.translate(
@@ -46,21 +49,21 @@ class TextToSpeechEngine:
 
             for i, word in enumerate(words_list):
                 if self.word_dictionary.is_in_dictionary(word):
-                    words_list[i] = self.word_dictionary.replace_word(word)
+                    words = self.word_dictionary.replace_word(word)
+                    words_list[i:i+1] = words
 
-            last_voice = ''
-            allowed_voices = ["msdavid:", "mszira:", "stephen:"]
+            self.last_used_voice = ''
             for word in words_list:
                 if not self.dictionary.check(word):
                     word_length = len(word)
-                    if word_length > self.maximum_word_length and not word in self.available_voices and not last_voice in allowed_voices:
+                    if not self.last_used_voice in self.synth_voices and word_length > self.maximum_word_length and not word in self.available_voices:
                         splits = math.ceil(
                             word_length / self.maximum_word_length)
                         for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
                             if i != (splits - 1) * self.maximum_word_length:
                                 self.words.append(
                                     word[i:i + self.maximum_word_length])
-                                if last_voice == "vader:":
+                                if self.last_used_voice == "vader:":
                                     self.words.append(',and')
                                 else:
                                     self.words.append(',')
@@ -68,7 +71,7 @@ class TextToSpeechEngine:
                                 self.words.append(word[i:])
                     else:
                         if word in self.available_voices:
-                            last_voice = word
+                            self.last_used_voice = word
                         self.words.append(word)
                 else:
                     self.words.append(word)

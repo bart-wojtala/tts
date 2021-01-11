@@ -10,4 +10,5 @@ class WordDictionary:
         return word in self.dictionary
 
     def replace_word(self, word):
-        return self.dictionary[word]
+        words = self.dictionary[word].split()
+        return words
