@@ -81,8 +81,8 @@ class TextToSpeechEngine:
         self.sentence_separators = ['.', '?', '!']
 
         for i in range(0, len(self.words)):
-            if len(''.join(i for i in self.words if i.isalnum())) < 2:
-                break
+            # if len(''.join(i for i in self.words if i.isalnum())) < 2:
+            #     break
             if i == 0 and not self.words[0].endswith(':'):
                 if i < len(self.words):
                     self.create_voice_message(i, self.default_voice)
