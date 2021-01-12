@@ -48,7 +48,7 @@ class TextToSpeechEngine:
                     words_list[i:i+1] = word_split
 
             for i, word in enumerate(words_list):
-                if self.word_dictionary.is_in_dictionary(word):
+                if word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
                     words = self.word_dictionary.replace_word(word)
                     words_list[i:i+1] = words
 
