@@ -55,29 +55,31 @@ class TextToSpeechEngine:
                 elif word in self.available_voices:
                     self.last_used_voice = word
 
-            self.last_used_voice = ''
-            for word in words_list:
-                if not self.dictionary.check(word):
-                    word_length = len(word)
-                    if not self.last_used_voice in self.synth_voices and word_length > self.maximum_word_length and not word in self.available_voices:
-                        splits = math.ceil(
-                            word_length / self.maximum_word_length)
-                        for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
-                            if i != (splits - 1) * self.maximum_word_length:
-                                self.words.append(
-                                    word[i:i + self.maximum_word_length])
-                                if self.last_used_voice == "vader:":
-                                    self.words.append(',and')
-                                else:
-                                    self.words.append(',')
-                            else:
-                                self.words.append(word[i:])
-                    else:
-                        if word in self.available_voices:
-                            self.last_used_voice = word
-                        self.words.append(word)
-                else:
-                    self.words.append(word)
+            self.words = words_list
+
+            # self.last_used_voice = ''
+            # for word in words_list:
+            #     if not self.dictionary.check(word):
+            #         word_length = len(word)
+            #         if not self.last_used_voice in self.synth_voices and word_length > self.maximum_word_length and not word in self.available_voices:
+            #             splits = math.ceil(
+            #                 word_length / self.maximum_word_length)
+            #             for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
+            #                 if i != (splits - 1) * self.maximum_word_length:
+            #                     self.words.append(
+            #                         word[i:i + self.maximum_word_length])
+            #                     if self.last_used_voice == "vader:":
+            #                         self.words.append(',and')
+            #                     else:
+            #                         self.words.append(',')
+            #                 else:
+            #                     self.words.append(word[i:])
+            #         else:
+            #             if word in self.available_voices:
+            #                 self.last_used_voice = word
+            #             self.words.append(word)
+            #     else:
+            #         self.words.append(word)
         else:
             self.words = donation.split()
         self.messages_to_generate = []
