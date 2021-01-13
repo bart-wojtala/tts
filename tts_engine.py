@@ -43,9 +43,10 @@ class TextToSpeechEngine:
                 {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
 
             for i, word in enumerate(words_list):
-                word_split = re.findall(r'[A-Za-z]+|\d+', word)
-                if len(word_split) > 1:
-                    words_list[i:i+1] = word_split
+                if not '\'' in word:
+                    word_split = re.findall(r'[A-Za-z]+|\d+', word)
+                    if len(word_split) > 1:
+                        words_list[i:i+1] = word_split
 
             for i, word in enumerate(words_list):
                 if word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
