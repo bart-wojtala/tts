@@ -19,7 +19,7 @@ from word_dictionary import WordDictionary
 class TextToSpeechEngine:
     available_voices = ['david:',  'gandalf:', 'glados:', 'hal:', 'keanu:', 'msdavid:', 'mszira:',
                         'neil:', 'samuel:', 'satan:', 'stephen:', 'trump:', 'vader:', 'vmail:', 'woman:']
-    default_voice = 'keanu:'
+    default_voice = 'glados:'
     synth_voices = ["msdavid:", "mszira:", "stephen:"]
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
