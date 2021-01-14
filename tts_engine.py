@@ -136,12 +136,21 @@ class TextToSpeechEngine:
             files = []
             if self.use_local_gpu:
                 from audio_generator import AudioGenerator
+                for i, message in enumerate(self.messages_to_generate):
+                    self.messages_to_generate[i].index = i
+
+                self.messages_to_generate.sort(
+                    key=lambda item: item.voice, reverse=True)
+
                 for index, message in enumerate(self.messages_to_generate):
                     audio_generator = AudioGenerator([message])
                     audio, sampling_rate = audio_generator.generate()
                     file_name = self.write_audio_file(
                         message.voice, audio, sampling_rate)
-                    files.append(VoiceMessage(message.voice, file_name))
+                    files.append(VoiceMessage(
+                        message.voice, file_name, message.index))
+
+                files.sort(key=lambda item: item.index, reverse=False)
             else:
                 messages_to_send = []
                 single_message = ''
