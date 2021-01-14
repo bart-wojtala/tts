@@ -1,7 +1,8 @@
 class VoiceMessage:
-    def __init__(self, voice, message):
+    def __init__(self, voice, message, index=0):
         self.voice = voice
         self.message = message
+        self.index = index
 
 
 class Donation:
