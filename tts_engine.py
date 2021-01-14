@@ -39,13 +39,19 @@ class TextToSpeechEngine:
 
         if path:
             # self.words = donation.message.split()
-            words_list = donation.message.translate(
-                {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"}).split()
+            translated_message = donation.message.translate(
+                {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"})
+            message_with_fixed_punctuation = re.sub(
+                r'(?<=[.,])(?=[^\s])', r' ', translated_message)
+            words_list = message_with_fixed_punctuation.split()
 
             for i, word in enumerate(words_list):
                 if not '\'' in word:
                     word_split = re.findall(r'[A-Za-z]+|\d+', word)
                     if len(word_split) > 1:
+                        punctuation = re.findall(r'[,.?!]+', word)
+                        if punctuation:
+                            word_split[-1] += punctuation[0]
                         words_list[i:i+1] = word_split
 
             for i, word in enumerate(words_list):
