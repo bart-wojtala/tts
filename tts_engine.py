@@ -86,24 +86,29 @@ class TextToSpeechEngine:
         self.messages_to_generate = []
         self.sentence_separators = ['.', '?', '!']
 
+        message_index = 0
         for i in range(0, len(self.words)):
             # if len(''.join(i for i in self.words if i.isalnum())) < 2:
             #     break
             if i == 0 and not self.words[0].endswith(':'):
                 if i < len(self.words):
-                    self.create_voice_message(i, self.default_voice)
+                    self.create_voice_message(
+                        i, self.default_voice, message_index)
             elif i == 0 and self.words[0].endswith(':'):
                 if i < len(self.words):
                     if self.words[i] in self.available_voices:
-                        self.create_voice_message(i + 1, self.words[i])
+                        self.create_voice_message(
+                            i + 1, self.words[i], message_index)
                     else:
                         self.create_voice_message(
-                            i + 1, self.default_voice, self.words[0])
+                            i + 1, self.default_voice, self.words[0], message_index)
             if i != 0 and self.words[i].endswith(':'):
                 if self.words[i] in self.available_voices and i < len(self.words):
-                    self.create_voice_message(i + 1, self.words[i])
+                    self.create_voice_message(
+                        i + 1, self.words[i], message_index)
+            message_index += 1
 
-    def create_voice_message(self, start, voice, init_word=''):
+    def create_voice_message(self, start, voice, message_index, init_word=''):
         sentence = init_word
         for i in range(start, len(self.words)):
             word = self.words[i]
@@ -122,13 +127,13 @@ class TextToSpeechEngine:
             else:
                 if sentence[-1] not in self.sentence_separators:
                     sentence += '.'
-                voice_message = VoiceMessage(voice, sentence)
+                voice_message = VoiceMessage(voice, sentence, message_index)
                 self.messages_to_generate.append(voice_message)
                 break
             if i == len(self.words) - 1:
                 if sentence[-1] not in self.sentence_separators:
                     sentence += '.'
-                voice_message = VoiceMessage(voice, sentence)
+                voice_message = VoiceMessage(voice, sentence, message_index)
                 self.messages_to_generate.append(voice_message)
 
     def generate_audio(self):
@@ -136,9 +141,6 @@ class TextToSpeechEngine:
             files = []
             if self.use_local_gpu:
                 from audio_generator import AudioGenerator
-                for i, message in enumerate(self.messages_to_generate):
-                    self.messages_to_generate[i].index = i
-
                 self.messages_to_generate.sort(
                     key=lambda item: item.voice, reverse=True)
 
