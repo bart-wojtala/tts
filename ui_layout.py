@@ -121,4 +121,4 @@ class Ui_MainWindow(object):
         self.volumeSlider.setSingleStep(1)
         self.volumeSlider.setTickInterval(10)
         self.volumeSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
-        self.volumeSlider.setValue(80)
+        self.volumeSlider.setValue(70)
