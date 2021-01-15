@@ -64,6 +64,9 @@ class TextToSpeechEngine:
                 else:
                     self.words.append(word)
 
+            self.words = [word for word in self.words if word in self.available_voices or len(
+                word.translate(str.maketrans('', '', r":"))) > 0]
+
             # self.last_used_voice = ''
             # for word in words_list:
             #     if not self.dictionary.check(word):
