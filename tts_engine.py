@@ -94,8 +94,20 @@ class TextToSpeechEngine:
             word = self.words[i]
             if not word in self.available_voices:
                 add_word_to_sentence = True
-                if word.isdigit() and len(word) > self.maximum_number_length:
+                word_length = len(word)
+                if word.isdigit() and word_length > self.maximum_number_length:
                     word = word[0:self.maximum_number_length]
+                elif word.isdigit() and word_length < 16:
+                    if word_length > 12:
+                        word = word[:-12] + " trillion " + word[-12:]
+                    if word_length > 9:
+                        word = word[:-9] + " billion " + word[-9:]
+                    if word_length > 6:
+                        word = word[:-6] + " million " + word[-6:]
+                    if word_length > 3:
+                        word = word[:-3] + " thousand " + word[-3:]
+                    if word_length > 2:
+                        word = word[:-2] + " hundred " + word[-2:]
                 elif not word.isalpha() and not word.isnumeric() and word.isalnum():
                     add_word_to_sentence = False
                 word = word.replace(',', ', ')
