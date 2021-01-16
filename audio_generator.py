@@ -140,7 +140,10 @@ class AudioGenerator:
 
                 message_extended = False
                 if trimmed_message_length < 11:
-                    message.message = message.message + " ----------------."
+                    if message.voice == "vader:":
+                        message.message = message.message + " -. -------. -------."
+                    else:
+                        message.message = message.message + " -------. -------."
                     message_extended = True
 
                 model = self.load_model(hparams)
