@@ -1,6 +1,5 @@
 from models import VoiceMessage, DonationAudio
 import sys
-import enchant
 import math
 import numpy as np
 import re
@@ -33,12 +32,9 @@ class TextToSpeechEngine:
         self.maximum_number_length = 36
         self.maximum_word_length = 11
         self.words = []
-        self.dictionary = enchant.Dict("en_US")
         self.word_dictionary = WordDictionary()
-        self.last_used_voice = ''
 
         if path:
-            # self.words = donation.message.split()
             translated_message = donation.message.translate(
                 {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"})
             message_with_fixed_punctuation = re.sub(
@@ -54,42 +50,19 @@ class TextToSpeechEngine:
                             word_split[-1] += punctuation[0]
                         words_list[i:i+1] = word_split
 
+            last_used_voice = ''
             for i, word in enumerate(words_list):
-                if self.last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
+                if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
                     words = self.word_dictionary.replace_word(word)
                     self.words += words
                 elif word in self.available_voices:
-                    self.last_used_voice = word
+                    last_used_voice = word
                     self.words.append(word)
                 else:
                     self.words.append(word)
 
             self.words = [word for word in self.words if word in self.available_voices or len(
                 word.translate(str.maketrans('', '', r":"))) > 0]
-
-            # self.last_used_voice = ''
-            # for word in words_list:
-            #     if not self.dictionary.check(word):
-            #         word_length = len(word)
-            #         if not self.last_used_voice in self.synth_voices and word_length > self.maximum_word_length and not word in self.available_voices:
-            #             splits = math.ceil(
-            #                 word_length / self.maximum_word_length)
-            #             for i in range(0, splits * self.maximum_word_length, self.maximum_word_length):
-            #                 if i != (splits - 1) * self.maximum_word_length:
-            #                     self.words.append(
-            #                         word[i:i + self.maximum_word_length])
-            #                     if self.last_used_voice == "vader:":
-            #                         self.words.append(',and')
-            #                     else:
-            #                         self.words.append(',')
-            #                 else:
-            #                     self.words.append(word[i:])
-            #         else:
-            #             if word in self.available_voices:
-            #                 self.last_used_voice = word
-            #             self.words.append(word)
-            #     else:
-            #         self.words.append(word)
         else:
             self.words = donation.split()
         self.messages_to_generate = []
@@ -97,8 +70,6 @@ class TextToSpeechEngine:
 
         message_index = 0
         for i in range(0, len(self.words)):
-            # if len(''.join(i for i in self.words if i.isalnum())) < 2:
-            #     break
             if i == 0 and not self.words[0].endswith(':'):
                 if i < len(self.words):
                     self.create_voice_message(
