@@ -1,5 +1,6 @@
 from models import VoiceMessage, DonationAudio
 import sys
+import enchant
 import math
 import numpy as np
 import re
@@ -12,6 +13,7 @@ import pyrubberband as pyrb
 from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
+from textwrap import wrap
 from word_dictionary import WordDictionary
 
 
@@ -33,6 +35,7 @@ class TextToSpeechEngine:
         self.maximum_word_length = 11
         self.words = []
         self.word_dictionary = WordDictionary()
+        self.enchant_dict = enchant.Dict("en_US")
 
         if path:
             translated_message = donation.message.translate(
@@ -58,6 +61,9 @@ class TextToSpeechEngine:
                 elif word in self.available_voices:
                     last_used_voice = word
                     self.words.append(word)
+                elif len(word) > 45 and not self.enchant_dict.check(word):
+                    word_split = wrap(word, 45)
+                    self.words.extend(word_split)
                 else:
                     self.words.append(word)
 
