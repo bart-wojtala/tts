@@ -19,7 +19,7 @@ import torch
 
 
 class AudioGenerator:
-    models = {
+    models_22khz = {
         "david:": "attenborough_checkpoint_547000",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
@@ -32,6 +32,9 @@ class AudioGenerator:
         "vader:": "jej_checkpoint_904500",
         "woman:": "tacotron2_statedict.pt",
         "vmail:": "tacotron2_statedict.pt"
+    }
+
+    models_48khz = {
     }
 
     synth_voices_linux = {
@@ -82,7 +85,7 @@ class AudioGenerator:
         # denoiser = Denoiser(waveglow)
 
         for message in self.messages:
-            if message.voice in self.models:
+            if message.voice in self.models_22khz:
                 waveglow_path = ''
                 if message.voice == "vader:":
                     waveglow_path = models_path + self.waveglow["vader:"]
@@ -148,7 +151,7 @@ class AudioGenerator:
 
                 model = self.load_model(hparams)
                 model.load_state_dict(torch.load(
-                    models_path + self.models[message.voice])['state_dict'])
+                    models_path + self.models_22khz[message.voice])['state_dict'])
                 _ = model.cuda().eval().half()
 
                 sequence = np.array(text_to_sequence(
