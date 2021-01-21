@@ -35,6 +35,9 @@ class AudioGenerator:
     }
 
     models_48khz = {
+        "dan:": "mmi_danv3",
+        "g2nh:": "Nameless.Hero_6640_g2_0.299372_22",
+        "sonic:": "mmi_sonicthv3"
     }
 
     synth_voices_linux = {
@@ -47,10 +50,14 @@ class AudioGenerator:
         "stephen:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en"
     }
 
-    waveglow = {
+    waveglow_22khz = {
         "david:": "attenborough_waveglow_1516200",
         "default": "waveglow_256channels.pt",
         "vader:": "jej_waveglow_890k"
+    }
+
+    waveglow_48khz = {
+        "default": "twilight_weights.pt"
     }
 
     def __init__(self, messages):
@@ -86,13 +93,15 @@ class AudioGenerator:
 
         for message in self.messages:
             if message.voice in self.models_22khz:
+                hparams.sampling_rate = self.default_sampling_rate
                 waveglow_path = ''
                 if message.voice == "vader:":
-                    waveglow_path = models_path + self.waveglow["vader:"]
+                    waveglow_path = models_path + self.waveglow_22khz["vader:"]
                 elif message.voice == "keanu:" or message.voice == "hal:":
-                    waveglow_path = models_path + self.waveglow["david:"]
+                    waveglow_path = models_path + self.waveglow_22khz["david:"]
                 else:
-                    waveglow_path = models_path + self.waveglow['default']
+                    waveglow_path = models_path + \
+                        self.waveglow_22khz['default']
 
                 waveglow = torch.load(waveglow_path)['model']
                 waveglow.cuda().eval().half()
@@ -184,6 +193,79 @@ class AudioGenerator:
                 if message.voice == "vader:":
                     _, effect = read("extras/breathing.wav")
                     scaled_audio = np.concatenate((effect, scaled_audio))
+
+                scaled_audio = np.concatenate((scaled_audio, self.silence))
+                self.joined_audio = np.concatenate(
+                    (self.joined_audio, scaled_audio))
+
+                # torch.cuda.empty_cache()
+            elif message.voice in self.models_48khz:
+                hparams.sampling_rate = 48000
+                waveglow_path = ''
+                waveglow_path = models_path + self.waveglow_48khz['default']
+
+                waveglow = torch.load(waveglow_path)['model']
+                waveglow.cuda().eval().half()
+                for k in waveglow.convinv:
+                    k.float()
+                denoiser = Denoiser(waveglow)
+
+                if len(message.message) > 127:
+                    hparams.max_decoder_steps = 100000
+                else:
+                    hparams.max_decoder_steps = 10000
+
+                trimmed_message_length = len(
+                    ''.join(c for c in message.message if c.isalnum()))
+                if trimmed_message_length < 7:
+                    hparams.gate_threshold = 0.01
+                    if any(char.isdigit() for char in message.message):
+                        hparams.gate_threshold = 0.1
+                elif trimmed_message_length >= 7 and trimmed_message_length < 15:
+                    hparams.gate_threshold = 0.1
+                    hparams.gate_threshold = 0.1
+                    if any(char.isdigit() for char in message.message):
+                        hparams.gate_threshold = 0.2
+                else:
+                    hparams.gate_threshold = 0.5
+
+                message_extended = False
+                if trimmed_message_length < 11:
+                    message.message = message.message + " -------. -------."
+                    message_extended = True
+
+                model = self.load_model(hparams)
+                model.load_state_dict(torch.load(
+                    models_path + self.models_48khz[message.voice])['state_dict'])
+                _ = model.cuda().eval().half()
+
+                sequence = np.array(text_to_sequence(
+                    message.message, ['english_cleaners']))[None, :]
+                sequence = torch.autograd.Variable(
+                    torch.from_numpy(sequence)).cuda().long()
+
+                mel_outputs, mel_outputs_postnet, _, alignments, requires_cutting = model.inference(
+                    sequence)
+
+                with torch.no_grad():
+                    audio = waveglow.infer(mel_outputs_postnet, sigma=1)
+                # audio_data = audio[0].data.cpu().numpy()
+                audio_denoised = denoiser(audio, strength=0.001)[:, 0]
+                audio_data = audio_denoised.cpu().numpy()[0]
+
+                # audio_data = np.concatenate((audio_data, silence))
+                scaled_audio = np.int16(
+                    audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
+                if message_extended or requires_cutting:
+                    cut_idx = 0
+                    silence_length = 0
+                    for idx, val in enumerate(scaled_audio):
+                        if val == 0:
+                            silence_length += 1
+                        if silence_length > 500:
+                            cut_idx = idx
+                            break
+                    scaled_audio = scaled_audio[:cut_idx]
 
                 scaled_audio = np.concatenate((scaled_audio, self.silence))
                 self.joined_audio = np.concatenate(
