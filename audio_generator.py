@@ -21,9 +21,11 @@ import torch
 class AudioGenerator:
     models_22khz = {
         "david:": "attenborough_checkpoint_547000",
+        "fergy:": "fergy-fudgehog",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
         "hal:": "hal_9000",
+        "hudson:": "hudson-horstachio-22khz",
         "keanu:": "keanu_67912",
         "mlpab:": "Apple_Bloom_28037_0.120",
         "mlpaj:": "Applejack_40071_0.156",
