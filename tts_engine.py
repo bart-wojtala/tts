@@ -61,7 +61,7 @@ class TextToSpeechEngine:
                 elif word in self.available_voices:
                     last_used_voice = word
                     self.words.append(word)
-                elif len(word) > 45 and not self.enchant_dict.check(word):
+                elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
                     word_split = wrap(word, 45)
                     self.words.extend(word_split)
                 else:
