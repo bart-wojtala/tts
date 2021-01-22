@@ -110,10 +110,10 @@ class TextToSpeechEngine:
                         word = word[:-9] + " billion " + word[-9:]
                     if word_length > 6:
                         word = word[:-6] + " million " + word[-6:]
-                    if word_length > 3:
+                    if word_length > 4:
                         word = word[:-3] + " thousand " + word[-3:]
-                    if word_length > 2:
-                        word = word[:-2] + " hundred " + word[-2:]
+                        if word[-3] != '0':
+                            word = word[:-2] + " hundred " + word[-2:]
                 elif not word.isalpha() and not word.isnumeric() and word.isalnum():
                     add_word_to_sentence = False
                 word = word.replace(',', ', ')
