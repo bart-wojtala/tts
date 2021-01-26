@@ -2,6 +2,7 @@ from models import VoiceMessage, DonationAudio
 import sys
 import enchant
 import math
+import nltk
 import numpy as np
 import re
 import requests
@@ -14,6 +15,7 @@ from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
 from textwrap import wrap
+from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 
 
@@ -32,67 +34,142 @@ class TextToSpeechEngine:
         self.path = path
         self.use_local_gpu = use_local_gpu
         self.maximum_number_length = 36
-        self.maximum_word_length = 11
         self.words = []
         self.word_dictionary = WordDictionary()
+        self.symbol_dictionary = SymbolDictionary()
         self.enchant_dict = enchant.Dict("en_US")
+        self.sentence_separators = ['.', '?', '!']
+        self.messages_to_generate = []
 
         if path:
+            # translated_message = donation.message.translate(
+            #     {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"})
+            # message_with_fixed_punctuation = re.sub(
+            #     r'(?<=[.,])(?=[^\s])', r' ', translated_message)
+            # words_list = message_with_fixed_punctuation.split()
+
+            # for i, word in enumerate(words_list):
+            #     if not '\'' in word:
+            #         word_split = re.findall(r'[A-Za-z]+|\d+', word)
+            #         if len(word_split) > 1:
+            #             punctuation = re.findall(r'[,.?!]+', word)
+            #             if punctuation:
+            #                 word_split[-1] += punctuation[0]
+            #             words_list[i:i+1] = word_split
+
+            # last_used_voice = ''
+            # for i, word in enumerate(words_list):
+            #     if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
+            #         words = self.word_dictionary.replace_word(word)
+            #         self.words += words
+            #     elif word in self.available_voices:
+            #         last_used_voice = word
+            #         self.words.append(word)
+            #     elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
+            #         word_split = wrap(word, 45)
+            #         self.words.extend(word_split)
+            #     else:
+            #         self.words.append(word)
+
+            # self.words = [word for word in self.words if word in self.available_voices or len(
+            #     word.translate(str.maketrans('', '', r":"))) > 0]
+
             translated_message = donation.message.translate(
-                {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"})
-            message_with_fixed_punctuation = re.sub(
-                r'(?<=[.,])(?=[^\s])', r' ', translated_message)
-            words_list = message_with_fixed_punctuation.split()
+                {ord(c): " " for c in "()[]{};<>|`~"})
+            words_list = translated_message.split()
 
-            for i, word in enumerate(words_list):
-                if not '\'' in word:
-                    word_split = re.findall(r'[A-Za-z]+|\d+', word)
-                    if len(word_split) > 1:
-                        punctuation = re.findall(r'[,.?!]+', word)
-                        if punctuation:
-                            word_split[-1] += punctuation[0]
-                        words_list[i:i+1] = word_split
+            if words_list[0] not in self.available_voices:
+                words_list.insert(0, self.default_voice)
 
-            last_used_voice = ''
-            for i, word in enumerate(words_list):
-                if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
-                    words = self.word_dictionary.replace_word(word)
-                    self.words += words
-                elif word in self.available_voices:
-                    last_used_voice = word
-                    self.words.append(word)
-                elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
-                    word_split = wrap(word, 45)
-                    self.words.extend(word_split)
+            voice_indexes = [i for i, word in enumerate(
+                words_list) if word in self.available_voices]
+            voice_messages = []
+
+            for i, index in enumerate(voice_indexes):
+                if i != len(voice_indexes) - 1:
+                    voice_message = VoiceMessage(words_list[index], ' '.join(
+                        words_list[index+1:voice_indexes[i+1]]), i)
                 else:
-                    self.words.append(word)
+                    voice_message = VoiceMessage(
+                        words_list[index], ' '.join(words_list[index+1:]), i)
+                if voice_message.message:
+                    voice_messages.append(voice_message)
 
-            self.words = [word for word in self.words if word in self.available_voices or len(
-                word.translate(str.maketrans('', '', r":"))) > 0]
+            for vm in voice_messages:
+                message = vm.message.split()
+                message_split = []
+
+                for i, word in enumerate(message):
+                    words = nltk.word_tokenize(word)
+                    for w in words:
+                        word_split = re.findall(r'[A-Za-z]+|\d+', w)
+                        if len(word_split) > 1:
+                            message_split.extend(word_split)
+                        else:
+                            message_split.append(w)
+
+                for i, word in enumerate(message_split):
+                    if self.symbol_dictionary.is_in_dictionary(word):
+                        message_split[i] = self.symbol_dictionary.replace_symbol(
+                            word)
+
+                formatted_split = []
+                if vm.voice not in self.synth_voices:
+                    for i, word in enumerate(message_split):
+                        if self.word_dictionary.is_in_dictionary(word):
+                            formatted_split.extend(
+                                self.word_dictionary.replace_word(word))
+                        elif len(word) > 45 and not self.enchant_dict.check(word):
+                            word_split = wrap(word, 45)
+                            formatted_split.extend(word_split)
+                        else:
+                            formatted_split.append(word)
+
+                formatted_message = ' '.join(formatted_split)
+                if formatted_message[-1] not in self.sentence_separators:
+                    formatted_message += '.'
+
+                new_vm = VoiceMessage(vm.voice, formatted_message, vm.index)
+                self.messages_to_generate.append(new_vm)
+
+            # last_used_voice = ''
+            # for i, word in enumerate(words_list):
+            #     if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
+            #         words = self.word_dictionary.replace_word(word)
+            #         self.words += words
+            #     elif word in self.available_voices:
+            #         last_used_voice = word
+            #         self.words.append(word)
+            #     elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
+            #         word_split = wrap(word, 45)
+            #         self.words.extend(word_split)
+            #     else:
+            #         self.words.append(word)
+            # print(self.words)
         else:
             self.words = donation.split()
-        self.messages_to_generate = []
-        self.sentence_separators = ['.', '?', '!']
+        # self.messages_to_generate = []
+        # self.sentence_separators = ['.', '?', '!']
 
-        message_index = 0
-        for i in range(0, len(self.words)):
-            if i == 0 and not self.words[0].endswith(':'):
-                if i < len(self.words):
-                    self.create_voice_message(
-                        i, self.default_voice, message_index)
-            elif i == 0 and self.words[0].endswith(':'):
-                if i < len(self.words):
-                    if self.words[i] in self.available_voices:
-                        self.create_voice_message(
-                            i + 1, self.words[i], message_index)
-                    else:
-                        self.create_voice_message(
-                            i + 1, self.default_voice, self.words[0], message_index)
-            if i != 0 and self.words[i].endswith(':'):
-                if self.words[i] in self.available_voices and i < len(self.words):
-                    self.create_voice_message(
-                        i + 1, self.words[i], message_index)
-            message_index += 1
+        # message_index = 0
+        # for i in range(0, len(self.words)):
+        #     if i == 0 and not self.words[0].endswith(':'):
+        #         if i < len(self.words):
+        #             self.create_voice_message(
+        #                 i, self.default_voice, message_index)
+        #     elif i == 0 and self.words[0].endswith(':'):
+        #         if i < len(self.words):
+        #             if self.words[i] in self.available_voices:
+        #                 self.create_voice_message(
+        #                     i + 1, self.words[i], message_index)
+        #             else:
+        #                 self.create_voice_message(
+        #                     i + 1, self.default_voice, self.words[0], message_index)
+        #     if i != 0 and self.words[i].endswith(':'):
+        #         if self.words[i] in self.available_voices and i < len(self.words):
+        #             self.create_voice_message(
+        #                 i + 1, self.words[i], message_index)
+        #     message_index += 1
 
     def create_voice_message(self, start, voice, message_index, init_word=''):
         sentence = init_word
