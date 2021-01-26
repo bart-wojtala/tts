@@ -1,0 +1,15 @@
+{
+    "@": "at",
+    "#": "hashtag",
+    "$": "dollar",
+    "%": "percent",
+    "^": "caret",
+    "&": "and",
+    "*": "asterisk",
+    "/": "slash",
+    "\\": "backslash",
+    "-": "minus",
+    "=": "equals",
+    "_": "underscore",
+    "+": "plus"
+}
