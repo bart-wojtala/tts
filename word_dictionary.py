@@ -7,7 +7,7 @@ class WordDictionary:
     def __init__(self):
         with open('dictionary.json') as f:
             self.dictionary = json.loads(f.read())
-        with open('dictionary.json') as f:
+        with open('symbol_dictionary.json') as f:
             self.symbol_dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):
