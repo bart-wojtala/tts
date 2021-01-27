@@ -129,6 +129,8 @@ class TextToSpeechEngine:
                             formatted_split.extend(word_split)
                         else:
                             formatted_split.append(word)
+                else:
+                    formatted_split = message_split
 
                 formatted_message = ' '.join(formatted_split)
                 if formatted_message[-1] not in self.sentence_separators:
