@@ -5,7 +5,7 @@ import string
 
 class SymbolDictionary:
     def __init__(self):
-        with open('dictionary_symbols.json') as f:
+        with open('dictionaries/dictionary_symbols.json') as f:
             self.symbol_dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):

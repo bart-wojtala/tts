@@ -5,7 +5,7 @@ import string
 
 class WordDictionary:
     def __init__(self):
-        with open('dictionary.json') as f:
+        with open('dictionaries/dictionary.json') as f:
             self.dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):
