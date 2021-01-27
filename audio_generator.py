@@ -98,7 +98,7 @@ class AudioGenerator:
     def generate(self):
         hparams = create_hparams()
         hparams.sampling_rate = self.default_sampling_rate
-        models_path = "tts/models/"
+        models_path = "models/"
 
         # waveglow_path = models_path + 'waveglow_256channels.pt'
         # waveglow = torch.load(waveglow_path)['model']
