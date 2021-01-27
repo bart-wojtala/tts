@@ -5,7 +5,7 @@ import string
 
 class ContractionsDictionary:
     def __init__(self):
-        with open('dictionaries/contraction_dictionary.json') as f:
+        with open('dictionaries/dictionary_contractions.json') as f:
             self.contraction_dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):

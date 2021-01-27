@@ -15,7 +15,7 @@ from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
 from textwrap import wrap
-from contractions_dictionary import ContractionsDictionary
+from contraction_dictionary import ContractionsDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 
