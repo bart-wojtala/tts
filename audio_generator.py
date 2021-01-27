@@ -2,8 +2,8 @@ import os
 import platform
 import time
 import sys
-sys.path.append('tts/')
-sys.path.append('tts/waveglow/')
+sys.path.append('tacotron2/')
+sys.path.append('tacotron2/waveglow/')
 
 from scipy.io.wavfile import read
 import pyttsx3
