@@ -15,6 +15,7 @@ from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
 from textwrap import wrap
+from contractions_dictionary import ContractionsDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 
@@ -37,6 +38,7 @@ class TextToSpeechEngine:
         self.words = []
         self.word_dictionary = WordDictionary()
         self.symbol_dictionary = SymbolDictionary()
+        self.contraction_dictionary = ContractionsDictionary()
         self.enchant_dict = enchant.Dict("en_US")
         self.sentence_separators = ['.', '?', '!']
         self.messages_to_generate = []
@@ -100,13 +102,16 @@ class TextToSpeechEngine:
                 message_split = []
 
                 for i, word in enumerate(message):
-                    words = nltk.word_tokenize(word)
-                    for w in words:
-                        word_split = re.findall(r'[A-Za-z]+|\d+', w)
-                        if len(word_split) > 1:
-                            message_split.extend(word_split)
-                        else:
-                            message_split.append(w)
+                    if self.contraction_dictionary.is_in_dictionary(word):
+                        message_split.append(word)
+                    else:
+                        words = nltk.word_tokenize(word)
+                        for w in words:
+                            word_split = re.findall(r'[A-Za-z]+|\d+', w)
+                            if len(word_split) > 1:
+                                message_split.extend(word_split)
+                            else:
+                                message_split.append(w)
 
                 for i, word in enumerate(message_split):
                     if self.symbol_dictionary.is_in_dictionary(word):
