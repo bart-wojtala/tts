@@ -112,6 +112,9 @@ class TextToSpeechEngine:
                             if w.isalnum() and w != 'bart3s' and w != 'bart3sbot':
                                 message_split.extend(
                                     re.findall(r'[A-Za-z]+|\d+', w))
+                            elif self.symbol_dictionary.contains_symbol(w) and any(c.isalpha() for c in w):
+                                word_split = word_tokenize(w)
+                                message_split.extend(word_split)
                             else:
                                 message_split.append(w)
 
@@ -141,6 +144,8 @@ class TextToSpeechEngine:
                 new_vm = VoiceMessage(vm.voice, formatted_message, vm.index)
                 self.messages_to_generate.append(new_vm)
 
+            for msg in self.messages_to_generate:
+                print(msg.message)
             # last_used_voice = ''
             # for i, word in enumerate(words_list):
             #     if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
