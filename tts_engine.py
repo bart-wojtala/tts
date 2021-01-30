@@ -77,7 +77,7 @@ class TextToSpeechEngine:
             #     word.translate(str.maketrans('', '', r":"))) > 0]
 
             translated_message = donation.message.translate(
-                {ord(c): " " for c in "()[]{};<>|`~"})
+                {ord(c): " " for c in "{}"})
             words_list = translated_message.split()
 
             if words_list[0] not in self.available_voices:
