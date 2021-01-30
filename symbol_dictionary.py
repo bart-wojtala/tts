@@ -9,7 +9,6 @@ class SymbolDictionary:
             self.symbol_dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):
-        print(word)
         return word in self.symbol_dictionary
 
     def replace_symbol(self, word):
