@@ -2,7 +2,8 @@ from models import VoiceMessage, DonationAudio
 import sys
 import enchant
 import math
-import nltk
+from nltk.tokenize import TweetTokenizer
+from nltk.tokenize import word_tokenize
 import numpy as np
 import re
 import requests
@@ -105,7 +106,8 @@ class TextToSpeechEngine:
                     if self.contraction_dictionary.is_in_dictionary(word):
                         message_split.append(word)
                     else:
-                        words = nltk.word_tokenize(word)
+                        tt = TweetTokenizer()
+                        words = tt.tokenize(word)
                         for w in words:
                             word_split = re.findall(r'[A-Za-z]+|\d+', w)
                             if len(word_split) > 1:
