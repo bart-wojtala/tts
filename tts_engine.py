@@ -109,7 +109,7 @@ class TextToSpeechEngine:
                         tt = TweetTokenizer()
                         words = tt.tokenize(word)
                         for w in words:
-                            if w.isalnum():
+                            if w.isalnum() and w != 'bart3s' and w != 'bart3sbot':
                                 message_split.extend(
                                     re.findall(r'[A-Za-z]+|\d+', w))
                             else:
