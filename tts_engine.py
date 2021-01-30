@@ -109,9 +109,9 @@ class TextToSpeechEngine:
                         tt = TweetTokenizer()
                         words = tt.tokenize(word)
                         for w in words:
-                            word_split = re.findall(r'[A-Za-z]+|\d+', w)
-                            if len(word_split) > 1:
-                                message_split.extend(word_split)
+                            if w.isalnum():
+                                message_split.extend(
+                                    re.findall(r'[A-Za-z]+|\d+', w))
                             else:
                                 message_split.append(w)
 
