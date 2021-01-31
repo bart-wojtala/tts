@@ -23,6 +23,7 @@ class AudioGenerator:
         "carolla:": "ac2_checkpoint_637800",
         "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_547000",
+        "duke:": "duke_5771",
         "fergy:": "fergy-fudgehog",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
@@ -113,7 +114,7 @@ class AudioGenerator:
             if message.voice in self.models_22khz:
                 hparams.sampling_rate = self.default_sampling_rate
                 waveglow_path = ''
-                if message.voice == "vader:":
+                if message.voice == "vader:" or message.voice == "duke:":
                     waveglow_path = models_path + self.waveglow_22khz["vader:"]
                 elif message.voice == "keanu:" or message.voice == "hal:":
                     waveglow_path = models_path + self.waveglow_22khz["david:"]
