@@ -22,7 +22,6 @@ class AudioGenerator:
     models_22khz = {
         "david:": "attenborough_checkpoint_547000",
         "fergy:": "fergy-fudgehog",
-        "g2nh:": "Nameless.Hero_6640_g2_0.299372_22",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
         "hal:": "hal_9000",
@@ -42,6 +41,7 @@ class AudioGenerator:
         "mlpte:": "Trixie_30256_0.059",
         "mlpts:": "Twilight_Sparkle_42660_0.179",
         "mlpza:": "Zecora_8977_0.058",
+        "nameless:": "Nameless.Hero_6640_g2_0.299372_22",
         "neil:": "neil_tyson_checkpoint_500000",
         "samuel:": "slj_42372",
         "satan:": "tacotron2_statedict.pt",
