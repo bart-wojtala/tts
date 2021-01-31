@@ -22,6 +22,7 @@ class AudioGenerator:
     models_22khz = {
         "david:": "attenborough_checkpoint_547000",
         "fergy:": "fergy-fudgehog",
+        "g2nh:": "Nameless.Hero_6640_g2_0.299372_22",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
         "hal:": "hal_9000",
@@ -52,7 +53,6 @@ class AudioGenerator:
 
     models_48khz = {
         "dan:": "mmi_danv3",
-        "g2nh:": "Nameless.Hero_6640_g2_0.299372_22",
         "sonic:": "mmi_sonicthv3"
     }
 
