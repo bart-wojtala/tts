@@ -20,6 +20,8 @@ import torch
 
 class AudioGenerator:
     models_22khz = {
+        "carolla:": "ac2_checkpoint_637800",
+        "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_547000",
         "fergy:": "fergy-fudgehog",
         "gandalf:": "gandalf_checkpoint_23932",
