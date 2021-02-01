@@ -77,6 +77,9 @@ class AudioGenerator:
         self.current_os = platform.system()
         self.audio_length_parameter = 32767
         self.default_sampling_rate = 22050
+        self.models_path = "models/"
+        self.hparams = create_hparams()
+        self.hparams.sampling_rate = self.default_sampling_rate
 
     def load_model(self, hparams):
         model = Tacotron2(hparams).cuda()
@@ -90,27 +93,18 @@ class AudioGenerator:
         return model
 
     def generate(self):
-        hparams = create_hparams()
-        hparams.sampling_rate = self.default_sampling_rate
-        models_path = "models/"
-
-        # waveglow_path = models_path + 'waveglow_256channels.pt'
-        # waveglow = torch.load(waveglow_path)['model']
-        # waveglow.cuda().eval().half()
-        # for k in waveglow.convinv:
-        #     k.float()
-        # denoiser = Denoiser(waveglow)
-
         for message in self.messages:
             if message.voice in self.models_22khz:
-                hparams.sampling_rate = self.default_sampling_rate
+                self.hparams.sampling_rate = self.default_sampling_rate
                 waveglow_path = ''
                 if message.voice == "vader:" or message.voice == "duke:":
-                    waveglow_path = models_path + self.waveglow_22khz["vader:"]
+                    waveglow_path = self.models_path + \
+                        self.waveglow_22khz["vader:"]
                 elif message.voice == "keanu:" or message.voice == "hal:":
-                    waveglow_path = models_path + self.waveglow_22khz["david:"]
+                    waveglow_path = self.models_path + \
+                        self.waveglow_22khz["david:"]
                 else:
-                    waveglow_path = models_path + \
+                    waveglow_path = self.models_path + \
                         self.waveglow_22khz['default']
 
                 waveglow = torch.load(waveglow_path)['model']
@@ -120,45 +114,41 @@ class AudioGenerator:
                 denoiser = Denoiser(waveglow)
 
                 if len(message.message) > 127:
-                    hparams.max_decoder_steps = 100000
+                    self.hparams.max_decoder_steps = 100000
                 else:
-                    hparams.max_decoder_steps = 10000
+                    self.hparams.max_decoder_steps = 10000
 
                 trimmed_message_length = len(
                     ''.join(c for c in message.message if c.isalnum()))
                 if trimmed_message_length < 4:
                     if message.voice == "vader:":
-                        hparams.max_decoder_steps = 1000
-                        hparams.gate_threshold = 0.001
+                        self.hparams.max_decoder_steps = 1000
+                        self.hparams.gate_threshold = 0.001
                         if any(char.isdigit() for char in message.message):
-                            hparams.max_decoder_steps = 10000
-                            hparams.gate_threshold = 0.5
+                            self.hparams.max_decoder_steps = 10000
+                            self.hparams.gate_threshold = 0.5
                 if trimmed_message_length >= 4 and trimmed_message_length < 7:
-                    hparams.gate_threshold = 0.01
+                    self.hparams.gate_threshold = 0.01
                     if message.voice == "vader:":
-                        # hparams.max_decoder_steps = 1000
-                        hparams.gate_threshold = 0.01
+                        self.hparams.gate_threshold = 0.01
                         if any(char.isdigit() for char in message.message):
-                            # hparams.max_decoder_steps = 10000
-                            hparams.gate_threshold = 0.5
+                            self.hparams.gate_threshold = 0.5
                     else:
-                        hparams.gate_threshold = 0.01
+                        self.hparams.gate_threshold = 0.01
                         if any(char.isdigit() for char in message.message):
-                            hparams.gate_threshold = 0.1
+                            self.hparams.gate_threshold = 0.1
                 elif trimmed_message_length >= 7 and trimmed_message_length < 15:
-                    hparams.gate_threshold = 0.1
+                    self.hparams.gate_threshold = 0.1
                     if message.voice == "vader:":
-                        # hparams.max_decoder_steps = 1000
-                        hparams.gate_threshold = 0.01
+                        self.hparams.gate_threshold = 0.01
                         if any(char.isdigit() for char in message.message):
-                            # hparams.max_decoder_steps = 100000
-                            hparams.gate_threshold = 0.5
+                            self.hparams.gate_threshold = 0.5
                     else:
-                        hparams.gate_threshold = 0.1
+                        self.hparams.gate_threshold = 0.1
                         if any(char.isdigit() for char in message.message):
-                            hparams.gate_threshold = 0.2
+                            self.hparams.gate_threshold = 0.2
                 else:
-                    hparams.gate_threshold = 0.5
+                    self.hparams.gate_threshold = 0.5
 
                 message_extended = False
                 if trimmed_message_length < 11:
@@ -168,9 +158,9 @@ class AudioGenerator:
                         message.message = message.message + " -------. -------."
                     message_extended = True
 
-                model = self.load_model(hparams)
+                model = self.load_model(self.hparams)
                 model.load_state_dict(torch.load(
-                    models_path + self.models_22khz[message.voice])['state_dict'])
+                    self.models_path + self.models_22khz[message.voice])['state_dict'])
                 _ = model.cuda().eval().half()
 
                 sequence = np.array(text_to_sequence(
@@ -183,23 +173,21 @@ class AudioGenerator:
 
                 with torch.no_grad():
                     audio = waveglow.infer(mel_outputs_postnet, sigma=1)
-                # audio_data = audio[0].data.cpu().numpy()
                 audio_denoised = denoiser(audio, strength=0.001)[:, 0]
                 audio_data = audio_denoised.cpu().numpy()[0]
 
-                # audio_data = np.concatenate((audio_data, silence))
                 scaled_audio = np.int16(
                     audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
                 if message_extended or requires_cutting:
-                    cut_idx = 0
+                    cut_index = 0
                     silence_length = 0
-                    for idx, val in enumerate(scaled_audio):
+                    for i, val in enumerate(scaled_audio):
                         if val == 0:
                             silence_length += 1
                         if silence_length > 500:
-                            cut_idx = idx
+                            cut_index = i
                             break
-                    scaled_audio = scaled_audio[:cut_idx]
+                    scaled_audio = scaled_audio[:cut_index]
                 if message.voice == "vader:":
                     _, effect = read("extras/breathing.wav")
                     scaled_audio = np.concatenate((effect, scaled_audio))
@@ -232,11 +220,10 @@ class AudioGenerator:
                     self.joined_audio = np.concatenate(
                         (self.joined_audio, audio))
                     os.remove(temp_file)
-                    # del engine
 
         scaled_audio = np.int16(
             self.joined_audio/np.max(np.abs(self.joined_audio)) * self.audio_length_parameter)
         if scaled_audio[0] == self.audio_length_parameter:
             scaled_audio = scaled_audio[1:]
 
-        return scaled_audio, hparams.sampling_rate
+        return scaled_audio, self.hparams.sampling_rate

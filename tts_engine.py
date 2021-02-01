@@ -45,38 +45,6 @@ class TextToSpeechEngine:
         self.messages_to_generate = []
 
         if path:
-            # translated_message = donation.message.translate(
-            #     {ord(c): " " for c in "@#$%^&*()[]{};/<>\|`~-=_+"})
-            # message_with_fixed_punctuation = re.sub(
-            #     r'(?<=[.,])(?=[^\s])', r' ', translated_message)
-            # words_list = message_with_fixed_punctuation.split()
-
-            # for i, word in enumerate(words_list):
-            #     if not '\'' in word:
-            #         word_split = re.findall(r'[A-Za-z]+|\d+', word)
-            #         if len(word_split) > 1:
-            #             punctuation = re.findall(r'[,.?!]+', word)
-            #             if punctuation:
-            #                 word_split[-1] += punctuation[0]
-            #             words_list[i:i+1] = word_split
-
-            # last_used_voice = ''
-            # for i, word in enumerate(words_list):
-            #     if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
-            #         words = self.word_dictionary.replace_word(word)
-            #         self.words += words
-            #     elif word in self.available_voices:
-            #         last_used_voice = word
-            #         self.words.append(word)
-            #     elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
-            #         word_split = wrap(word, 45)
-            #         self.words.extend(word_split)
-            #     else:
-            #         self.words.append(word)
-
-            # self.words = [word for word in self.words if word in self.available_voices or len(
-            #     word.translate(str.maketrans('', '', r":"))) > 0]
-
             translated_message = donation.message.translate(
                 {ord(c): " " for c in "{}"})
             words_list = translated_message.split()
@@ -146,84 +114,8 @@ class TextToSpeechEngine:
 
             for msg in self.messages_to_generate:
                 print(msg.message)
-            # last_used_voice = ''
-            # for i, word in enumerate(words_list):
-            #     if last_used_voice not in self.synth_voices and word not in self.available_voices and self.word_dictionary.is_in_dictionary(word):
-            #         words = self.word_dictionary.replace_word(word)
-            #         self.words += words
-            #     elif word in self.available_voices:
-            #         last_used_voice = word
-            #         self.words.append(word)
-            #     elif last_used_voice not in self.synth_voices and len(word) > 45 and not self.enchant_dict.check(word):
-            #         word_split = wrap(word, 45)
-            #         self.words.extend(word_split)
-            #     else:
-            #         self.words.append(word)
-            # print(self.words)
         else:
             self.words = donation.split()
-        # self.messages_to_generate = []
-        # self.sentence_separators = ['.', '?', '!']
-
-        # message_index = 0
-        # for i in range(0, len(self.words)):
-        #     if i == 0 and not self.words[0].endswith(':'):
-        #         if i < len(self.words):
-        #             self.create_voice_message(
-        #                 i, self.default_voice, message_index)
-        #     elif i == 0 and self.words[0].endswith(':'):
-        #         if i < len(self.words):
-        #             if self.words[i] in self.available_voices:
-        #                 self.create_voice_message(
-        #                     i + 1, self.words[i], message_index)
-        #             else:
-        #                 self.create_voice_message(
-        #                     i + 1, self.default_voice, self.words[0], message_index)
-        #     if i != 0 and self.words[i].endswith(':'):
-        #         if self.words[i] in self.available_voices and i < len(self.words):
-        #             self.create_voice_message(
-        #                 i + 1, self.words[i], message_index)
-        #     message_index += 1
-
-    def create_voice_message(self, start, voice, message_index, init_word=''):
-        sentence = init_word
-        for i in range(start, len(self.words)):
-            word = self.words[i]
-            if not word in self.available_voices:
-                add_word_to_sentence = True
-                word_length = len(word)
-                if word.isdigit() and word_length > self.maximum_number_length:
-                    word = word[0:self.maximum_number_length]
-                elif word.isdigit() and word_length < 16:
-                    if word_length > 12:
-                        word = word[:-12] + " trillion " + word[-12:]
-                    if word_length > 9:
-                        word = word[:-9] + " billion " + word[-9:]
-                    if word_length > 6:
-                        word = word[:-6] + " million " + word[-6:]
-                    if word_length > 4:
-                        word = word[:-3] + " thousand " + word[-3:]
-                        if word[-3] != '0':
-                            word = word[:-2] + " hundred " + word[-2:]
-                elif not word.isalpha() and not word.isnumeric() and word.isalnum():
-                    add_word_to_sentence = False
-                word = word.replace(',', ', ')
-                if add_word_to_sentence:
-                    if len(sentence) == 0:
-                        sentence += word
-                    else:
-                        sentence += ' ' + word
-            else:
-                if sentence[-1] not in self.sentence_separators:
-                    sentence += '.'
-                voice_message = VoiceMessage(voice, sentence, message_index)
-                self.messages_to_generate.append(voice_message)
-                break
-            if i == len(self.words) - 1:
-                if sentence[-1] not in self.sentence_separators:
-                    sentence += '.'
-                voice_message = VoiceMessage(voice, sentence, message_index)
-                self.messages_to_generate.append(voice_message)
 
     def generate_audio(self):
         if self.messages_to_generate:
