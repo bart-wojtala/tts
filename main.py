@@ -169,7 +169,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStartBtn.setDisabled(True)
         self.ClientStopBtn.setEnabled(True)
         self.ClientSkipAudio.setEnabled(True)
-        text_ready.emit('Log1:Initializing')
+        text_ready.emit('Log1:TTS engine ready!')
         while True:
             _mutex1.lock()
             if _running == False:
