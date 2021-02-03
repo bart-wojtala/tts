@@ -41,7 +41,7 @@ class TextToSpeechEngine:
         self.symbol_dictionary = SymbolDictionary()
         self.contraction_dictionary = ContractionsDictionary()
         self.enchant_dict = enchant.Dict("en_US")
-        self.sentence_separators = ['.', '?', '!']
+        self.sentence_separators = ['.', '?', '!', ';']
         self.messages_to_generate = []
 
         if path:
