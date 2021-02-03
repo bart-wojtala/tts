@@ -12,7 +12,7 @@ class Donation:
         self.message = message
 
 
-class DonationAudio:
+class GeneratedAudio:
     def __init__(self, donation, files):
         self.donation = donation
         self.files = files

@@ -1,4 +1,4 @@
-from models import VoiceMessage, DonationAudio
+from models import VoiceMessage, GeneratedAudio
 import sys
 import enchant
 import math
@@ -163,7 +163,7 @@ class TextToSpeechEngine:
                         file_name = self.write_audio_file(
                             message.voice, audio, sampling_rate)
                         files.append(VoiceMessage(message.voice, file_name))
-            return DonationAudio(self.donation, files)
+            return GeneratedAudio(self.donation, files)
         return
 
     def request_audio(self, endpoint, params):

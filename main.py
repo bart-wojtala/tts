@@ -11,7 +11,7 @@ import pygame
 import traceback
 from scipy.io.wavfile import write
 from database_client import DatabaseClient
-from models import Donation, DonationAudio
+from models import Donation, GeneratedAudio
 from tts_engine import TextToSpeechEngine
 from configparser import ConfigParser
 import qdarkstyle
