@@ -114,9 +114,9 @@ class Ui_MainWindow(object):
             _translate("MainWindow", "Delete first"))
         self.label_1.setText(_translate("MainWindow", "Status:"))
         self.label_2.setText(_translate(
-            "MainWindow", "Currently processed message:"))
+            "MainWindow", "Currently generated message:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(
-            self.tab_1), _translate("MainWindow", "StreamElements"))
+            self.tab_1), _translate("MainWindow", "TTS"))
         self.statusbar.setText(_translate("MainWindow", "Ready"))
         self.volumeSlider.setMinimum(0)
         self.volumeSlider.setMaximum(100)

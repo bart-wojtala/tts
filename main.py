@@ -169,7 +169,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStartBtn.setDisabled(True)
         self.ClientStopBtn.setEnabled(True)
         self.ClientSkipAudio.setEnabled(True)
-        text_ready.emit('Log1:TTS engine ready!')
+        text_ready.emit('Log1:TTS engine started!')
         while True:
             _mutex1.lock()
             if _running == False:
@@ -179,8 +179,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                 _mutex1.unlock()
             while self.database_client.is_donations_collection_not_empty() and self.connected:
                 donation = self.database_client.get_first_donation_in_queue()
-                text_ready.emit('Log2:Message from: ' +
-                                donation.name + "\n" + donation.message)
+                text_ready.emit("Log2:" + donation.name + " donated!\nID: " +
+                                donation.messageId + "\n" + donation.message)
                 try:
                     start_time = time.time()
                     tts_engine = TextToSpeechEngine(
@@ -193,19 +193,19 @@ class GUI(QMainWindow, Ui_MainWindow):
                         self.donations_to_play.append(donation_audio)
                     else:
                         text_ready.emit(
-                            "Sta1:Message: " + donation.message + "\nwas automatically skipped!")
+                            "Sta1:Message: " + donation.messageId + "\nwas automatically skipped!")
                     self.database_client.delete_donation(donation.messageId)
                 except:
                     self.connected = False
                     text_ready.emit(
-                        "Log1:\n## Can't connect to TTS server! ##")
+                        "Log1:\nCan't connect to TTS server!")
                     self.stop()
                 text_ready.emit('Log2:')
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
-        text_ready.emit('Log1:\nDisconnected')
+        text_ready.emit('Log1:TTS engine stopped!')
         return 'Return value of execute_this_fn'
 
     def play_audio_fn(self, channel, progress_callback, elapsed_callback, text_ready):
@@ -224,12 +224,11 @@ class GUI(QMainWindow, Ui_MainWindow):
                     message = donation_audio.donation.message
                     messageId = donation_audio.donation.messageId
                     files = donation_audio.files
-                    text_ready.emit("Log1:\n###########################\n")
+                    text_ready.emit(
+                        "Log1:------------------------------------------------------------------------------------\n")
                     text_ready.emit("Log1:" + name + " donated!")
                     text_ready.emit("Log1:ID: " + messageId)
                     text_ready.emit("Log1:" + message)
-                    # text_ready.emit(
-                    #     'Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
                     self.files = files
                     while self.current_audio_length > 0:

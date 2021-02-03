@@ -17,9 +17,3 @@ class GeneratedAudio:
         self.donation = donation
         self.files = files
         self.length = len(files)
-
-
-class AudioSequence:
-    def __init__(self, audio, rate):
-        self.audio = audio
-        self.rate = rate
