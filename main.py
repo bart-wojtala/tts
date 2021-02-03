@@ -138,6 +138,12 @@ class GUI(QMainWindow, Ui_MainWindow):
     def print_output(self, s):
         pass
 
+    def closeEvent(self, event):
+        if self.connected:
+            event.ignore()
+        else:
+            event.accept()
+
     def start(self):
         global _running
         _mutex1.lock()
