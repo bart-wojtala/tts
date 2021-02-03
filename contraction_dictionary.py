@@ -1,6 +1,4 @@
 import json
-import re
-import string
 
 
 class ContractionsDictionary:
@@ -9,7 +7,7 @@ class ContractionsDictionary:
             self.contraction_dictionary = json.loads(f.read())
 
     def is_in_dictionary(self, word):
-        return word in self.contraction_dictionary
+        return word in self.contraction_dictionary or word.replace("’", "'") in self.contraction_dictionary
 
     def replace_symbol(self, word):
         return self.contraction_dictionary[word]
