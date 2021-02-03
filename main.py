@@ -187,8 +187,9 @@ class GUI(QMainWindow, Ui_MainWindow):
                         donation, donation.name, self.url, self.generated_audio_path, True)
                     donation_audio = tts_engine.generate_audio()
                     if donation_audio:
-                        text_ready.emit("Sta1:Generating message: " + donation.message +
-                                        "\ntook: " + str(round((time.time() - start_time), 2)) + "seconds")
+                        text_ready.emit("Sta1:Generating message: " + donation.messageId +
+                                        " took: " + str(round((time.time() - start_time), 2)) + " seconds.")
+                        donation_audio.messageId = donation.messageId
                         self.donations_to_play.append(donation_audio)
                     else:
                         text_ready.emit(
@@ -199,6 +200,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     text_ready.emit(
                         "Log1:\n## Can't connect to TTS server! ##")
                     self.stop()
+                text_ready.emit('Log2:')
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
@@ -219,11 +221,13 @@ class GUI(QMainWindow, Ui_MainWindow):
                     time.sleep(1)
                     donation_audio = self.donations_to_play.pop(0)
                     name = donation_audio.donation.name
-                    msg = donation_audio.donation.message
+                    message = donation_audio.donation.message
+                    messageId = donation_audio.donation.messageId
                     files = donation_audio.files
                     text_ready.emit("Log1:\n###########################\n")
-                    text_ready.emit("Log1:" + name + ' donated message:')
-                    text_ready.emit("Log1:" + msg)
+                    text_ready.emit("Log1:" + name + " donated!")
+                    text_ready.emit("Log1:ID: " + messageId)
+                    text_ready.emit("Log1:" + message)
                     # text_ready.emit(
                     #     'Sta1:Currently playing -> ' + name + ' | ' + msg)
                     self.current_audio_length = donation_audio.length
