@@ -139,7 +139,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         pass
 
     def closeEvent(self, event):
-        if self.connected:
+        global _running
+        if _running:
             event.ignore()
         else:
             event.accept()
