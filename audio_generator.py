@@ -20,6 +20,7 @@ import torch
 
 class AudioGenerator:
     models_22khz = {
+        "carlson:": "tuck2",
         "carolla:": "ac2_checkpoint_637800",
         "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_547000",
@@ -35,6 +36,7 @@ class AudioGenerator:
         "mlpbm:": "Big_Macintosh_12650_0.024",
         "mlpca:": "Celestia_38429_0.167",
         "mlpfy:": "Fluttershy_46598_0.101",
+        "mlpla:": "Luna_30075_0.184",
         "mlppp:": "Pinkie_Pie_46853_0.119",
         "mlprd:": "Rainbow_Dash_62638_0.228",
         "mlpry:": "Rarity_43950_0.150",
