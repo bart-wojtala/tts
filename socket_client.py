@@ -5,9 +5,9 @@ from datetime import datetime
 
 class LocalClient:
     def __init__(self, database_client):
-        sio = socketio.Client()
+        self.sio = socketio.Client()
 
-        @sio.on('event')
+        @self.sio.on('event')
         def on_event(event):
             messageId = event['messageId']
             message = event['message'].lower()
@@ -16,26 +16,29 @@ class LocalClient:
             donation = Donation(messageId, name, message)
             database_client.add_donation(donation)
 
-        @sio.event
+        @self.sio.event
         def connect():
             print("I'm connected!")
 
-        @sio.event
+        @self.sio.event
         def connect_error():
             print("The connection failed!")
 
-        @sio.event
+        @self.sio.event
         def disconnect():
             print("I'm disconnected!")
 
-        sio.connect('http://localhost:3000')
+        self.sio.connect('http://localhost:3000')
+
+    def disconnect(self):
+        self.sio.disconnect()
 
 
 class StreamlabsClient:
     def __init__(self, database_client, token):
-        sio = socketio.Client()
+        self.sio = socketio.Client()
 
-        @sio.on('event')
+        @self.sio.on('event')
         def on_event(event):
             if(event['type'] == 'donation'):
                 messageId = event['event_id'].lower()
@@ -46,16 +49,19 @@ class StreamlabsClient:
                 donation = Donation(messageId, name, message)
                 database_client.add_donation(donation)
 
-        @sio.event
+        @self.sio.event
         def connect():
             print("I'm connected!")
 
-        @sio.event
+        @self.sio.event
         def connect_error():
             print("The connection failed!")
 
-        @sio.event
+        @self.sio.event
         def disconnect():
             print("I'm disconnected!")
 
-        sio.connect('https://sockets.streamlabs.com?token=' + token)
+        self.sio.connect('https://sockets.streamlabs.com?token=' + token)
+
+    def disconnect(self):
+        self.sio.disconnect()
