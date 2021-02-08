@@ -170,8 +170,7 @@ class AudioGenerator:
                 sequence = torch.autograd.Variable(
                     torch.from_numpy(sequence)).cuda().long()
 
-                mel_outputs, mel_outputs_postnet, _, alignments, requires_cutting = model.inference(
-                    sequence)
+                mel_outputs_postnet, requires_cutting = model.inference(sequence)
 
                 with torch.no_grad():
                     audio = waveglow.infer(mel_outputs_postnet, sigma=1)
