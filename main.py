@@ -68,9 +68,10 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.donations_to_play = []
         self.database_client = DatabaseClient()
         if streamlabs_token:
-            StreamlabsClient(self.database_client, streamlabs_token)
+            self.socket_client = StreamlabsClient(
+                self.database_client, streamlabs_token)
         else:
-            LocalClient(self.database_client)
+            self.socket_client = LocalClient(self.database_client)
         self.url = "http://" + instance_url + ":9000"
         self.app = app
         self.setupUi(self)
@@ -143,6 +144,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         if _running:
             event.ignore()
         else:
+            self.socket_client.disconnect()
             event.accept()
 
     def start(self):
