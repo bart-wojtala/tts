@@ -24,7 +24,7 @@ class AudioGenerator:
         "carolla:": "ac2_checkpoint_637800",
         "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_824800",
-        "duke:": "duke_46168",
+        "duke:": "duke_53795",
         "fergy:": "fergy-fudgehog",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
