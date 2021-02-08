@@ -71,13 +71,13 @@ class TextToSpeechEngine:
                 message_split = []
 
                 for i, word in enumerate(message):
-                    if self.contraction_dictionary.is_in_dictionary(word):
+                    if self.contraction_dictionary.is_in_dictionary(word) or 'bart3s' in word:
                         message_split.append(word)
                     else:
                         tt = TweetTokenizer()
                         words = tt.tokenize(word)
                         for w in words:
-                            if w.isalnum() and w != 'bart3s' and w != 'bart3sbot':
+                            if w.isalnum():
                                 message_split.extend(
                                     re.findall(r'[A-Za-z]+|\d+', w))
                             elif self.symbol_dictionary.contains_symbol(w) and any(c.isalpha() for c in w):
