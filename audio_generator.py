@@ -9,13 +9,11 @@ from scipy.io.wavfile import read
 import pyttsx3
 from denoiser import Denoiser
 from text import text_to_sequence
-from audio_processing import griffin_lim
-from layers import TacotronSTFT, STFT
 from model import Tacotron2
 from hparams import create_hparams
 import numpy as np
 import torch
-# from train import load_model
+from train import load_model
 
 
 class AudioGenerator:
@@ -83,17 +81,6 @@ class AudioGenerator:
         self.hparams = create_hparams()
         self.hparams.sampling_rate = self.default_sampling_rate
 
-    def load_model(self, hparams):
-        model = Tacotron2(hparams).cuda()
-        if hparams.fp16_run:
-            model.decoder.attention_layer.score_mask_value = finfo(
-                'float16').min
-
-        if hparams.distributed_run:
-            model = apply_gradient_allreduce(model)
-
-        return model
-
     def generate(self):
         for message in self.messages:
             if message.voice in self.models_22khz:
@@ -160,7 +147,7 @@ class AudioGenerator:
                         message.message = message.message + " -------. -------."
                     message_extended = True
 
-                model = self.load_model(self.hparams)
+                model = load_model(self.hparams)
                 model.load_state_dict(torch.load(
                     self.models_path + self.models_22khz[message.voice])['state_dict'])
                 _ = model.cuda().eval().half()
@@ -170,7 +157,8 @@ class AudioGenerator:
                 sequence = torch.autograd.Variable(
                     torch.from_numpy(sequence)).cuda().long()
 
-                mel_outputs_postnet, requires_cutting = model.inference(sequence)
+                mel_outputs_postnet, requires_cutting = model.inference(
+                    sequence)
 
                 with torch.no_grad():
                     audio = waveglow.infer(mel_outputs_postnet, sigma=1)
