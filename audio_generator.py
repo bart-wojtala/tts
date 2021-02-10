@@ -46,7 +46,7 @@ class AudioGenerator:
         "mlpza:": "Zecora_8977_0.058",
         "nameless:": "Nameless.Hero_6640_g2_0.299372_22",
         "neil:": "neil_tyson_checkpoint_500000",
-        "samuel:": "slj_52932",
+        "samuel:": "slj_73392",
         "satan:": "tacotron2_statedict.pt",
         "trump:": "trump_7752",
         "vader:": "jej_checkpoint_904500",
