@@ -48,6 +48,7 @@ class AudioGenerator:
         "neil:": "neil_tyson_checkpoint_500000",
         "samuel:": "slj_117480",
         "satan:": "tacotron2_statedict.pt",
+        "trevor:": "trevor_18180",
         "trump:": "trump_15198",
         "vader:": "jej_checkpoint_904500",
         "woman:": "tacotron2_statedict.pt",
