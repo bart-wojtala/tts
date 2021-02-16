@@ -111,7 +111,7 @@ class AudioGenerator:
                 trimmed_message_length = len(
                     ''.join(c for c in message.message if c.isalnum()))
                 if trimmed_message_length < 4:
-                    if message.voice == "vader:":
+                    if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.max_decoder_steps = 1000
                         self.hparams.gate_threshold = 0.001
                         if any(char.isdigit() for char in message.message):
@@ -119,7 +119,7 @@ class AudioGenerator:
                             self.hparams.gate_threshold = 0.5
                 if trimmed_message_length >= 4 and trimmed_message_length < 7:
                     self.hparams.gate_threshold = 0.01
-                    if message.voice == "vader:":
+                    if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.gate_threshold = 0.01
                         if any(char.isdigit() for char in message.message):
                             self.hparams.gate_threshold = 0.5
@@ -129,7 +129,7 @@ class AudioGenerator:
                             self.hparams.gate_threshold = 0.1
                 elif trimmed_message_length >= 7 and trimmed_message_length < 15:
                     self.hparams.gate_threshold = 0.1
-                    if message.voice == "vader:":
+                    if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.gate_threshold = 0.01
                         if any(char.isdigit() for char in message.message):
                             self.hparams.gate_threshold = 0.5
