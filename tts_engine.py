@@ -17,6 +17,7 @@ from random import randint
 from AudioLib import AudioEffect
 from textwrap import wrap
 from contraction_dictionary import ContractionsDictionary
+from emote_dictionary import EmoteDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 
@@ -40,6 +41,7 @@ class TextToSpeechEngine:
         self.word_dictionary = WordDictionary()
         self.symbol_dictionary = SymbolDictionary()
         self.contraction_dictionary = ContractionsDictionary()
+        self.emote_dictionary = EmoteDictionary()
         self.enchant_dict = enchant.Dict("en_US")
         self.sentence_separators = ['.', '?', '!', ';']
         self.messages_to_generate = []
@@ -69,6 +71,10 @@ class TextToSpeechEngine:
             for vm in voice_messages:
                 message = vm.message.split()
                 message_split = []
+
+                for i, word in enumerate(message):
+                    if self.emote_dictionary.is_in_dictionary(word):
+                        message[i:i+1] = self.emote_dictionary.replace_emote(word)
 
                 for i, word in enumerate(message):
                     if self.contraction_dictionary.is_in_dictionary(word) or 'bart3s' in word:
