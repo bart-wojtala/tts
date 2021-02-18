@@ -23,10 +23,10 @@ from word_dictionary import WordDictionary
 
 
 class TextToSpeechEngine:
-    available_voices = ['carlson:', 'carolla:', 'daria:', 'david:', 'duke:', 'fergy:', 'gandalf:', 'glados:', 'hal:', 'hudson:', 'keanu:', 'mlpab:', 'mlpaj:', 'mlpbm:', 'mlpca:', 'mlpfy:', 'mlpla:', 'mlppp:',
-                        'mlprd:', 'mlpry:', 'mlpsb:', 'mlpse:', 'mlpso:', 'mlpte:', 'mlpts:', 'mlpza:', 'msdavid:', 'mszira:', 'nameless:', 'neil:', 'samuel:', 'satan:', 'stephen:', 'trevor:', 'trump:', 'vader:', 'vmail:', 'woman:']
+    available_voices = ['carlson:', 'daria:', 'david:', 'duke:', 'gandalf:', 'glados:', 'hal:', 'hudson:', 'keanu:', 'mlpab:', 'mlpaj:', 'mlpca:',
+                        'mlpfy:', 'mlppp:', 'mlprd:', 'mlpts:', 'mlpza:', 'msdavid:', 'neil:', 'samuel:', 'satan:', 'stephen:', 'trevor:', 'trump:', 'vader:', 'woman:']
     default_voice = 'glados:'
-    synth_voices = ["msdavid:", "mszira:", "stephen:"]
+    synth_voices = ["msdavid:", "stephen:"]
 
     def __init__(self, donation, name, url='', path='', use_local_gpu=False):
         self.donation = donation
@@ -144,11 +144,11 @@ class TextToSpeechEngine:
                 messages_to_send = []
                 single_message = ''
                 for index, message in enumerate(self.messages_to_generate):
-                    if message.voice == "satan:" or message.voice == "vmail:" or message.voice == "vader:":
+                    if message.voice == "satan:" or message.voice == "vader:":
                         messages_to_send.append(message)
                     else:
                         single_message += message.voice + ' ' + message.message + ' '
-                        if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "vmail:" or self.messages_to_generate[index + 1].voice == "vader:"):
+                        if (index == len(self.messages_to_generate) - 1) or (self.messages_to_generate[index + 1].voice == "satan:" or self.messages_to_generate[index + 1].voice == "vader:"):
                             messages_to_send.append(single_message)
                             single_message = ''
 
@@ -197,15 +197,6 @@ class TextToSpeechEngine:
 
             sound = AudioSegment.from_wav(file_name)
             sound.export(file_name, format="wav")
-        elif voice == "vmail:":
-            temp_file_name = self.path + "temp.wav"
-            write(temp_file_name, sampling_rate, audio)
-            fs, audio = read(temp_file_name)
-            low_freq = 200.0
-            high_freq = 3000.0
-            filtered_signal = butter_bandpass_filter(
-                audio, low_freq, high_freq, fs, order=6)
-            write(file_name, fs, np.array(filtered_signal, dtype=np.int16))
         elif voice == "vader:":
             temp_file_name = self.path + "temp.wav"
             write(temp_file_name, sampling_rate, audio)

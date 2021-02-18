@@ -19,11 +19,9 @@ from train import load_model
 class AudioGenerator:
     models_22khz = {
         "carlson:": "tuck2",
-        "carolla:": "ac2_checkpoint_637800",
         "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_824800",
         "duke:": "duke_53795",
-        "fergy:": "fergy-fudgehog",
         "gandalf:": "gandalf_checkpoint_23932",
         "glados:": "glados_7325",
         "hal:": "hal_9000",
@@ -31,28 +29,19 @@ class AudioGenerator:
         "keanu:": "keanu_67912",
         "mlpab:": "Apple_Bloom_28037_0.120",
         "mlpaj:": "Applejack_40071_0.156",
-        "mlpbm:": "Big_Macintosh_12650_0.024",
         "mlpca:": "Celestia_38429_0.167",
         "mlpfy:": "Fluttershy_46598_0.101",
-        "mlpla:": "Luna_30075_0.184",
         "mlppp:": "Pinkie_Pie_46853_0.119",
         "mlprd:": "Rainbow_Dash_62638_0.228",
-        "mlpry:": "Rarity_43950_0.150",
-        "mlpsb:": "Sweetie_Belle_38746_0.329_Neutral_Happy_Amused",
-        "mlpse:": "Spike_32978_0.145",
-        "mlpso:": "Scootaloo_24363_0.210",
-        "mlpte:": "Trixie_30256_0.059",
         "mlpts:": "Twilight_Sparkle_42660_0.179",
         "mlpza:": "Zecora_8977_0.058",
-        "nameless:": "Nameless.Hero_6640_g2_0.299372_22",
         "neil:": "neil_tyson_checkpoint_500000",
         "samuel:": "slj_117480",
         "satan:": "tacotron2_statedict.pt",
         "trevor:": "trevor_18180",
         "trump:": "trump_7752",
         "vader:": "jej_checkpoint_904500",
-        "woman:": "tacotron2_statedict.pt",
-        "vmail:": "tacotron2_statedict.pt"
+        "woman:": "tacotron2_statedict.pt"
     }
 
     synth_voices_linux = {
@@ -61,7 +50,6 @@ class AudioGenerator:
 
     synth_voices_windows = {
         "msdavid:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_DAVID_11.0",
-        "mszira:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_ZIRA_11.0",
         "stephen:": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\eSpeakNG_en"
     }
 
