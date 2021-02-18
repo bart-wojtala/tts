@@ -49,7 +49,7 @@ class AudioGenerator:
         "samuel:": "slj_117480",
         "satan:": "tacotron2_statedict.pt",
         "trevor:": "trevor_18180",
-        "trump:": "trump_15198",
+        "trump:": "trump_7752",
         "vader:": "jej_checkpoint_904500",
         "woman:": "tacotron2_statedict.pt",
         "vmail:": "tacotron2_statedict.pt"
