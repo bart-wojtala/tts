@@ -67,11 +67,11 @@ class GUI(QMainWindow, Ui_MainWindow):
         super(GUI, self).__init__()
         self.donations_to_play = []
         self.database_client = DatabaseClient()
+        self.local_socket_client = LocalClient(self.database_client)
+        self.streamlabs_socket_client = None
         if streamlabs_token:
-            self.socket_client = StreamlabsClient(
+            self.streamlabs_socket_client = StreamlabsClient(
                 self.database_client, streamlabs_token)
-        else:
-            self.socket_client = LocalClient(self.database_client)
         self.url = "http://" + instance_url + ":9000"
         self.app = app
         self.setupUi(self)
@@ -144,7 +144,9 @@ class GUI(QMainWindow, Ui_MainWindow):
         if _running:
             event.ignore()
         else:
-            self.socket_client.disconnect()
+            self.local_socket_client.disconnect()
+            if self.streamlabs_socket_client:
+                self.streamlabs_socket_client.disconnect()
             event.accept()
 
     def start(self):
@@ -287,9 +289,9 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     url = config['GCP']['url']
-    # token = config['Streamlabs']['token']
+    token = config['Streamlabs']['token']
     app = Qt.QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet())
-    window = GUI(app, url)
+    window = GUI(app, url, token)
     window.show()
     sys.exit(app.exec_())
