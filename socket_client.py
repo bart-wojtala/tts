@@ -18,15 +18,15 @@ class LocalClient:
 
         @self.sio.event
         def connect():
-            print("I'm connected!")
+            print("I'm connected to local socket server!")
 
         @self.sio.event
         def connect_error():
-            print("The connection failed!")
+            print("The connection to local socket server failed!")
 
         @self.sio.event
         def disconnect():
-            print("I'm disconnected!")
+            print("I'm disconnected from local socket server!")
 
         self.sio.connect('http://localhost:3000')
 
@@ -51,15 +51,15 @@ class StreamlabsClient:
 
         @self.sio.event
         def connect():
-            print("I'm connected!")
+            print("I'm connected to Streamlabs socket API!")
 
         @self.sio.event
         def connect_error():
-            print("The connection failed!")
+            print("The connection to Streamlabs socket API failed!")
 
         @self.sio.event
         def disconnect():
-            print("I'm disconnected!")
+            print("I'm disconnected from Streamlabs socket API!")
 
         self.sio.connect('https://sockets.streamlabs.com?token=' + token)
 
