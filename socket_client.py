@@ -12,7 +12,6 @@ class LocalClient:
             messageId = event['messageId']
             message = event['message'].lower()
             name = event['username']
-            message_time = event['messageTime']
             donation = Donation(messageId, name, message)
             database_client.add_donation(donation)
 
