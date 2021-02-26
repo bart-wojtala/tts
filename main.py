@@ -188,8 +188,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            while self.database_client.is_donations_collection_not_empty() and self.connected:
-                donation = self.database_client.get_first_donation_in_queue()
+            while self.database_client.is_messages_collection_not_empty() and self.connected:
+                donation = self.database_client.get_first_message_in_queue()
                 text_ready.emit("Log2:" + donation.name + " donated!\nID: " +
                                 donation.messageId + "\n" + donation.message)
                 try:
@@ -205,7 +205,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     else:
                         text_ready.emit(
                             "Sta1:Message: " + donation.messageId + "\nwas automatically skipped!")
-                    self.database_client.delete_donation(donation.messageId)
+                    self.database_client.delete_message(donation.messageId)
                 except:
                     self.connected = False
                     text_ready.emit(
@@ -277,9 +277,9 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.current_audio_length = 0
 
     def delete_first_message(self):
-        if self.database_client.is_donations_collection_not_empty():
-            donation = self.database_client.get_first_donation_in_queue()
-            self.database_client.delete_donation(donation.messageId)
+        if self.database_client.is_messages_collection_not_empty():
+            donation = self.database_client.get_first_message_in_queue()
+            self.database_client.delete_message(donation.messageId)
 
     def change_volume(self):
         value = self.volumeSlider.value()
