@@ -202,6 +202,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                                         " took: " + str(round((time.time() - start_time), 2)) + " seconds.")
                         donation_audio.messageId = donation.messageId
                         self.donations_to_play.append(donation_audio)
+                        self.database_client.add_generated_message(donation)
                     else:
                         text_ready.emit(
                             "Sta1:Message: " + donation.messageId + "\nwas automatically skipped!")

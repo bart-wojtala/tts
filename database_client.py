@@ -6,16 +6,23 @@ class DatabaseClient:
     connection_string = 'mongodb://localhost:27017/'
     database_name = 'tts'
     messages_collection_name = 'messages'
+    generated_collection_name = 'generated'
 
     def __init__(self):
         self.client = MongoClient(self.connection_string)
         self.database = self.client[self.database_name]
         self.messages_collection = self.database[self.messages_collection_name]
+        self.generated_collection = self.database[self.generated_collection_name]
 
     def add_message(self, donation):
         query = donation.__dict__
         newvalues = {"$set": donation.__dict__}
         self.messages_collection.update_one(query, newvalues, upsert=True)
+
+    def add_generated_message(self, donation):
+        query = donation.__dict__
+        newvalues = {"$set": donation.__dict__}
+        self.generated_collection.update_one(query, newvalues, upsert=True)
 
     def get_first_message_in_queue(self):
         donation = self.messages_collection.find_one()
