@@ -3,10 +3,10 @@ from pymongo import MongoClient
 
 
 class DatabaseClient:
-    connection_string = 'mongodb://localhost:27017/'
-    database_name = 'tts'
-    messages_collection_name = 'messages'
-    generated_collection_name = 'generated'
+    connection_string = "mongodb://localhost:27017/"
+    database_name = "tts"
+    messages_collection_name = "messages"
+    generated_collection_name = "generated"
 
     def __init__(self):
         self.client = MongoClient(self.connection_string)
@@ -26,10 +26,10 @@ class DatabaseClient:
 
     def get_first_message_in_queue(self):
         message = self.messages_collection.find_one()
-        return Message(message['messageId'], message['name'], message['text'])
+        return Message(message["messageId"], message["name"], message["text"])
 
     def delete_message(self, messageId):
-        self.messages_collection.delete_one({'messageId': messageId})
+        self.messages_collection.delete_one({"messageId": messageId})
 
     def is_messages_collection_not_empty(self):
         return False if self.messages_collection.count_documents({}) == 0 else True
