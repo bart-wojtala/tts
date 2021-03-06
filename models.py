@@ -5,7 +5,7 @@ class VoiceMessage:
         self.index = index
 
 
-class Donation:
+class Message:
     def __init__(self, messageId, name, message, event_type=None):
         self.messageId = messageId
         self.name = name

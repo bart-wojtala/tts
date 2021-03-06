@@ -1,5 +1,5 @@
 import socketio
-from models import Donation
+from models import Message
 from datetime import datetime
 
 
@@ -12,8 +12,8 @@ class LocalClient:
             messageId = event['messageId']
             message = event['message'].lower()
             name = event['username']
-            donation = Donation(messageId, name, message)
-            database_client.add_message(donation)
+            message = Message(messageId, name, message)
+            database_client.add_message(message)
 
         @self.sio.event
         def connect():
@@ -44,14 +44,14 @@ class StreamlabsClient:
                 messageId = event['event_id'].lower()
                 message = event['message'][0]['message']
                 name = event['message'][0]['name']
-                donation = Donation(messageId, name, message, event_type)
-                database_client.add_message(donation)
+                message = Message(messageId, name, message, event_type)
+                database_client.add_message(message)
             elif event_type == 'bits':
                 messageId = event['event_id'].lower()
                 message = event['message'][0]['message'].split(' ', 1)[1]
                 name = event['message'][0]['name']
-                donation = Donation(messageId, name, message, event_type)
-                database_client.add_message(donation)
+                message = Message(messageId, name, message, event_type)
+                database_client.add_message(message)
 
         @self.sio.event
         def connect():

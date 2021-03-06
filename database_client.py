@@ -1,4 +1,4 @@
-from models import Donation
+from models import Message
 from pymongo import MongoClient
 
 
@@ -14,19 +14,19 @@ class DatabaseClient:
         self.messages_collection = self.database[self.messages_collection_name]
         self.generated_collection = self.database[self.generated_collection_name]
 
-    def add_message(self, donation):
-        query = donation.__dict__
-        newvalues = {"$set": donation.__dict__}
+    def add_message(self, message):
+        query = message.__dict__
+        newvalues = {"$set": message.__dict__}
         self.messages_collection.update_one(query, newvalues, upsert=True)
 
-    def add_generated_message(self, donation):
-        query = donation.__dict__
-        newvalues = {"$set": donation.__dict__}
+    def add_generated_message(self, message):
+        query = message.__dict__
+        newvalues = {"$set": message.__dict__}
         self.generated_collection.update_one(query, newvalues, upsert=True)
 
     def get_first_message_in_queue(self):
-        donation = self.messages_collection.find_one()
-        return Donation(donation['messageId'], donation['name'], donation['message'])
+        message = self.messages_collection.find_one()
+        return Message(message['messageId'], message['name'], message['message'])
 
     def delete_message(self, messageId):
         self.messages_collection.delete_one({'messageId': messageId})
