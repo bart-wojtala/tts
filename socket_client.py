@@ -44,13 +44,13 @@ class StreamlabsClient:
                 messageId = event['event_id'].lower()
                 message = event['message'][0]['message']
                 name = event['message'][0]['name']
-                donation = Donation(messageId, name, message)
+                donation = Donation(messageId, name, message, event_type)
                 database_client.add_message(donation)
             elif event_type == 'bits':
                 messageId = event['event_id'].lower()
                 message = event['message'][0]['message'].split(' ', 1)[1]
                 name = event['message'][0]['name']
-                donation = Donation(messageId, name, message)
+                donation = Donation(messageId, name, message, event_type)
                 database_client.add_message(donation)
 
         @self.sio.event
