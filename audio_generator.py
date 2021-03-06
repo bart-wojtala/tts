@@ -2,9 +2,8 @@ import os
 import platform
 import time
 import sys
-sys.path.append('tacotron2/')
-sys.path.append('tacotron2/waveglow/')
-
+sys.path.append("tacotron2/")
+sys.path.append("tacotron2/waveglow/")
 from scipy.io.wavfile import read
 import pyttsx3
 from denoiser import Denoiser
@@ -69,12 +68,13 @@ class AudioGenerator:
         self.models_path = "models/"
         self.hparams = create_hparams()
         self.hparams.sampling_rate = self.default_sampling_rate
+        self.temp_file = "temp.wav"
 
     def generate(self):
         for message in self.messages:
             if message.voice in self.models_22khz:
                 self.hparams.sampling_rate = self.default_sampling_rate
-                waveglow_path = ''
+                waveglow_path = ""
                 if message.voice == "vader:" or message.voice == "duke:":
                     waveglow_path = self.models_path + \
                         self.waveglow_22khz["vader:"]
@@ -83,9 +83,9 @@ class AudioGenerator:
                         self.waveglow_22khz["david:"]
                 else:
                     waveglow_path = self.models_path + \
-                        self.waveglow_22khz['default']
+                        self.waveglow_22khz["default"]
 
-                waveglow = torch.load(waveglow_path)['model']
+                waveglow = torch.load(waveglow_path)["model"]
                 waveglow.cuda().eval().half()
                 for k in waveglow.convinv:
                     k.float()
@@ -97,7 +97,7 @@ class AudioGenerator:
                     self.hparams.max_decoder_steps = 10000
 
                 trimmed_message_length = len(
-                    ''.join(c for c in message.text if c.isalnum()))
+                    "".join(c for c in message.text if c.isalnum()))
                 if trimmed_message_length < 4:
                     if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.max_decoder_steps = 1000
@@ -131,18 +131,20 @@ class AudioGenerator:
                 message_extended = False
                 if trimmed_message_length < 11:
                     if message.voice == "vader:":
-                        message.text = message.text + " -. -------. -------."
+                        message.text = "{} -. -------. -------.".format(
+                            message.text)
                     else:
-                        message.text = message.text + " -------. -------."
+                        message.text = "{} -------. -------.".format(
+                            message.text)
                     message_extended = True
 
                 model = load_model(self.hparams)
                 model.load_state_dict(torch.load(
-                    self.models_path + self.models_22khz[message.voice])['state_dict'])
+                    self.models_path + self.models_22khz[message.voice])["state_dict"])
                 _ = model.cuda().eval().half()
 
                 sequence = np.array(text_to_sequence(
-                    message.text, ['english_cleaners']))[None, :]
+                    message.text, ["english_cleaners"]))[None, :]
                 sequence = torch.autograd.Variable(
                     torch.from_numpy(sequence)).cuda().long()
 
@@ -176,29 +178,29 @@ class AudioGenerator:
                 if requires_cutting:
                     torch.cuda.empty_cache()
             else:
-                temp_file = 'temp.wav'
                 engine = pyttsx3.init()
-                if self.current_os == 'Windows':
+                if self.current_os == "Windows":
                     engine.setProperty(
-                        'voice', self.synth_voices_windows[message.voice])
+                        "voice", self.synth_voices_windows[message.voice])
                 else:
                     engine.setProperty(
-                        'voice', self.synth_voices_linux[message.voice])
-                engine.setProperty('rate', 120)
-                engine.save_to_file(message.text, temp_file)
+                        "voice", self.synth_voices_linux[message.voice])
+                engine.setProperty("rate", 120)
+                engine.save_to_file(message.text, self.temp_file)
                 engine.runAndWait()
 
-                while not os.path.isfile(temp_file):
+                while not os.path.isfile(self.temp_file):
                     time.sleep(1.5)
 
-                if os.path.isfile(temp_file):
+                if os.path.isfile(self.temp_file):
                     del engine
-                    file = read(os.path.join(os.path.abspath("."), temp_file))
+                    file = read(os.path.join(
+                        os.path.abspath("."), self.temp_file))
                     audio = np.array(file[1], dtype=np.int16)
                     audio = np.concatenate((audio, self.silence))
                     self.joined_audio = np.concatenate(
                         (self.joined_audio, audio))
-                    os.remove(temp_file)
+                    os.remove(self.temp_file)
 
         scaled_audio = np.int16(
             self.joined_audio/np.max(np.abs(self.joined_audio)) * self.audio_length_parameter)
