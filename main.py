@@ -111,6 +111,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         print("Multithreading with maximum %d threads" %
               self.threadpool.maxThreadCount())
         self.signals = GUISignals()
+        self.tts_engine = TextToSpeechEngine(
+            self.url, self.generated_audio_path)
 
     @pyqtSlot(str)
     def draw_text(self, text):
@@ -194,9 +196,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                                 donation.messageId + "\n" + donation.message)
                 try:
                     start_time = time.time()
-                    tts_engine = TextToSpeechEngine(
-                        donation, donation.name, self.url, self.generated_audio_path, True)
-                    donation_audio = tts_engine.generate_audio()
+                    donation_audio = self.tts_engine.generate_audio(donation)
                     if donation_audio:
                         text_ready.emit("Sta1:Generating message: " + donation.messageId +
                                         " took: " + str(round((time.time() - start_time), 2)) + " seconds.")
