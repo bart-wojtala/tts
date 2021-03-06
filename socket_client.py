@@ -65,7 +65,8 @@ class StreamlabsClient:
         def disconnect():
             print("I'm disconnected from Streamlabs socket API!")
 
-        self.sio.connect('https://sockets.streamlabs.com?token=' + token)
+        self.sio.connect(
+            'https://sockets.streamlabs.com?token={}'.format(token))
 
     def disconnect(self):
         self.sio.disconnect()
