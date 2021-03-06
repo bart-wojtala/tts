@@ -39,9 +39,9 @@ class Worker(QRunnable):
         self.kwargs = kwargs
         self.signals = WorkerSignals()
 
-        self.kwargs['progress_callback'] = self.signals.progress
-        self.kwargs['elapsed_callback'] = self.signals.elapsed
-        self.kwargs['text_ready'] = self.signals.textready
+        self.kwargs["progress_callback"] = self.signals.progress
+        self.kwargs["elapsed_callback"] = self.signals.elapsed
+        self.kwargs["text_ready"] = self.signals.textready
 
     @pyqtSlot()
     def run(self):
@@ -63,16 +63,16 @@ class GUISignals(QObject):
 
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self, app, instance_url, streamlabs_token=''):
+    def __init__(self, app, instance_url, streamlabs_token=""):
         super(GUI, self).__init__()
-        self.donations_to_play = []
+        self.messages_to_play = []
         self.database_client = DatabaseClient()
         self.local_socket_client = LocalClient(self.database_client)
         self.streamlabs_socket_client = None
         if streamlabs_token:
             self.streamlabs_socket_client = StreamlabsClient(
                 self.database_client, streamlabs_token)
-        self.url = "http://" + instance_url + ":9000"
+        self.url = "http://{}:9000".format(instance_url)
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -108,8 +108,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStopBtn.clicked.connect(self.stop)
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(3)
-        print("Multithreading with maximum %d threads" %
-              self.threadpool.maxThreadCount())
+        print("Multithreading with maximum {} threads".format(
+            self.threadpool.maxThreadCount()))
         self.signals = GUISignals()
         self.tts_engine = TextToSpeechEngine(
             self.url, self.generated_audio_path)
@@ -118,17 +118,17 @@ class GUI(QMainWindow, Ui_MainWindow):
     def draw_text(self, text):
         obj = text[0:4]
         msg = text[5:]
-        if obj == 'Log1':
+        if obj == "Log1":
             if len(self.logs2) > self.max_log2_lines:
                 self.logs2.pop(0)
             self.logs2.append(msg)
-            log_text = '\n'.join(self.logs2)
+            log_text = "\n".join(self.logs2)
             self.log_window.setPlainText(log_text)
             self.log_window.verticalScrollBar().setValue(
                 self.log_window.verticalScrollBar().maximum())
-        if obj == 'Log2':
+        if obj == "Log2":
             self.log_window2.setPlainText(msg)
-        if obj == 'Sta1':
+        if obj == "Sta1":
             self.statusbar.setText(msg)
 
     @pyqtSlot(int)
@@ -182,7 +182,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.ClientStartBtn.setDisabled(True)
         self.ClientStopBtn.setEnabled(True)
         self.ClientSkipAudio.setEnabled(True)
-        text_ready.emit('Log1:TTS engine started!')
+        text_ready.emit("Log1:TTS engine started!")
         while True:
             _mutex1.lock()
             if _running == False:
@@ -191,34 +191,33 @@ class GUI(QMainWindow, Ui_MainWindow):
             else:
                 _mutex1.unlock()
             while self.database_client.is_messages_collection_not_empty() and self.connected:
-                donation = self.database_client.get_first_message_in_queue()
-                text_ready.emit("Log2:" + donation.name + " donated!\nID: " +
-                                donation.messageId + "\n" + donation.text)
+                message = self.database_client.get_first_message_in_queue()
+                text_ready.emit("Log2:{} donated!\nID: {}\n{}".format(
+                    message.name, message.messageId, message.text))
                 try:
                     start_time = time.time()
-                    donation_audio = self.tts_engine.generate_audio(donation)
-                    if donation_audio:
-                        text_ready.emit("Sta1:Generating message: " + donation.messageId +
-                                        " took: " + str(round((time.time() - start_time), 2)) + " seconds.")
-                        donation_audio.messageId = donation.messageId
-                        self.donations_to_play.append(donation_audio)
-                        self.database_client.add_generated_message(donation)
+                    generated_audio = self.tts_engine.generate_audio(message)
+                    if generated_audio:
+                        text_ready.emit("Sta1:Generating message: {} took: {} seconds.".format(
+                            message.messageId, str(round((time.time() - start_time), 2))))
+                        generated_audio.messageId = message.messageId
+                        self.messages_to_play.append(generated_audio)
+                        self.database_client.add_generated_message(message)
                     else:
                         text_ready.emit(
-                            "Sta1:Message: " + donation.messageId + "\nwas automatically skipped!")
-                    self.database_client.delete_message(donation.messageId)
+                            "Sta1:Message: {}\nwas automatically skipped!".format(message.messageId))
+                    self.database_client.delete_message(message.messageId)
                 except:
                     self.connected = False
-                    text_ready.emit(
-                        "Log1:\nCan't connect to TTS server!")
+                    text_ready.emit("Log1:\nCan't connect to TTS server!")
                     self.stop()
-                text_ready.emit('Log2:')
+                text_ready.emit("Log2:")
             time.sleep(0.5)
         self.ClientStartBtn.setEnabled(True)
         self.ClientStopBtn.setDisabled(True)
         self.ClientSkipAudio.setDisabled(True)
-        text_ready.emit('Log1:TTS engine stopped!')
-        return 'Return value of execute_this_fn'
+        text_ready.emit("Log1:TTS engine stopped!")
+        return "Return value of execute_this_fn"
 
     def play_audio_fn(self, channel, progress_callback, elapsed_callback, text_ready):
         while True:
@@ -228,27 +227,27 @@ class GUI(QMainWindow, Ui_MainWindow):
                 break
             else:
                 _mutex1.unlock()
-            while self.donations_to_play:
+            while self.messages_to_play:
                 if not channel.get_busy() and self.current_audio_length == 0:
                     time.sleep(1)
-                    donation_audio = self.donations_to_play.pop(0)
-                    name = donation_audio.donation.name
-                    message = donation_audio.donation.text
-                    messageId = donation_audio.donation.messageId
-                    files = donation_audio.files
+                    generated_audio = self.messages_to_play.pop(0)
+                    name = generated_audio.message.name
+                    text = generated_audio.message.text
+                    messageId = generated_audio.message.messageId
+                    files = generated_audio.files
                     text_ready.emit(
                         "Log1:------------------------------------------------------------------------------------\n")
-                    text_ready.emit("Log1:" + name + " donated!")
-                    text_ready.emit("Log1:ID: " + messageId)
-                    text_ready.emit("Log1:" + message)
-                    self.current_audio_length = donation_audio.length
+                    text_ready.emit("Log1:{} donated!".format(name))
+                    text_ready.emit("Log1:ID: {}".format(messageId))
+                    text_ready.emit("Log1:{}".format(text))
+                    self.current_audio_length = generated_audio.length
                     self.files = files
                     while self.current_audio_length > 0:
                         if not channel.get_busy() and len(self.files) > 0:
                             self.playback_wav(self.files.pop(0))
 
             time.sleep(0.5)
-        return 'Return value of play_audio_fn'
+        return "Return value of play_audio_fn"
 
     def playback_wav(self, file):
         voice = file.voice
@@ -279,18 +278,18 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def delete_first_message(self):
         if self.database_client.is_messages_collection_not_empty():
-            donation = self.database_client.get_first_message_in_queue()
-            self.database_client.delete_message(donation.messageId)
+            message = self.database_client.get_first_message_in_queue()
+            self.database_client.delete_message(message.messageId)
 
     def change_volume(self):
         value = self.volumeSlider.value()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     config = ConfigParser()
-    config.read('config.ini')
-    url = config['GCP']['url']
-    token = config['Streamlabs']['token']
+    config.read("config.ini")
+    url = config["GCP"]["url"]
+    token = config["Streamlabs"]["token"]
     app = Qt.QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet())
     window = GUI(app, url, token)
