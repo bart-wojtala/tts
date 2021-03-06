@@ -14,7 +14,7 @@ class Message:
 
 
 class GeneratedAudio:
-    def __init__(self, donation, files):
-        self.donation = donation
+    def __init__(self, message, files):
+        self.message = message
         self.files = files
         self.length = len(files)
