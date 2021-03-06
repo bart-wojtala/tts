@@ -21,6 +21,7 @@ from emote_dictionary import EmoteDictionary
 from heteronym_dictionary import HeteronymDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
+from audio_generator import AudioGenerator
 
 
 class TextToSpeechEngine:
@@ -76,7 +77,8 @@ class TextToSpeechEngine:
 
                 for i, word in enumerate(message):
                     if self.emote_dictionary.is_in_dictionary(word):
-                        message[i:i+1] = self.emote_dictionary.replace_emote(word)
+                        message[i:i +
+                                1] = self.emote_dictionary.replace_emote(word)
 
                 for i, word in enumerate(message):
                     if self.contraction_dictionary.is_in_dictionary(word) or 'bart3s' in word:
@@ -129,7 +131,6 @@ class TextToSpeechEngine:
         if self.messages_to_generate:
             files = []
             if self.use_local_gpu:
-                from audio_generator import AudioGenerator
                 self.messages_to_generate.sort(
                     key=lambda item: item.voice, reverse=True)
 
@@ -217,7 +218,6 @@ class TextToSpeechEngine:
 
     def generate_single_audio(self):
         if self.messages_to_generate:
-            from audio_generator import AudioGenerator
             audio_generator = AudioGenerator(self.messages_to_generate)
             return audio_generator.generate()
         return
