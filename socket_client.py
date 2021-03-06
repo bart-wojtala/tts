@@ -10,9 +10,9 @@ class LocalClient:
         @self.sio.on('event')
         def on_event(event):
             messageId = event['messageId']
-            message = event['message'].lower()
+            text = event['message'].lower()
             name = event['username']
-            message = Message(messageId, name, message)
+            message = Message(messageId, name, text)
             database_client.add_message(message)
 
         @self.sio.event
@@ -42,15 +42,15 @@ class StreamlabsClient:
             event_type = event['type']
             if event_type == 'donation' or event_type == 'subscription' or event_type == 'resub':
                 messageId = event['event_id'].lower()
-                message = event['message'][0]['message']
+                text = event['message'][0]['message']
                 name = event['message'][0]['name']
-                message = Message(messageId, name, message, event_type)
+                message = Message(messageId, name, text, event_type)
                 database_client.add_message(message)
             elif event_type == 'bits':
                 messageId = event['event_id'].lower()
-                message = event['message'][0]['message'].split(' ', 1)[1]
+                text = event['message'][0]['message'].split(' ', 1)[1]
                 name = event['message'][0]['name']
-                message = Message(messageId, name, message, event_type)
+                message = Message(messageId, name, text, event_type)
                 database_client.add_message(message)
 
         @self.sio.event

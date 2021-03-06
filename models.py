@@ -1,15 +1,15 @@
 class VoiceMessage:
-    def __init__(self, voice, message, index=0):
+    def __init__(self, voice, text, index=0):
         self.voice = voice
-        self.message = message
+        self.text = text
         self.index = index
 
 
 class Message:
-    def __init__(self, messageId, name, message, event_type=None):
+    def __init__(self, messageId, name, text, event_type=None):
         self.messageId = messageId
         self.name = name
-        self.message = message
+        self.text = text
         self.event_type = event_type
 
 

@@ -48,7 +48,7 @@ class TextToSpeechEngine:
 
     def preprocess_message(self, donation):
         messages_to_generate = []
-        translated_message = donation.message.translate(
+        translated_message = donation.text.translate(
             {ord(c): " " for c in "{}"})
         words_list = translated_message.split()
 
@@ -66,11 +66,11 @@ class TextToSpeechEngine:
             else:
                 voice_message = VoiceMessage(
                     words_list[index], ' '.join(words_list[index+1:]), i)
-            if voice_message.message:
+            if voice_message.text:
                 voice_messages.append(voice_message)
 
         for vm in voice_messages:
-            message = vm.message.split()
+            message = vm.text.split()
             message_split = []
 
             for i, word in enumerate(message):
@@ -121,7 +121,7 @@ class TextToSpeechEngine:
             messages_to_generate.append(new_vm)
 
         for msg in messages_to_generate:
-            print(msg.message)
+            print(msg.text)
         return messages_to_generate
 
     def generate_audio(self, donation):
@@ -149,7 +149,7 @@ class TextToSpeechEngine:
                     if message.voice == "satan:" or message.voice == "vader:":
                         messages_to_send.append(message)
                     else:
-                        single_message += message.voice + ' ' + message.message + ' '
+                        single_message += message.voice + ' ' + message.text + ' '
                         if (index == len(messages_to_generate) - 1) or (messages_to_generate[index + 1].voice == "satan:" or messages_to_generate[index + 1].voice == "vader:"):
                             messages_to_send.append(single_message)
                             single_message = ''
@@ -165,7 +165,7 @@ class TextToSpeechEngine:
                             self.default_voice, file_name))
                     else:
                         params = {'voice': message.voice,
-                                  'message': message.message}
+                                  'message': message.text}
                         audio, sampling_rate = self.request_audio(
                             self.endpoint_tts, params)
                         file_name = self.write_audio_file(

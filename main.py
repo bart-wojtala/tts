@@ -193,7 +193,7 @@ class GUI(QMainWindow, Ui_MainWindow):
             while self.database_client.is_messages_collection_not_empty() and self.connected:
                 donation = self.database_client.get_first_message_in_queue()
                 text_ready.emit("Log2:" + donation.name + " donated!\nID: " +
-                                donation.messageId + "\n" + donation.message)
+                                donation.messageId + "\n" + donation.text)
                 try:
                     start_time = time.time()
                     donation_audio = self.tts_engine.generate_audio(donation)
@@ -233,7 +233,7 @@ class GUI(QMainWindow, Ui_MainWindow):
                     time.sleep(1)
                     donation_audio = self.donations_to_play.pop(0)
                     name = donation_audio.donation.name
-                    message = donation_audio.donation.message
+                    message = donation_audio.donation.text
                     messageId = donation_audio.donation.messageId
                     files = donation_audio.files
                     text_ready.emit(
@@ -252,7 +252,7 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def playback_wav(self, file):
         voice = file.voice
-        wav = file.message
+        wav = file.text
         if voice == "satan:":
             pygame.mixer.quit()
             pygame.mixer.init(frequency=11000, size=-16, channels=1)

@@ -26,7 +26,7 @@ class DatabaseClient:
 
     def get_first_message_in_queue(self):
         message = self.messages_collection.find_one()
-        return Message(message['messageId'], message['name'], message['message'])
+        return Message(message['messageId'], message['name'], message['text'])
 
     def delete_message(self, messageId):
         self.messages_collection.delete_one({'messageId': messageId})
