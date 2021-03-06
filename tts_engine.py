@@ -18,6 +18,7 @@ from AudioLib import AudioEffect
 from textwrap import wrap
 from contraction_dictionary import ContractionsDictionary
 from emote_dictionary import EmoteDictionary
+from heteronym_dictionary import HeteronymDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 
@@ -42,6 +43,7 @@ class TextToSpeechEngine:
         self.symbol_dictionary = SymbolDictionary()
         self.contraction_dictionary = ContractionsDictionary()
         self.emote_dictionary = EmoteDictionary()
+        self.heteronym_dictionary = HeteronymDictionary()
         self.enchant_dict = enchant.Dict("en_US")
         self.sentence_separators = ['.', '?', '!', ';']
         self.messages_to_generate = []
