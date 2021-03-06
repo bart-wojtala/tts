@@ -91,39 +91,39 @@ class AudioGenerator:
                     k.float()
                 denoiser = Denoiser(waveglow)
 
-                if len(message.message) > 127:
+                if len(message.text) > 127:
                     self.hparams.max_decoder_steps = 100000
                 else:
                     self.hparams.max_decoder_steps = 10000
 
                 trimmed_message_length = len(
-                    ''.join(c for c in message.message if c.isalnum()))
+                    ''.join(c for c in message.text if c.isalnum()))
                 if trimmed_message_length < 4:
                     if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.max_decoder_steps = 1000
                         self.hparams.gate_threshold = 0.001
-                        if any(char.isdigit() for char in message.message):
+                        if any(char.isdigit() for char in message.text):
                             self.hparams.max_decoder_steps = 10000
                             self.hparams.gate_threshold = 0.5
                 if trimmed_message_length >= 4 and trimmed_message_length < 7:
                     self.hparams.gate_threshold = 0.01
                     if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.gate_threshold = 0.01
-                        if any(char.isdigit() for char in message.message):
+                        if any(char.isdigit() for char in message.text):
                             self.hparams.gate_threshold = 0.5
                     else:
                         self.hparams.gate_threshold = 0.01
-                        if any(char.isdigit() for char in message.message):
+                        if any(char.isdigit() for char in message.text):
                             self.hparams.gate_threshold = 0.1
                 elif trimmed_message_length >= 7 and trimmed_message_length < 15:
                     self.hparams.gate_threshold = 0.1
                     if message.voice == "vader:" or message.voice == "carlson:":
                         self.hparams.gate_threshold = 0.01
-                        if any(char.isdigit() for char in message.message):
+                        if any(char.isdigit() for char in message.text):
                             self.hparams.gate_threshold = 0.5
                     else:
                         self.hparams.gate_threshold = 0.1
-                        if any(char.isdigit() for char in message.message):
+                        if any(char.isdigit() for char in message.text):
                             self.hparams.gate_threshold = 0.2
                 else:
                     self.hparams.gate_threshold = 0.5
@@ -131,9 +131,9 @@ class AudioGenerator:
                 message_extended = False
                 if trimmed_message_length < 11:
                     if message.voice == "vader:":
-                        message.message = message.message + " -. -------. -------."
+                        message.text = message.text + " -. -------. -------."
                     else:
-                        message.message = message.message + " -------. -------."
+                        message.text = message.text + " -------. -------."
                     message_extended = True
 
                 model = load_model(self.hparams)
@@ -142,7 +142,7 @@ class AudioGenerator:
                 _ = model.cuda().eval().half()
 
                 sequence = np.array(text_to_sequence(
-                    message.message, ['english_cleaners']))[None, :]
+                    message.text, ['english_cleaners']))[None, :]
                 sequence = torch.autograd.Variable(
                     torch.from_numpy(sequence)).cuda().long()
 
@@ -185,7 +185,7 @@ class AudioGenerator:
                     engine.setProperty(
                         'voice', self.synth_voices_linux[message.voice])
                 engine.setProperty('rate', 120)
-                engine.save_to_file(message.message, temp_file)
+                engine.save_to_file(message.text, temp_file)
                 engine.runAndWait()
 
                 while not os.path.isfile(temp_file):
