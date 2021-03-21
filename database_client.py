@@ -33,3 +33,7 @@ class DatabaseClient:
 
     def is_messages_collection_not_empty(self):
         return False if self.messages_collection.count_documents({}) == 0 else True
+
+    def get_all_generated_messages(self):
+        messages = self.generated_collection.find()
+        return [m for m in messages]
