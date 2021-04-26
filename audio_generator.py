@@ -25,7 +25,7 @@ class AudioGenerator:
         "glados:": "glados_7325",
         "hal:": "hal_9000",
         "hudson:": "hudson-horstachio-22khz",
-        "johnny:": "johnny_128212",
+        "johnny:": "johnny_154280",
         "keanu:": "keanu_67912",
         "mlpab:": "Apple_Bloom_28037_0.120",
         "mlpaj:": "Applejack_40071_0.156",
