@@ -6,9 +6,9 @@ class EmoteDictionary:
         with open('dictionaries/dictionary_emotes.json') as f:
             self.emote_dictionary = json.loads(f.read())
 
-    def is_in_dictionary(self, word):
-        return list(filter(word.startswith, self.emote_dictionary)) != []
-
-    def replace_emote(self, word):
-        key = list(filter(word.startswith, self.emote_dictionary))[0]
-        return [self.emote_dictionary[key], word.split(key)[1]]
+    def replace_emotes(self, message):
+        message_split = message.split()
+        for i, word in enumerate(message_split):
+            if word.lower().strip() in self.emote_dictionary:
+                message_split[i] = self.emote_dictionary[word.lower().strip()]
+        return ' '.join(message_split)
