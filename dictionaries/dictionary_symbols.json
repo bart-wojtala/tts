@@ -19,5 +19,6 @@
     "\\": " backslash ",
     "=": " equals ",
     "_": " underscore ",
-    "+": " plus "
+    "+": " plus ",
+    "’": "'"
 }
