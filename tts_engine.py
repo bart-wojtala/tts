@@ -2,7 +2,8 @@ from models import VoiceMessage, GeneratedAudio
 import sys
 import enchant
 import math
-from nltk.tokenize import TweetTokenizer
+import nltk.data
+from nltk.tokenize import RegexpTokenizer, TweetTokenizer
 from nltk.tokenize import word_tokenize
 import numpy as np
 import re
@@ -18,14 +19,18 @@ from AudioLib import AudioEffect
 from textwrap import wrap
 from contraction_dictionary import ContractionsDictionary
 from emote_dictionary import EmoteDictionary
+from emoticon_dictionary import EmoticonDictionary
 from heteronym_dictionary import HeteronymDictionary
+from letter_dictionary import LetterDictionary
 from symbol_dictionary import SymbolDictionary
 from word_dictionary import WordDictionary
 from audio_generator import AudioGenerator
+import emoji
+import emotlib
 
 
 class TextToSpeechEngine:
-    available_voices = ['carlson:', 'daria:', 'david:', 'duke:', 'gandalf:', 'glados:', 'hal:', 'hudson:', 'keanu:', 'mlpab:', 'mlpaj:', 'mlpca:',
+    available_voices = ['carlson:', 'daria:', 'david:', 'duke:', 'gandalf:', 'glados:', 'hal:', 'hudson:', 'johnny:', 'keanu:', 'mlpab:', 'mlpaj:', 'mlpca:',
                         'mlpfy:', 'mlppp:', 'mlprd:', 'mlpts:', 'mlpza:', 'msdavid:', 'neil:', 'samuel:', 'satan:', 'stephen:', 'trevor:', 'trump:', 'vader:', 'woman:']
     default_voice = 'glados:'
     synth_voices = ["msdavid:", "stephen:"]
@@ -42,9 +47,13 @@ class TextToSpeechEngine:
         self.symbol_dictionary = SymbolDictionary()
         self.contraction_dictionary = ContractionsDictionary()
         self.emote_dictionary = EmoteDictionary()
+        self.emoticon_dictionary = EmoticonDictionary()
         self.heteronym_dictionary = HeteronymDictionary()
+        self.letter_dictionary = LetterDictionary()
         self.enchant_dict = enchant.Dict("en_US")
         self.sentence_separators = ['.', '?', '!', ';']
+        self.sentence_tokenizer = nltk.data.load(
+            'tokenizers/punkt/english.pickle')
 
     def preprocess_message(self, donation):
         messages_to_generate = []
@@ -60,69 +69,58 @@ class TextToSpeechEngine:
         voice_messages = []
 
         for i, index in enumerate(voice_indexes):
-            if i != len(voice_indexes) - 1:
-                voice_message = VoiceMessage(words_list[index], ' '.join(
-                    words_list[index+1:voice_indexes[i+1]]), i)
-            else:
-                voice_message = VoiceMessage(
-                    words_list[index], ' '.join(words_list[index+1:]), i)
-            if voice_message.text:
-                voice_messages.append(voice_message)
+            text = ' '.join(words_list[index+1:voice_indexes[i+1]]) if i != len(
+                voice_indexes) - 1 else ' '.join(words_list[index+1:])
+            if text:
+                voice = words_list[index]
+                vm = VoiceMessage(voice, self.format_message(voice, text), i)
+                voice_messages.append(vm)
 
-        for vm in voice_messages:
-            message = vm.text.split()
-            message_split = []
+        return voice_messages
 
-            for i, word in enumerate(message):
-                if self.emote_dictionary.is_in_dictionary(word):
-                    message[i:i +
-                            1] = self.emote_dictionary.replace_emote(word)
+    def replace_symbols_and_emojis(self, message):
+        message = emoji.demojize(message)
+        message = self.emoticon_dictionary.replace_emoticons(message)
+        message = self.emote_dictionary.replace_emotes(message)
+        message = self.letter_dictionary.replace_abbreviations(message)
+        message_as_list = list(message)
+        for i, c in enumerate(message_as_list):
+            if not c.isalnum() and self.symbol_dictionary.contains_symbol(c):
+                message_as_list[i] = self.symbol_dictionary.replace_symbol(c)
+        message = ''.join(message_as_list).replace('  ', ' ').strip()
+        return message
 
-            for i, word in enumerate(message):
-                if self.contraction_dictionary.is_in_dictionary(word) or 'bart3s' in word:
-                    message_split.append(word)
-                else:
-                    tt = TweetTokenizer()
-                    words = tt.tokenize(word)
-                    for w in words:
-                        if w.isalnum():
-                            message_split.extend(
-                                re.findall(r'[A-Za-z]+|\d+', w))
-                        elif self.symbol_dictionary.contains_symbol(w) and any(c.isalpha() for c in w):
-                            word_split = word_tokenize(w)
-                            message_split.extend(word_split)
-                        else:
-                            message_split.append(w)
+    def format_message(self, voice, message):
+        message = self.replace_symbols_and_emojis(message)
+        sentences = [s for s in self.sentence_tokenizer.tokenize(message)]
+        new_sentences = []
+        for sentence in sentences:
+            words = sentence.split()
+            for i, word in enumerate(words):
+                word_split = re.findall(r"[A-Za-z]+|[-+]?[\d.\d]+|\S", word)
+                for j, w in enumerate(word_split):
+                    if len(w) > 1 and re.match(r"[-+]?[\d]*[.\d]+", w):
+                        groups = re.findall('(.\d+)', w)
+                        for group in groups:
+                            if '.' in group:
+                                group_list = list(group)
+                                group_list[0] = ' point'
+                                w = w.replace(group, ' '.join(group_list))
 
-            for i, word in enumerate(message_split):
-                if self.symbol_dictionary.is_in_dictionary(word):
-                    message_split[i] = self.symbol_dictionary.replace_symbol(
-                        word)
-
-            formatted_split = []
-            if vm.voice not in self.synth_voices:
-                for i, word in enumerate(message_split):
-                    if self.word_dictionary.is_in_dictionary(word):
-                        formatted_split.extend(
-                            self.word_dictionary.replace_word(word))
-                    elif len(word) > 45 and not self.enchant_dict.check(word):
-                        word_split = wrap(word, 45)
-                        formatted_split.extend(word_split)
+                        word_split[j] = w.replace(
+                            '+', ' plus ').replace('-', ' minus ').strip()
                     else:
-                        formatted_split.append(word)
-            else:
-                formatted_split = message_split
+                        if self.word_dictionary.is_in_dictionary(w):
+                            word_split[j] = self.word_dictionary.replace_word(
+                                word)
 
-            formatted_message = ' '.join(formatted_split)
-            if formatted_message[-1] not in self.sentence_separators:
-                formatted_message += '.'
+                    if (voice not in self.synth_voices) and (len(word) > 45):
+                        word_split[j] = ' '.join(wrap(w, 45))
 
-            new_vm = VoiceMessage(vm.voice, formatted_message, vm.index)
-            messages_to_generate.append(new_vm)
+                words[i] = ''.join(word_split)
 
-        for msg in messages_to_generate:
-            print(msg.text)
-        return messages_to_generate
+            new_sentences.append(' '.join(words))
+        return ' '.join(new_sentences)
 
     def generate_audio(self, donation):
         messages_to_generate = self.preprocess_message(donation)
