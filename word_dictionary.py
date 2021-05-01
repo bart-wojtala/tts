@@ -15,6 +15,4 @@ class WordDictionary:
         punctuation = re.findall(r'[,.?!]+', word)
         temp_word = word.translate(str.maketrans('', '', self.punctuation))
         translated_word = self.dictionary[temp_word].split()[0]
-        if punctuation:
-            translated_word += punctuation[0]
         return translated_word
