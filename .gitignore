@@ -148,3 +148,6 @@ models/
 
 # Build output directory
 /output
+
+# Database
+/data
