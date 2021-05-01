@@ -25,6 +25,7 @@ class AudioGenerator:
         "glados:": "glados_7325",
         "hal:": "hal_9000",
         "hudson:": "hudson-horstachio-22khz",
+        "johnny:": "johnny_192850",
         "keanu:": "keanu_67912",
         "mlpab:": "Apple_Bloom_28037_0.120",
         "mlpaj:": "Applejack_40071_0.156",
@@ -55,7 +56,7 @@ class AudioGenerator:
     waveglow_22khz = {
         "david:": "attenborough_waveglow_1516200",
         "default": "waveglow_256channels.pt",
-        "samuel:": "waveglow_slj_204000.pt",
+        "samuel:": "waveglow_slj_227400.pt",
         "vader:": "jej_waveglow_890k"
     }
 
@@ -82,6 +83,9 @@ class AudioGenerator:
                 elif message.voice == "keanu:" or message.voice == "hal:":
                     waveglow_path = self.models_path + \
                         self.waveglow_22khz["david:"]
+                # elif message.voice == "samuel:":
+                #     waveglow_path = self.models_path + \
+                #         self.waveglow_22khz["samuel:"]
                 else:
                     waveglow_path = self.models_path + \
                         self.waveglow_22khz["default"]
@@ -156,6 +160,7 @@ class AudioGenerator:
                     audio = waveglow.infer(mel_outputs_postnet, sigma=1)
                 audio_denoised = denoiser(audio, strength=0.001)[:, 0]
                 audio_data = audio_denoised.cpu().numpy()[0]
+                # audio_data = audio.cpu().numpy()[0]
 
                 scaled_audio = np.int16(
                     audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
