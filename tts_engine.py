@@ -1,10 +1,7 @@
 from models import VoiceMessage, GeneratedAudio
 import sys
 import enchant
-import math
 import nltk.data
-from nltk.tokenize import RegexpTokenizer, TweetTokenizer
-from nltk.tokenize import word_tokenize
 import numpy as np
 import re
 import requests
@@ -17,13 +14,7 @@ from pydub import AudioSegment
 from random import randint
 from AudioLib import AudioEffect
 from textwrap import wrap
-from contraction_dictionary import ContractionsDictionary
-from emote_dictionary import EmoteDictionary
-from emoticon_dictionary import EmoticonDictionary
-from heteronym_dictionary import HeteronymDictionary
-from letter_dictionary import LetterDictionary
-from symbol_dictionary import SymbolDictionary
-from word_dictionary import WordDictionary
+from dictionary import ContractionsDictionary, EmoteDictionary, EmoticonDictionary, HeteronymDictionary, LetterDictionary, SymbolDictionary, WordDictionary
 from audio_generator import AudioGenerator
 import emoji
 import emotlib
