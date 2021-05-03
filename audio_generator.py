@@ -159,8 +159,10 @@ class AudioGenerator:
                 with torch.no_grad():
                     audio = waveglow.infer(mel_outputs_postnet, sigma=1)
                 audio_denoised = denoiser(audio, strength=0.001)[:, 0]
-                audio_data = audio_denoised.cpu().numpy()[0]
-                # audio_data = audio.cpu().numpy()[0]
+                if np.isnan(audio_denoised.cpu().numpy()[0][0]):
+                    audio_data = audio.cpu().numpy()[0]
+                else:
+                    audio_data = audio_denoised.cpu().numpy()[0]
 
                 scaled_audio = np.int16(
                     audio_data/np.max(np.abs(audio_data)) * self.audio_length_parameter)
