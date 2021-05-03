@@ -56,6 +56,7 @@ class AudioGenerator:
     waveglow_22khz = {
         "david:": "attenborough_waveglow_1516200",
         "default": "waveglow_256channels.pt",
+        "johnny:": "waveglow_johnny_150000.pt",
         "samuel:": "waveglow_slj_227400.pt",
         "vader:": "jej_waveglow_890k"
     }
@@ -83,9 +84,9 @@ class AudioGenerator:
                 elif message.voice == "keanu:" or message.voice == "hal:":
                     waveglow_path = self.models_path + \
                         self.waveglow_22khz["david:"]
-                # elif message.voice == "samuel:":
-                #     waveglow_path = self.models_path + \
-                #         self.waveglow_22khz["samuel:"]
+                elif message.voice == "johnny:":
+                    waveglow_path = self.models_path + \
+                        self.waveglow_22khz["johnny:"]
                 else:
                     waveglow_path = self.models_path + \
                         self.waveglow_22khz["default"]
