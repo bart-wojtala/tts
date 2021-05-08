@@ -1,6 +1,5 @@
 from models import VoiceMessage, GeneratedAudio
 import sys
-import enchant
 import nltk.data
 import numpy as np
 import re
@@ -24,7 +23,7 @@ class TextToSpeechEngine:
     available_voices = ['carlson:', 'daria:', 'david:', 'duke:', 'gandalf:', 'glados:', 'hal:', 'hudson:', 'johnny:', 'keanu:', 'mlpab:', 'mlpaj:', 'mlpca:',
                         'mlpfy:', 'mlppp:', 'mlprd:', 'mlpts:', 'mlpza:', 'msdavid:', 'neil:', 'samuel:', 'satan:', 'stephen:', 'trevor:', 'trump:', 'vader:', 'woman:']
     default_voice = 'glados:'
-    synth_voices = ["msdavid:", "stephen:"]
+    synth_voices = ['msdavid:', 'stephen:']
 
     def __init__(self, url='', path='', use_local_gpu=True):
         self.url = url
@@ -33,7 +32,6 @@ class TextToSpeechEngine:
         self.path = path
         self.use_local_gpu = use_local_gpu
         self.maximum_number_length = 36
-        self.words = []
         self.word_dictionary = WordDictionary()
         self.symbol_dictionary = SymbolDictionary()
         self.contraction_dictionary = ContractionsDictionary()
@@ -41,7 +39,6 @@ class TextToSpeechEngine:
         self.emoticon_dictionary = EmoticonDictionary()
         self.heteronym_dictionary = HeteronymDictionary()
         self.letter_dictionary = LetterDictionary()
-        self.enchant_dict = enchant.Dict("en_US")
         self.sentence_separators = ['.', '?', '!', ';']
         self.sentence_tokenizer = nltk.data.load(
             'tokenizers/punkt/english.pickle')
