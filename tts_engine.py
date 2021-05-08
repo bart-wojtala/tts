@@ -110,6 +110,10 @@ class TextToSpeechEngine:
 
                 words[i] = ''.join(word_split)
 
+            for i, word in enumerate(words):
+                if word.isdigit() and len(word) > self.maximum_number_length:
+                    words[i] = word[:self.maximum_number_length]
+
             new_sentences.append(' '.join(words))
         return ' '.join(new_sentences)
 
