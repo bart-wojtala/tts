@@ -9,9 +9,7 @@ from ui_layout import Ui_MainWindow
 import time
 import pygame
 import traceback
-from scipy.io.wavfile import write
 from database_client import DatabaseClient
-from models import GeneratedAudio, Message
 from tts_engine import TextToSpeechEngine
 from configparser import ConfigParser
 import qdarkstyle
@@ -63,7 +61,7 @@ class GUISignals(QObject):
 
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self, app, instance_url, streamlabs_token=""):
+    def __init__(self, app, streamlabs_token=""):
         super(GUI, self).__init__()
         self.messages_to_play = []
         self.database_client = DatabaseClient()
@@ -72,7 +70,6 @@ class GUI(QMainWindow, Ui_MainWindow):
         if streamlabs_token:
             self.streamlabs_socket_client = StreamlabsClient(
                 self.database_client, streamlabs_token)
-        self.url = "http://{}:9000".format(instance_url)
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -111,8 +108,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         print("Multithreading with maximum {} threads".format(
             self.threadpool.maxThreadCount()))
         self.signals = GUISignals()
-        self.tts_engine = TextToSpeechEngine(
-            self.url, self.generated_audio_path)
+        self.tts_engine = TextToSpeechEngine(self.generated_audio_path)
 
     @pyqtSlot(str)
     def draw_text(self, text):
@@ -288,10 +284,9 @@ class GUI(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     config = ConfigParser()
     config.read("config.ini")
-    url = config["GCP"]["url"]
     token = config["Streamlabs"]["token"]
     app = Qt.QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet())
-    window = GUI(app, url, token)
+    window = GUI(app, token)
     window.show()
     sys.exit(app.exec_())

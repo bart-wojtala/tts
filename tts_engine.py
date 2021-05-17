@@ -1,9 +1,6 @@
 from models import VoiceMessage, GeneratedAudio
-import sys
 import nltk.data
-import numpy as np
 import re
-import requests
 import time
 from scipy.io.wavfile import write, read
 from scipy.signal import lfilter, butter
@@ -16,7 +13,6 @@ from textwrap import wrap
 from dictionary import ContractionsDictionary, EmoteDictionary, EmoticonDictionary, HeteronymDictionary, LetterDictionary, SymbolDictionary, WordDictionary
 from audio_generator import AudioGenerator
 import emoji
-import emotlib
 
 
 class TextToSpeechEngine:
@@ -25,12 +21,8 @@ class TextToSpeechEngine:
     default_voice = 'glados:'
     synth_voices = ['msdavid:', 'stephen:']
 
-    def __init__(self, url='', path='', use_local_gpu=True):
-        self.url = url
-        self.endpoint_tts = self.url + "/tts"
-        self.endpoint_single_tts = self.endpoint_tts + "/single"
+    def __init__(self, path=''):
         self.path = path
-        self.use_local_gpu = use_local_gpu
         self.maximum_number_length = 36
         self.word_dictionary = WordDictionary()
         self.symbol_dictionary = SymbolDictionary()
@@ -44,7 +36,6 @@ class TextToSpeechEngine:
             'tokenizers/punkt/english.pickle')
 
     def preprocess_message(self, donation):
-        messages_to_generate = []
         translated_message = donation.text.translate(
             {ord(c): " " for c in "{}"})
         words_list = translated_message.split()
@@ -117,57 +108,21 @@ class TextToSpeechEngine:
     def generate_audio(self, donation):
         messages_to_generate = self.preprocess_message(donation)
         if messages_to_generate:
-            name = donation.name
             files = []
-            if self.use_local_gpu:
-                messages_to_generate.sort(
-                    key=lambda item: item.voice, reverse=True)
+            messages_to_generate.sort(
+                key=lambda item: item.voice, reverse=True)
 
-                for index, message in enumerate(messages_to_generate):
-                    audio_generator = AudioGenerator([message])
-                    audio, sampling_rate = audio_generator.generate()
-                    file_name = self.write_audio_file(
-                        name, message.voice, audio, sampling_rate)
-                    files.append(VoiceMessage(
-                        message.voice, file_name, message.index))
+            for message in messages_to_generate:
+                audio_generator = AudioGenerator([message])
+                audio, sampling_rate = audio_generator.generate()
+                file_name = self.write_audio_file(
+                    donation.name, message.voice, audio, sampling_rate)
+                files.append(VoiceMessage(
+                    message.voice, file_name, message.index))
 
-                files.sort(key=lambda item: item.index, reverse=False)
-            else:
-                messages_to_send = []
-                single_message = ''
-                for index, message in enumerate(messages_to_generate):
-                    if message.voice == "satan:" or message.voice == "vader:":
-                        messages_to_send.append(message)
-                    else:
-                        single_message += message.voice + ' ' + message.text + ' '
-                        if (index == len(messages_to_generate) - 1) or (messages_to_generate[index + 1].voice == "satan:" or messages_to_generate[index + 1].voice == "vader:"):
-                            messages_to_send.append(single_message)
-                            single_message = ''
-
-                for message in messages_to_send:
-                    if isinstance(message, str):
-                        params = {'message': message}
-                        audio, sampling_rate = self.request_audio(
-                            self.endpoint_single_tts, params)
-                        file_name = self.write_audio_file(
-                            name, self.default_voice, audio, sampling_rate)
-                        files.append(VoiceMessage(
-                            self.default_voice, file_name))
-                    else:
-                        params = {'voice': message.voice,
-                                  'message': message.text}
-                        audio, sampling_rate = self.request_audio(
-                            self.endpoint_tts, params)
-                        file_name = self.write_audio_file(
-                            name, message.voice, audio, sampling_rate)
-                        files.append(VoiceMessage(message.voice, file_name))
+            files.sort(key=lambda item: item.index, reverse=False)
             return GeneratedAudio(donation, files)
         return
-
-    def request_audio(self, endpoint, params):
-        response = requests.get(endpoint, params)
-        res_json = response.json()
-        return np.array(res_json["audio"], dtype=np.int16), res_json["rate"]
 
     def write_audio_file(self, name, voice, audio, sampling_rate):
         file_name = self.path + \
