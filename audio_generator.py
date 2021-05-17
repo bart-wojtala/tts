@@ -56,7 +56,7 @@ class AudioGenerator:
     waveglow_22khz = {
         "david:": "attenborough_waveglow_1516200",
         "default": "waveglow_256channels.pt",
-        "johnny:": "waveglow_johnny_150000.pt",
+        "johnny:": "waveglow_johnny_516600.pt",
         "samuel:": "waveglow_slj_227400.pt",
         "vader:": "jej_waveglow_890k"
     }
