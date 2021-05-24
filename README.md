@@ -2,7 +2,7 @@
 
 ## About
 
-Simple text-to-speech application handling messages from Twitch.
+Simple text-to-speech application handling Tacotron 2 + WaveGlow inference.
 
 ## Acknowledgements
 
