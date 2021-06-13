@@ -16,6 +16,7 @@ from train import load_model
 
 class AudioGenerator:
     models_22khz = {
+        "biggie:": "biggie_756",
         "carlson:": "tuck2",
         "daria:": "daria22_model",
         "david:": "attenborough_checkpoint_824800",
