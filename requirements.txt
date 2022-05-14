@@ -2,7 +2,7 @@ matplotlib==2.1.0
 tensorflow-gpu==1.15
 numba==0.48.0
 llvmlite==0.31.0
-numpy==1.13.3
+numpy==1.21.0
 inflect==0.2.5
 librosa==0.7.2
 scipy==1.5.1
