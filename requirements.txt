@@ -1,5 +1,5 @@
 matplotlib==2.1.0
-tensorflow-gpu==1.15
+tensorflow-gpu==2.7.2
 numba==0.48.0
 llvmlite==0.31.0
 # numpy==1.13.3
