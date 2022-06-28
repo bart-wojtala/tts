@@ -76,33 +76,37 @@ class TextToSpeechEngine:
         for sentence in sentences:
             words = sentence.split()
             for i, word in enumerate(words):
-                word_split = re.findall(r"[A-Za-z]+|[-+]?[\d.\d]+|\S", word)
-                for j, w in enumerate(word_split):
-                    if len(w) > 1 and re.match(r"[-+]?[\d]*[.\d]+", w):
-                        groups = re.findall('(.\d+)', w)
-                        for group in groups:
-                            if '.' in group:
-                                group_list = list(group)
-                                group_list[0] = ' point'
-                                w = w.replace(group, ' '.join(group_list))
+                if not self.contraction_dictionary.is_in_dictionary(word):
+                    word_split = re.findall(r"[A-Za-z]+|[-+]?[\d.\d]+|\S", word)
+                    for j, w in enumerate(word_split):
+                        if len(w) > 1 and re.match(r"[-+]?[\d]*[.\d]+", w):
+                            groups = re.findall('(.\d+)', w)
+                            for group in groups:
+                                if '.' in group:
+                                    group_list = list(group)
+                                    group_list[0] = ' point'
+                                    w = w.replace(group, ' '.join(group_list))
 
-                        word_split[j] = w.replace(
-                            '+', ' plus ').replace('-', ' minus ').strip()
-                    else:
-                        if self.word_dictionary.is_in_dictionary(w):
-                            word_split[j] = self.word_dictionary.replace_word(
-                                word)
+                            word_split[j] = w.replace(
+                                '+', ' plus ').replace('-', ' minus ').strip()
+                        else:
+                            if self.word_dictionary.is_in_dictionary(w):
+                                word_split[j] = self.word_dictionary.replace_word(
+                                    word)
 
-                    if (voice not in self.synth_voices) and (len(word) > 45):
-                        word_split[j] = ' '.join(wrap(w, 45))
+                        if (voice not in self.synth_voices) and (len(word) > 45):
+                            word_split[j] = ' '.join(wrap(w, 45))
 
-                words[i] = ''.join(word_split)
+                    words[i] = ''.join(word_split)
 
             for i, word in enumerate(words):
                 if word.isdigit() and len(word) > self.maximum_number_length:
                     words[i] = word[:self.maximum_number_length]
 
-            new_sentences.append(' '.join(words))
+            formatted_sentence = ' '.join(words)
+            if formatted_sentence[-1] not in self.sentence_separators:
+                formatted_sentence += '.'
+            new_sentences.append(formatted_sentence)
         return ' '.join(new_sentences)
 
     def generate_audio(self, donation):
