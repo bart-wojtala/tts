@@ -1,3 +1,6 @@
 [submodule "tacotron2"]
 	path = tacotron2
 	url = https://github.com/bart-wojtala/tacotron2
+[submodule "flowtron"]
+	path = flowtron
+	url = https://github.com/bart-wojtala/flowtron
