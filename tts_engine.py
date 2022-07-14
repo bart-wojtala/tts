@@ -1,18 +1,11 @@
 from models import VoiceMessage, GeneratedAudio
 import nltk.data
 import re
-import time
-from scipy.io.wavfile import write, read
-from scipy.signal import lfilter, butter
-import soundfile as sf
-import pyrubberband as pyrb
-from pydub import AudioSegment
-from random import randint
-from AudioLib import AudioEffect
 from textwrap import wrap
 from dictionary import ContractionsDictionary, EmoteDictionary, EmoticonDictionary, HeteronymDictionary, LetterDictionary, SymbolDictionary, WordDictionary
 from audio_generator import AudioGenerator
 import emoji
+from sound_utils import write_audio_file
 
 
 class TextToSpeechEngine:
@@ -119,8 +112,8 @@ class TextToSpeechEngine:
             for message in messages_to_generate:
                 audio_generator = AudioGenerator([message])
                 audio, sampling_rate = audio_generator.generate()
-                file_name = self.write_audio_file(
-                    donation.name, message.voice, audio, sampling_rate)
+                file_name = write_audio_file(
+                    self.path, donation.name, message.voice, audio, sampling_rate)
                 files.append(VoiceMessage(
                     message.voice, file_name, message.index))
 
@@ -128,58 +121,8 @@ class TextToSpeechEngine:
             return GeneratedAudio(donation, files)
         return
 
-    def write_audio_file(self, name, voice, audio, sampling_rate):
-        file_name = self.path + \
-            time.strftime("%Y%m%d-%H%M%S_") + name + \
-            str(randint(0, 100)) + ".wav"
-        if voice == "satan:":
-            temp_file_name = self.path + "temp.wav"
-            write(temp_file_name, sampling_rate, audio)
-
-            fixed_framerate = 11000
-            sound = AudioSegment.from_file(temp_file_name)
-            sound = sound.set_frame_rate(fixed_framerate)
-            write(file_name, fixed_framerate, audio)
-
-            y, sr = sf.read(file_name)
-            y_stretch = pyrb.time_stretch(y, sr, 1.6)
-            y_shift = pyrb.pitch_shift(y, sr, 1.6)
-            sf.write(file_name, y_stretch, sr, format='wav')
-
-            sound = AudioSegment.from_wav(file_name)
-            sound.export(file_name, format="wav")
-        elif voice == "vader:":
-            temp_file_name = self.path + "temp.wav"
-            write(temp_file_name, sampling_rate, audio)
-            AudioEffect.robotic(temp_file_name, file_name)
-
-            y, sr = sf.read(file_name)
-            y_stretch = pyrb.time_stretch(y, sr, 0.9)
-            y_shift = pyrb.pitch_shift(y, sr, 0.9)
-            sf.write(file_name, y_stretch, sr, format='wav')
-
-            sound = AudioSegment.from_wav(file_name)
-            sound.export(file_name, format="wav")
-        else:
-            write(file_name, sampling_rate, audio)
-        return file_name
-
     def generate_single_audio(self, messages_to_generate):
         if messages_to_generate:
             audio_generator = AudioGenerator(messages_to_generate)
             return audio_generator.generate()
         return
-
-
-def butter_params(low_freq, high_freq, fs, order=5):
-    nyq = 0.5 * fs
-    low = low_freq / nyq
-    high = high_freq / nyq
-    b, a = butter(order, [low, high], btype='band')
-    return b, a
-
-
-def butter_bandpass_filter(data, low_freq, high_freq, fs, order=5):
-    b, a = butter_params(low_freq, high_freq, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
