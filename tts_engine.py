@@ -70,7 +70,8 @@ class TextToSpeechEngine:
             words = sentence.split()
             for i, word in enumerate(words):
                 if not self.contraction_dictionary.is_in_dictionary(word):
-                    word_split = re.findall(r"[A-Za-z]+|[-+]?[\d.\d]+|\S", word)
+                    word_split = re.findall(
+                        r"[A-Za-z]+|[-+]?[\d.\d]+|\S", word)
                     for j, w in enumerate(word_split):
                         if len(w) > 1 and re.match(r"[-+]?[\d]*[.\d]+", w):
                             groups = re.findall('(.\d+)', w)
