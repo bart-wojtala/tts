@@ -3,7 +3,7 @@ import nltk.data
 import re
 from textwrap import wrap
 from dictionary import ContractionsDictionary, EmoteDictionary, EmoticonDictionary, HeteronymDictionary, LetterDictionary, SymbolDictionary, WordDictionary
-from audio_generator import AudioGenerator
+from audio_generator_tacotron import AudioGenerator
 import emoji
 from sound_utils import write_audio_file
 
