@@ -3,7 +3,7 @@ import nltk.data
 import re
 from textwrap import wrap
 from dictionary import ContractionsDictionary, EmoteDictionary, EmoticonDictionary, HeteronymDictionary, LetterDictionary, SymbolDictionary, WordDictionary
-from audio_generator_tacotron import AudioGenerator
+from audio_generator_tacotron import AudioGeneratorTacotron
 import emoji
 from sound_utils import write_audio_file
 
@@ -111,7 +111,7 @@ class TextToSpeechEngine:
                 key=lambda item: item.voice, reverse=True)
 
             for message in messages_to_generate:
-                audio_generator = AudioGenerator([message])
+                audio_generator = AudioGeneratorTacotron([message])
                 audio, sampling_rate = audio_generator.generate()
                 file_name = write_audio_file(
                     self.path, donation.name, message.voice, audio, sampling_rate)
@@ -124,6 +124,6 @@ class TextToSpeechEngine:
 
     def generate_single_audio(self, messages_to_generate):
         if messages_to_generate:
-            audio_generator = AudioGenerator(messages_to_generate)
+            audio_generator = AudioGeneratorTacotron(messages_to_generate)
             return audio_generator.generate()
         return

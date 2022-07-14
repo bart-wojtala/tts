@@ -14,7 +14,7 @@ import torch
 from train import load_model
 
 
-class AudioGenerator:
+class AudioGeneratorTacotron:
     models_22khz = {
         "biggie:": "biggie_52272",
         "carlson:": "tuck2",
