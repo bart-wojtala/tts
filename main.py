@@ -4,7 +4,7 @@ from PyQt5 import Qt
 from PyQt5 import QtCore
 from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool
 from PyQt5.QtWidgets import QMainWindow
-from socket_client import LocalClient, StreamlabsClient
+from socket_client import LocalClient, StreamElementsClient, StreamlabsClient
 from ui_layout import Ui_MainWindow
 import time
 import pygame
@@ -61,15 +61,19 @@ class GUISignals(QObject):
 
 
 class GUI(QMainWindow, Ui_MainWindow):
-    def __init__(self, app, streamlabs_token=""):
+    def __init__(self, app, client="", token=""):
         super(GUI, self).__init__()
         self.messages_to_play = []
         self.database_client = DatabaseClient()
         self.local_socket_client = LocalClient(self.database_client)
-        self.streamlabs_socket_client = None
-        if streamlabs_token:
-            self.streamlabs_socket_client = StreamlabsClient(
-                self.database_client, streamlabs_token)
+        self.socket_client = None
+        if token:
+            if client == 'Streamlabs':
+                self.socket_client = StreamlabsClient(
+                    self.database_client, token)
+            if client == 'StreamElements':
+                self.socket_client = StreamElementsClient(
+                    self.database_client, token)
         self.app = app
         self.setupUi(self)
         self.setWindowTitle("bart3s tts")
@@ -143,8 +147,8 @@ class GUI(QMainWindow, Ui_MainWindow):
             event.ignore()
         else:
             self.local_socket_client.disconnect()
-            if self.streamlabs_socket_client:
-                self.streamlabs_socket_client.disconnect()
+            if self.socket_client:
+                self.socket_client.disconnect()
             event.accept()
 
     def start(self):
@@ -284,9 +288,9 @@ class GUI(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     config = ConfigParser()
     config.read("config.ini")
-    token = config["Streamlabs"]["token"]
+    token = config["StreamElements"]["token"]
     app = Qt.QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet())
-    window = GUI(app, token)
+    window = GUI(app, 'StreamElements', token)
     window.show()
     sys.exit(app.exec_())
