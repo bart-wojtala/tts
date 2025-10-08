@@ -6,11 +6,12 @@ class VoiceMessage:
 
 
 class Message:
-    def __init__(self, messageId, name, text, event_type=None):
+    def __init__(self, messageId, name, text, speaker=None, event_type=None):
         self.messageId = messageId
         self.name = name
         self.text = text
         self.event_type = event_type
+        self.speaker = speaker
 
 
 class GeneratedAudio:
