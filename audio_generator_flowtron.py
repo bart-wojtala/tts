@@ -10,7 +10,7 @@ import json
 
 class AudioGeneratorFlowtron:
     models = {
-        'flowtron': 'flowtron_model.pt',
+        'flowtron': 'bart3s_model_200000.pt',
     }
 
     waveglow = {
@@ -24,7 +24,7 @@ class AudioGeneratorFlowtron:
         with open(self.config_path) as f:
             data = f.read()
         self.config = json.loads(data)
-        self.config['model_config']['n_speakers'] = 41
+        self.config['model_config']['n_speakers'] = 57
         self.lambd = 0.001
         self.sigma = 0.85
         self.waveglow_sigma = 1
